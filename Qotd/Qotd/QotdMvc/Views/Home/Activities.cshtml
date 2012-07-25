@@ -1,0 +1,6 @@
+﻿@foreach (var activity in ViewBag.Activities)
+{
+    <div class="ajax-container">
+    @Html.Partial("Activity", (Qotd.PresentationObjects.ActivityPO)activity)
+    </div>
+}

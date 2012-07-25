@@ -1,0 +1,34 @@
+﻿@model Qotd.PresentationObjects.ActivityPO
+<div style="border-bottom: 1px solid #dddddd; overflow: hidden; margin: 8px;">
+    <!-- Side bar of post -->
+    <div style="width: 30px; float: left; text-align: center; margin-right: 8px">
+        <!-- Profile image -->
+        <div style="float: left; clear: both; width: 30px; margin-bottom: 8px">
+            <img src="@Model.UserProfileImageUrl" alt="profile picture" style="width: 25px; height: 25px"/>
+        </div>
+    </div>
+    <!-- Main section of post -->
+    <div style="overflow: hidden;">
+        <!-- Content -->
+        <div style="overflow: hidden; margin-bottom: 8px; font-size: 9px;">
+            <span style="font-weight: bold;"><a href="#">@Model.UserDisplayName</a></span>
+            @{
+                switch (Model.Activity.ActivityType)
+                {
+                    case Qotd.Entities.ActivityType.PostComment:
+                        <text><span>&nbsp;posted a comment <i class="icon-comment"></i>&nbsp;- &quot</span><span>@Model.Activity.Text</span><span>&quot</span>
+                        </text>
+                        break;
+                    case Qotd.Entities.ActivityType.PostAnswer:
+                        <text>&nbsp;posted an answer
+                        </text>
+                        break;
+                }
+            }
+        </div> 
+        <!-- Footer -->
+        <div style="overflow: hidden; margin-bottom: 8px; font-size: 9px;">
+            <i class="icon-time"></i>&nbsp;About a minute ago
+        </div>
+    </div>
+</div>

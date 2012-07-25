@@ -1,0 +1,91 @@
+﻿@model Qotd.PresentationObjects.AnswerPO
+<div style="border-bottom: 1px solid #dddddd; overflow: hidden; margin: 8px;">
+    <!-- Side bar of post -->
+    <div style="width: 60px; float: left; text-align: center; margin-right: 8px">
+        <!-- Profile image -->
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <img src="@Model.UserProfileImageUrl" alt="profile picture"/>
+        </div>
+        <!-- Up arrow -->
+        @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
+        {
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <a href="@Url.Action("VoteUp", "Home", new { answerId = Model.Answer.Id })" class="ajax-link"><i class="icon-caret-up" style="font-size: 22px;"></i></a>
+        </div>
+        }
+        else
+        {
+            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+                <i class="icon-caret-up" style="font-size: 22px; color: #dddddd;"></i>
+            </div>
+        }
+        <!-- Votes -->
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <span style="font-size: 22px">@Model.Answer.VotesTotal</span>
+        </div>
+        <!-- Down arrow -->
+        @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
+        {
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <a href="@Url.Action("VoteDown", "Home", new { answerId = Model.Answer.Id })" class="ajax-link"><i class="icon-caret-down" style="font-size: 22px;"></i></a>
+        </div>
+        }
+        else
+        {
+            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+                <i class="icon-caret-down" style="font-size: 22px; color: #dddddd;"></i>
+            </div>
+        }
+    </div>
+    <!-- Main section of post -->
+    <div style="overflow: hidden;">
+        <!-- Header -->
+        <div style="overflow: hidden;">
+            <span style="font-weight: bold">@Model.Answer.Title</span>
+            <span>by</span>
+            <span style="font-weight: bold;"><a href="#">@Model.UserDisplayName</a></span>
+        </div> 
+        <!-- Content -->
+        <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">@Html.Raw(Model.Answer.Content)</div>
+        <!-- Controls footer -->
+        <div style="float: left; overflow: hidden; clear: left; margin-top: 8px; font-size: 11px; margin-bottom: 8px;">
+            @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+            {
+                 <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-pencil"></i>&nbsp;Comment</a></div>
+            }
+            <div style="float: left; margin-right: 16px;"><i class="icon-time"></i>&nbsp;Posted about a minute ago</div>
+        </div>
+        <!-- Comments footer -->
+        <div class="ajax-container">
+        @if (Model.Comments != null && Model.Answer.NumComments > Model.Comments.Length)
+        {
+            <!-- Num comments -->
+            <div style="overflow: hidden; clear: left; font-size: 10px; background-color: #eeeeee; padding: 4px 4px;">
+                <a href="@Url.Action("Comments", "Home", new { answerId = Model.Answer.Id })" class="ajax-link"><i class="icon-edit"></i>&nbsp;View all @Model.Answer.NumComments comments...</a>
+            </div>
+        }
+        @if (Model.Comments != null)
+        {
+            foreach (var comment in Model.Comments)
+            {
+                <div class="ajax-container">
+                    @Html.Partial("Comment", (Qotd.PresentationObjects.CommentPO)comment)
+                </div>
+            }
+        }
+        </div>
+        <!-- Comment input footer -->
+        <div style="overflow: hidden; clear: left; margin-top: 1px; margin-bottom: 8px; font-size: 10px; background-color: #eeeeee; padding: 4px 4px;">
+            <div style="float: left;">
+                <img src="@Model.UserProfileImageUrl" style="width: 25px; height: 25px; margin-right: 4px;"/>
+            </div>
+            <div style="overflow: hidden;">
+                <form class="ajax-form" action="@Url.Action("CommentSubmit", "Home", new { answerId = Model.Answer.Id })" method="get">
+                    <input type="text" style="overflow: hidden; margin-bottom: 0px" class="comment-input" name="content"/>
+                    <input type="submit" class="btn btn-mini btn-primary ajax-submit" style="display: none" value="Submit"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

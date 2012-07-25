@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@ViewBag.Title</title>
+    <!-- <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />-->
+    <link href="@Url.Content("~/Content/bootstrap/css/bootstrap.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/bootstrap/css/bootstrap-responsive.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/redactor/css/redactor.css")" rel="Stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/fontawesome/css/font-awesome.css")" rel="Stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-1.7.2.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Content/bootstrap/js/bootstrap.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Content/redactor/redactor.js")" type="text/javascript"></script>
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+</head>
+
+<body>
+<!-- Top Bar -->
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="#">
+                Question of the Day
+            </a>
+            <ul class="nav"><li class="divider-vertical"></li></ul>
+            <ul class="nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="icon-envelope" style="font-size: 22px; position: relative; top: 3px;"></i>
+                    </a>
+                    <ul class="dropdown-menu"></ul>
+                </li>
+            </ul>
+            <ul class="nav"><li class="divider-vertical"></li></ul>
+            <div class="btn-group pull-right">
+                <!-- if signed in -->
+                @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+                {
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                      <i class="icon-user"></i>&nbsp;@ViewBag.User.DisplayName
+                      <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a href="#">Account</a></li>
+                      <li class="divider"></li>
+                      <li><a href="@Url.Action("Signout", "Account")">Sign out</a></li>
+   
+                    </ul>
+                }
+                else
+                {
+                <!-- if not signed in -->
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                      <i class="icon-user"></i> Sign in
+                      <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a href="@Url.Action("FacebookSignin", "Account")">with Facebook</a></li>
+                      <li><a href="@Url.Action("GoogleSignin", "Account")">with Google</a></li>
+                      <li><a href="#">with Twitter</a></li>
+                      <li class="divider"></li>
+                      <li><a href="#">More Options...</a></li>
+                      <li class="divider"></li>
+                      <li><a href="#">Register</a></li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+    @RenderBody()
+</div>
+</body>
+</html>

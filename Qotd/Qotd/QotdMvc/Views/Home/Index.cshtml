@@ -1,0 +1,182 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    $(document).ready(
+	function () {
+	    $('#answerContent').redactor({
+            buttons: [ 'bold', 'italic', 'unorderedlist', 'orderedlist', '|', 'alignleft', 'aligncenter', '|', 'link', '|', 'fullscreen' ]
+        });
+
+	    $('#answerSubmit').click(
+            function () {
+                $.post("@Url.Action("AnswerSubmit")", $("#answerForm").serialize(), function(data)
+                {
+                    if (data.error)
+                        alert(data.error);
+
+                    $('a[href*="#tab1"]').click();
+                    $.get('@Url.Action("Answer", "Home")' + '?answerId=' + data.answerId, function(data2)
+                    {
+                        $('#new-answer').html(data2);
+                    });
+                }, "json");
+
+                
+            });
+
+        $('.ajax-link').live("click",
+            function(event)
+            {
+                event.preventDefault();
+                var elem = this;
+                $.get($(this).attr("href"), function(data)
+                {
+                    $(elem).closest('.ajax-container').html(data);
+                });
+                return false;
+            });
+
+        $('.ajax-tab').live("click",
+            function(event)
+            {
+                var tab = $($(this).attr("href"));
+                $.get($(this).attr("rel"), function(data)
+                {
+                    $(tab).html(data);
+                });
+                return true;
+            });
+
+        $('.comment-input').live('click',
+            function(event)
+            {
+                $(this).next().show();
+                return false;
+            });
+
+//        $('.comment-input').live('focusout',
+//        function(event)
+//        {
+//            $(this).next().hide();
+//            return false;
+//        });
+
+        $('.ajax-form').live('submit',
+        function(event)
+        {
+            event.preventDefault();
+            var elem = this;
+            $.get($(this).attr("action"), $(this).serialize(), function(data)
+            {
+                $(elem).closest('.ajax-container').html(data);
+            });
+            return false;
+        });
+	}
+);
+</script>
+<style>
+    .modal {width:940px;left:36%;}
+    
+    .ajax-container { padding: 0px 0px; margin: 0px 0px }
+</style>
+<!-- Answer Modal -->
+<div class="modal hide fade" id="answerModal">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Write your answer...</h3>
+  </div>
+  <form class="well" action="/" id="answerForm">
+  <div class="modal-body">
+        <label>Title:</label>
+        <input type="text" class="span3" placeholder="Answer title..." name="title" />
+        <label>Content:</label>
+        <textarea id="answerContent" rows="12" cols="100" style="height: 210px" name="content"></textarea>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
+    <a href="#" class="btn btn-primary" id="answerSubmit" data-dismiss="modal">Submit</a>
+  </div>
+  </form>
+</div>
+<!-- Question Modal -->
+<div class="modal hide fade" id="questionModal">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Write your question for tomorrow...</h3>
+    </div>
+    <form class="well" action="@Url.Action("QuestionSubmit", "Home")" id="answerForm">
+    <div class="modal-body">
+    
+        <label>Question (Main Text):</label>
+        <input type="text" class="span3" placeholder="Main Text..." name="title" size="80" />
+        <label>Question (Sub Text):</label>
+        <input type="text" class="span3" placeholder="Sub Text..." name="title" size="80" />
+    
+    </div>
+    <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
+    <a href="#" class="btn btn-primary" id="answerSubmit">Submit</a>
+    </div>
+    </form>
+</div>
+<!-- Page -->
+<div class="container">
+    <div class="hero-unit">
+        <h1>@ViewBag.Question.MainText</h1>
+        <p>@ViewBag.Question.SubText</p>
+         @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+         {
+             if (ViewBag.Question.QuestionType == Qotd.Entities.QuestionType.Debate)
+             {
+                <a href="" class="btn btn-danger" style="width: 75px"><i class="icon-thumbs-down icon-white" style="font-size: 18px; padding-right: 10px; position: relative; top:0px"></i>Disagree</a>
+                <a href="" class="btn btn-success" style="width: 75px"><i class="icon-thumbs-up icon-white" style="font-size: 18px; padding-right: 10px; position: relative; top:3px"></i>&nbsp;Agree</a>
+             }
+             <a href="#questionModal" class="btn btn-warning pull-right" style="width:155px" data-toggle="modal"><i class="icon-question-sign icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Pose a Question&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i></a> 
+             <a href="#answerModal" class="@QotdMvc.DisplayHelper.AnswerButtonClass(ViewBag.Question.QuestionType, ViewBag.HasPickedSide)" data-toggle="modal" style="margin-right: 8px; width: 155px"><i class="icon-edit icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Submit an Answer&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i></a>
+         }
+    </div>
+    <div class="row">
+        <div class="span9">
+            <div class="tabbable tabs-left">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#tab1" data-toggle="tab"><i class="icon-comments" style="font-size: 15px; color: Red; padding-right: 10px"></i><b>Answers</b></a>
+                            </li>
+                            <li>
+                                <a href="#tab2" data-toggle="tab"><i class="icon-question-sign" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Questions</b></a>
+                            </li>
+                            <li>
+                                <a href="#tab3" data-toggle="tab" class="ajax-tab"><i class="icon-leaf" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Activities</b></a>
+                            </li>
+                            <li>
+                                <a href="#tab4" data-toggle="tab"><i class="icon-trophy" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Leaderboard</b></a>
+                            </li>
+                            <li>
+                                <a href="#tab5" data-toggle="tab"><i class="icon-globe" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>History</b></a>
+                            </li>
+                        </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab1">
+                            @Html.Action("AnswersTab", "Home")
+                        </div>
+                        <div class="tab-pane" id="tab2">
+                        
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="span3">
+            <div style="border-left: 1px solid #dddddd; padding-left: 12px;">
+                <div style="padding: 12px 12px">
+                    <span><h3><i class="icon-leaf"></i>&nbsp;&nbsp;Recent Activities</h3></span>
+                </div>
+                <div>
+                    @Html.Action("Activities", "Home")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

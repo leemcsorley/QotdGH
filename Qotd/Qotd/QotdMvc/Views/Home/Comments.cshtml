@@ -1,0 +1,9 @@
+﻿@if (ViewBag.Comments != null)
+{
+    foreach (var comment in ViewBag.Comments)
+    {
+        <div class="ajax-container">
+            @Html.Partial("Comment", (Qotd.PresentationObjects.CommentPO)comment)
+        </div>
+    }
+}
