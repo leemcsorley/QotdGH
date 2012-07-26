@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using System.Web.Services;
 using Qotd.Entities;
+using Qotd.PresentationObjects;
 
 namespace QotdMvc.Controllers
 {
@@ -39,6 +40,42 @@ namespace QotdMvc.Controllers
         public ActionResult Answer(Guid answerId)
         {
             return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
+        }
+
+        public ActionResult QuestionsLatest(int skip = 0, int take = DEFAULT_TAKE)
+        {
+            if (UserEntity != null)
+                ViewBag.Questions = DataProvider.GetQuestionsLatest(UserEntity.Id, skip, take);
+            else
+                ViewBag.Questions = DataProvider.GetQuestionsLatest(skip, take);
+            ViewBag.Skip = take;
+            ViewBag.Take = DEFAULT_TAKE;
+            ViewBag.Action = "QuestionsLatest";
+            return View("Questions");
+        }
+
+        public ActionResult QuestionsRated(int skip = 0, int take = DEFAULT_TAKE)
+        {
+            if (UserEntity != null)
+                ViewBag.Questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take);
+            else
+                ViewBag.Questions = DataProvider.GetQuestionsRated(skip, take);
+            ViewBag.Skip = take;
+            ViewBag.Take = DEFAULT_TAKE;
+            ViewBag.Action = "QuestionsRated";
+            return View("Questions");
+        }
+
+        public ActionResult QuestionsTab(int skip = 0, int take = DEFAULT_TAKE)
+        {
+            if (UserEntity != null)
+                ViewBag.Questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take);
+            else
+                ViewBag.Questions = DataProvider.GetQuestionsRated(skip, take);
+            ViewBag.Skip = take;
+            ViewBag.Take = DEFAULT_TAKE;
+            ViewBag.Action = "QuestionsRated";
+            return View("QuestionsTab");
         }
 
         public ActionResult AnswersLatest(int skip = 0, int take = DEFAULT_TAKE)
@@ -116,6 +153,35 @@ namespace QotdMvc.Controllers
                 // save
                 QotdService.SaveNewComment(comment);
                 return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
+            }
+            catch (Exception ex)
+            {
+                return JsonError(ex.Message);
+            }
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult QuestionSubmit(string main, string sub, string details)
+        {
+            try
+            {
+                DateTime now = DateTime.Now;
+
+                // create the question
+                Question question = new Question()
+                {
+                    CreatedOn = now,
+                    DateFor = now.AddDays(1).Date,
+                    MainText = main,
+                    SubText = sub,
+                    Details = details,
+                    QuestionType = QuestionType.Open,
+                    User = UserEntity
+                };
+
+                QotdService.SaveNewQuestion(question);
+
+                return Json(new { questionId = question.Id });
             }
             catch (Exception ex)
             {

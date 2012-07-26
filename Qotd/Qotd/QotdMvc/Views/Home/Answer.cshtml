@@ -53,7 +53,11 @@
             {
                  <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-pencil"></i>&nbsp;Comment</a></div>
             }
-            <div style="float: left; margin-right: 16px;"><i class="icon-time"></i>&nbsp;Posted about a minute ago</div>
+            <div style="float: left; margin-right: 16px;"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Answer.CreatedOn.ToString("s")"></time></div>
+            @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+            {
+                 <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
+            }
         </div>
         <!-- Comments footer -->
         <div class="ajax-container">

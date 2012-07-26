@@ -37,9 +37,13 @@ namespace Qotd.Data
 
         AnswerPO[] GetAnswersRated(Guid questionId, int skip, int take);
 
-        QuestionPO[] GetQuestionsLatest(Guid userId, Guid questionId, int skip, int take);
+        QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take);
 
-        QuestionPO[] GetQuestionsRated(Guid userId, Guid questionId, int skip, int take);
+        QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take);
+
+        QuestionPO[] GetQuestionsLatest(int skip, int take);
+
+        QuestionPO[] GetQuestionsRated(int skip, int take);
 
         Answer GetAnswerById(Guid answerId);
 

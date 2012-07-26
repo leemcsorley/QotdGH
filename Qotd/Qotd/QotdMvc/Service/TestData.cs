@@ -29,9 +29,14 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
         private static readonly Random RND = new Random(
             Environment.TickCount);
 
+        private const int NUM_DAYS = 4;
+        private const int NUM_QUESTIONS = 30;
+        private const int NUM_ANSWERS = 30;
+        private const int NUM_COMMENTS = 10;
+
         private static string GenText(int words)
         {
-            int w = RND.Next(0, words);
+            int w = RND.Next(words / 2, words);
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < w; i++)
@@ -44,6 +49,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
 
         public static void Create(QotdContext dp)
         {
+            double perc = 0.0;
             string imgpath = ConfigurationManager.AppSettings["UploadImagesUrl"];
             using (IQotdService service = new QotdService(dp))
             {
@@ -75,11 +81,11 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                     users.Add(user);
                 }
                 DateTime now = DateTime.Now.Date;
-                for (DateTime date = now.AddDays(-20); date <= now; date = date.AddDays(1))
+                for (DateTime date = now.AddDays(-NUM_DAYS); date <= now.AddDays(1); date = date.AddDays(1))
                 {
                     // questions
                     List<Question> questions = new List<Question>();
-                    for (int i = 0; i < 30; i++)
+                    for (int i = 0; i < NUM_QUESTIONS; i++)
                     {
                         int minutes = RND.Next(0, 60 * 24);
                         User user = users[RND.Next(0, users.Count)];
@@ -103,28 +109,54 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                                 dp.VoteQuestion(q.Id, users[j].Id, -1);
                         }
                     }
-                    // pick winner
-                    dp.PickWinningQuestion(date);
-                    // transition to winning question
-                    dp.TransitionToWinningQuestion(date);
-                    // get todays question
-                    var tq = dp.GetTodaysQuestion();
-                    // create answers
-                    for (int i = 0; i < 50; i++)
+                    if (date <= now)
                     {
-                        User u = users[RND.Next(0, users.Count)];
-                        Answer answer = new Answer()
+                        // pick winner
+                        dp.PickWinningQuestion(date);
+                        // transition to winning question
+                        dp.TransitionToWinningQuestion(date);
+                        // get todays question
+                        var tq = dp.GetTodaysQuestion();
+                        // create answers
+                        for (int i = 0; i < NUM_ANSWERS; i++)
                         {
-                            CreatedOn = date.AddMinutes(-RND.Next(0, 60 * 24)),
-                            User = u,
-                            NumComments = 0,
-                            Question = tq,
-                            Title = GenText(5),
-                            Content = GenText(RND.Next(0, 300))
-                        };
-                        service.SaveNewAnswer(answer);
+                            User u = users[RND.Next(0, users.Count)];
+                            Answer answer = new Answer()
+                            {
+                                CreatedOn = date.AddMinutes(-RND.Next(0, 60 * 24)),
+                                User = u,
+                                NumComments = 0,
+                                Question = tq,
+                                Title = GenText(5),
+                                Content = GenText(RND.Next(0, 300))
+                            };
+                            service.SaveNewAnswer(answer);
+                            int numVotes = RND.Next(0, users.Count);
+                            for (int j = 0; j < numVotes; j++)
+                            {
+                                if (RND.Next(0, 2) == 0)
+                                    dp.VoteAnswer(answer.Id, users[j].Id, 1);
+                                else
+                                    dp.VoteAnswer(answer.Id, users[j].Id, -1);
+                            }
 
-
+                            // comments
+                            for (int j = 0; j < RND.Next(0, NUM_COMMENTS); j++)
+                            {
+                                u = users[RND.Next(0, users.Count)];
+                                Comment comment = new Comment()
+                                {
+                                    AnswerId = answer.Id,
+                                    Content = GenText(30),
+                                    User = u,
+                                    CreatedOn = answer.CreatedOn.AddMinutes(RND.Next(0, 120)),
+                                    NumLikes = 0
+                                };
+                                perc += 100.0 / (double)(NUM_ANSWERS * NUM_COMMENTS * NUM_DAYS);
+                                service.SaveNewComment(comment);
+                                Console.WriteLine(perc + "%");
+                            }
+                        }
                     }
                 }
 

@@ -1,0 +1,61 @@
+﻿@model Qotd.PresentationObjects.QuestionPO
+<div style="border-bottom: 1px solid #dddddd; overflow: hidden; margin: 8px;">
+    <!-- Side bar of post -->
+    <div style="width: 60px; float: left; text-align: center; margin-right: 8px">
+        <!-- Profile image -->
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <img src="@Model.UserProfileImageUrl" alt="profile picture"/>
+        </div>
+        <!-- Up arrow -->
+        @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
+        {
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <a href="@Url.Action("VoteUpQuestion", "Home", new { answerId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-up" style="font-size: 22px;"></i></a>
+        </div>
+        }
+        else
+        {
+            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+                <i class="icon-caret-up" style="font-size: 22px; color: #dddddd;"></i>
+            </div>
+        }
+        <!-- Votes -->
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <span style="font-size: 22px">@Model.Question.VotesTotal</span>
+        </div>
+        <!-- Down arrow -->
+        @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
+        {
+        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+            <a href="@Url.Action("VoteDownQuestion", "Home", new { answerId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-down" style="font-size: 22px;"></i></a>
+        </div>
+        }
+        else
+        {
+            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+                <i class="icon-caret-down" style="font-size: 22px; color: #dddddd;"></i>
+            </div>
+        }
+    </div>
+    <!-- Main section of post -->
+    <div style="overflow: hidden;">
+        <!-- Header -->
+        <div style="overflow: hidden;">
+            <span style="font-weight: bold"><a href="#">@Model.UserDisplayName</a></span>
+            <span>asks:</span>
+        </div> 
+        <!-- Content -->
+        <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">
+            <div><b>@Model.Question.MainText</b></div>
+            <div>@Model.Question.SubText</div>
+        </div>
+        <!-- Controls footer -->
+        <div style="float: left; overflow: hidden; clear: left; margin-top: 8px; font-size: 11px; margin-bottom: 8px;">
+            <div style="float: left; margin-right: 16px;"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Question.CreatedOn.ToString("s")"></time></div>
+            @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+            {
+                 <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
+            }
+        </div>
+    </div>
+</div>

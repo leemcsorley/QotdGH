@@ -1,0 +1,18 @@
+﻿<div class="tabbable">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href="#rated" data-toggle="tab" class="ajax-tab" rel="@Url.Action("QuestionRated", "Home")">Most Rated</a>
+        </li>
+        <li>
+            <a href="#recent" data-toggle="tab" class="ajax-tab" rel="@Url.Action("QuestionsLatest", "Home")">Most Recent</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="rated">
+            @Html.Action("QuestionsRated", "Home")
+        </div>
+        <div class="tab-pane" id="recent">
+                                        
+        </div>
+    </div>
+</div>

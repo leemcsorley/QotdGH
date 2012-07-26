@@ -64,19 +64,59 @@ namespace Qotd.Data
             return UserQuestionSides.Any(u => u.UserId == userId && u.QuestionId == questionId);
         }
 
-        public QuestionPO[] GetQuestionsLatest(Guid userId, Guid questionId, int skip, int take)
+        public QuestionPO[] GetQuestionsLatest(int skip, int take)
         {
-            throw new NotImplementedException();
+            DateTime date = DateTime.Now.AddDays(1).Date;
+            return GetQuestions(Questions.Where(q => q.DateFor == date)
+                .OrderByDescending(q => q.CreatedOn)
+                .Skip(skip).Take(take), null);
         }
 
-        public QuestionPO[] GetQuestionsRated(Guid userId, Guid questionId, int skip, int take)
+        public QuestionPO[] GetQuestionsRated(int skip, int take)
         {
-            throw new NotImplementedException();
+            DateTime date = DateTime.Now.AddDays(1).Date;
+            return GetQuestions(Questions.Where(q => q.DateFor == date)
+                .OrderByDescending(q => q.VotesTotal).ThenByDescending(q => q.CreatedOn)
+                .Skip(skip).Take(take), null);
         }
 
-        private QuestionPO[] GetQuestions(IQueryable<Question> questions, Guid userId)
+        public QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take)
         {
-            throw new System.NotImplementedException();
+            DateTime date = DateTime.Now.AddDays(1).Date;
+            return GetQuestions(Questions.Where(q => q.DateFor == date)
+                .OrderByDescending(q => q.CreatedOn)
+                .Skip(skip).Take(take), userId);
+        }
+
+        public QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take)
+        {
+            DateTime date = DateTime.Now.AddDays(1).Date;
+            return GetQuestions(Questions.Where(q => q.DateFor == date)
+                .OrderByDescending(q => q.VotesTotal).ThenByDescending(q => q.CreatedOn)
+                .Skip(skip).Take(take), userId);
+        }
+
+        private QuestionPO[] GetQuestions(IQueryable<Question> questions, Guid? userId)
+        {
+            var qs = questions.ToArray();
+
+            var qids = qs.Select(q => q.Id).ToArray();
+
+            var uvqs = userId.HasValue ? UserVoteQuestions.Where(u => u.UserId == userId && qids.Contains(u.QuestionId)).ToArray()
+                .ToDictionary(q => q.QuestionId, q => q) : null;
+
+            var pqs = new QuestionPO[qs.Length];
+            for (int i = 0; i < qs.Length; i++)
+            {
+                pqs[i] = new QuestionPO()
+                {
+                    Question = qs[i],
+                    HasUserVoted = uvqs != null ? uvqs.ContainsKey(qs[i].Id) : false,
+                    UserDisplayName = qs[i].denorm_User_DisplayName,
+                    UserProfileImageUrl = qs[i].denorm_User_ProfileImageUrl
+                };
+            }
+            return pqs;
         }
 
         private AnswerPO[] GetAnswers(IQueryable<Answer> answers, Guid? userId)
@@ -275,6 +315,8 @@ namespace Qotd.Data
             modelBuilder.Entity<Comment>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<Activity>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<Notification>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+
+            modelBuilder.Entity<User>().Ignore(u => u.ActionEntriesThisPeriod);
 
             modelBuilder.Entity<UserLikeComment>().HasKey(t => new { t.UserId, t.CommentId });
             modelBuilder.Entity<UserVoteAnswer>().HasKey(t => new { t.UserId, t.AnswerId });

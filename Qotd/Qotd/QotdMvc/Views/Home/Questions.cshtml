@@ -1,0 +1,13 @@
+﻿<div id="new-question"></div>
+@foreach (var question in ViewBag.Questions)
+{
+    <div class="ajax-container">
+    @Html.Partial("Question", (Qotd.PresentationObjects.QuestionPO)question)
+    </div>
+}
+<div class="ajax-container">
+    <div style="overflow: hidden">
+        <a href="@Url.Action(ViewBag.Action, "Home", new { skip = ViewBag.Skip, take = ViewBag.Take })" class="ajax-link"><button class="btn btn-small btn-primary" type="submit">
+            <i class="icon-chevron-down"></i>&nbsp;&nbsp;See More</button></a>
+    </div>
+</div>

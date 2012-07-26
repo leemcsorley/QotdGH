@@ -12,7 +12,7 @@
                 <div style="float: left; margin-right: 8px;"><a href="#">Like</a></div>
             }
             <div style="float: left; margin-right: 8px;">&bull;</div>
-            <div style="float: left;">@Model.Comment.CreatedOn</div>
+            <div style="float: left;"><time class="timeago" datetime="@Model.Comment.CreatedOn.ToString("s")"></time></div>
         </div>
     </div>
 </div>

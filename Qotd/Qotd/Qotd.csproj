@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +50,7 @@
     <Compile Include="Data\Denormaliser.cs" />
     <Compile Include="Data\IDataProvider.cs" />
     <Compile Include="Data\QotdContext.cs" />
+    <Compile Include="Data\Serializer.cs" />
     <Compile Include="Entities\Activity.cs" />
     <Compile Include="Entities\Answer.cs" />
     <Compile Include="Entities\Comment.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="PresentationObjects\CommentPO.cs" />
     <Compile Include="PresentationObjects\QuestionPO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Config.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="WorkerImpl\WorkerUtils.cs" />
   </ItemGroup>
