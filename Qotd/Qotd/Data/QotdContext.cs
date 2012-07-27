@@ -263,9 +263,9 @@ update cte
 
         public LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take)
         {
-            var us = Users.OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
+            var us = Users.Where(u => u.OverallRankThisPeriod > 0).OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
 
-            LeaderboardRowPO[] top = us.Select(u => new LeaderboardRowPO() { User = u }).ToArray();
+            LeaderboardRowPO[] top = us.Select(UsertoLeaderboardThisPeriodFunc).ToArray();
             LeaderboardRowPO[] aroundUser = null;
             if (!us.Any(u => u.Id == userId))
             {
@@ -273,51 +273,17 @@ update cte
 
                 aroundUser = Users.Where(u => u.OverallRankThisPeriod > (ur - 3) && u.OverallRankThisPeriod < (ur + 3))
                     .ToArray()
-                    .Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRankThisPeriod, Score = u.ScoreThisPeriod,
-                                                          A1 = u.NumAnswersWonThisPeriod,
-                                                          A2 = u.NumAnswersSecondThisPeriod,
-                                                          A3 = u.NumAnswersThirdThisPeriod,
-                                                          Ac = u.NumAnswersThisPeriod,
-                                                          Qc = u.NumQuestionsThisPeriod,
-                                                          Q1 = u.NumQuestionsWonThisPeriod,
-                                                          Qv = u.TotalQuestionVotesThisPeriod,
-                                                          Av = u.TotalAnswerVotesThisPeriod
-                    }).ToArray();
+                    .Select(UsertoLeaderboardThisPeriodFunc).ToArray();
             }
             return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
         }
 
-        public LeaderboardPO GetLeaderboard(Guid userId, int skip, int take)
-        {
-            var us = Users.OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
-
-            LeaderboardRowPO[] top = us.Select(u => new LeaderboardRowPO() { User = u }).ToArray();
-            LeaderboardRowPO[] aroundUser = null;
-            if (!us.Any(u => u.Id == userId))
+        private Func<User, LeaderboardRowPO> UserToLeaderboardFunc =
+            u => new LeaderboardRowPO()
             {
-                int ur = Users.Where(u => u.Id == userId).Select(u => u.OverallRank).Single();
-
-                aroundUser = Users.Where(u => u.OverallRank > (ur - 3) && u.OverallRank < (ur + 3))
-                    .ToArray()
-                    .Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRank, Score = u.Score,
-                                                          A1 = u.NumAnswersWon,
-                                                          A2 = u.NumAnswersSecond,
-                                                          A3 = u.NumAnswersThird,
-                                                          Ac = u.NumAnswers,
-                                                          Qc = u.NumQuestions,
-                                                          Q1 = u.NumQuestionsWon,
-                                                          Qv = u.TotalQuestionVotes,
-                                                          Av = u.TotalAnswerVotes
-                    }).ToArray();
-            }
-            return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
-        }
-
-        public LeaderboardPO GetLeaderboard(int skip, int take)
-        {
-            var us = Users.OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
-
-            return new LeaderboardPO() { Top = us.Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRank, Score = u.Score,
+                User = u,
+                Rank = u.OverallRank,
+                Score = u.Score,
                 A1 = u.NumAnswersWon,
                 A2 = u.NumAnswersSecond,
                 A3 = u.NumAnswersThird,
@@ -326,23 +292,54 @@ update cte
                 Q1 = u.NumQuestionsWon,
                 Qv = u.TotalQuestionVotes,
                 Av = u.TotalAnswerVotes
-            }).ToArray() };
+            };
+        private Func<User, LeaderboardRowPO> UsertoLeaderboardThisPeriodFunc =
+            u => new LeaderboardRowPO()
+            {
+                User = u,
+                Rank = u.OverallRankThisPeriod,
+                Score = u.ScoreThisPeriod,
+                A1 = u.NumAnswersWonThisPeriod,
+                A2 = u.NumAnswersSecondThisPeriod,
+                A3 = u.NumAnswersThirdThisPeriod,
+                Ac = u.NumAnswersThisPeriod,
+                Qc = u.NumQuestionsThisPeriod,
+                Q1 = u.NumQuestionsWonThisPeriod,
+                Qv = u.TotalQuestionVotesThisPeriod,
+                Av = u.TotalAnswerVotesThisPeriod
+            };
+
+        public LeaderboardPO GetLeaderboard(Guid userId, int skip, int take)
+        {
+            var us = Users.Where(u => u.OverallRank > 0).OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
+
+            LeaderboardRowPO[] top = us.Select(UserToLeaderboardFunc).ToArray();
+            LeaderboardRowPO[] aroundUser = null;
+            if (!us.Any(u => u.Id == userId))
+            {
+                int ur = Users.Where(u => u.Id == userId).Select(u => u.OverallRank).Single();
+
+                aroundUser = Users.Where(u => u.OverallRank > (ur - 3) && u.OverallRank < (ur + 3))
+                    .ToArray()
+                    .Select(UserToLeaderboardFunc).ToArray();
+            }
+            return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
+        }
+
+        public LeaderboardPO GetLeaderboard(int skip, int take)
+        {
+            var us = Users.Where(u => u.OverallRank > 0).OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
+
+            return new LeaderboardPO() { Top = us.Select(UserToLeaderboardFunc).ToArray() };
         }
 
         public LeaderboardPO GetLeaderboardThisPeriod(int skip, int take)
         {
-            var us = Users.OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
+            var us = Users.Where(u => u.OverallRankThisPeriod > 0).OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
 
-            return new LeaderboardPO() { Top = us.Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRankThisPeriod, Score = u.ScoreThisPeriod,
-                                                                                       A1 = u.NumAnswersWonThisPeriod,
-                                                                                       A2 = u.NumAnswersSecondThisPeriod,
-                                                                                       A3 = u.NumAnswersThirdThisPeriod,
-                                                                                       Ac = u.NumAnswersThisPeriod,
-                                                                                       Qc = u.NumQuestionsThisPeriod,
-                                                                                       Q1 = u.NumQuestionsWonThisPeriod,
-                                                                                       Qv = u.TotalQuestionVotesThisPeriod,
-                                                                                       Av = u.TotalAnswerVotesThisPeriod
-            }).ToArray()
+            return new LeaderboardPO()
+            {
+                Top = us.Select(UsertoLeaderboardThisPeriodFunc).ToArray()
             };
         }
 

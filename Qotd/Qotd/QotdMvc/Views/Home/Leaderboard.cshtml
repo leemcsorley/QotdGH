@@ -21,14 +21,42 @@
     	border-bottom: 1px solid #dddddd;
     }
     
-    th, td .slim-col
+    .score-col
     {
-    	width: 32px
+    	color: White;
+    }
+    
+    th.score-col
+    {
+    	background-color: #333333;
+    }
+    
+    td.score-col
+    {   
+    	background-color: #666666;
+    	font-size: 1.4em;
+    	border-bottom: 1px solid #333333;
+    }
+    
+    td.score-col.oddrow
+    {
+    	background-color: #555555;
+    	
+    }
+    
+    th.slim-col
+    {
+    	width: 22px
     }
     
     td.number
     {
     	text-align: right;
+    }
+    
+    tr.oddrow
+    {
+    	background-color: #efefff;
     }
     
     .gold { color: #8B8B00 }
@@ -43,14 +71,23 @@
             <th class="slim-col"></th>
             <th class="slim-col">Rank</th>
             <th colspan="2">User</th>
-            <th class="slim-col">AV</th>
-            <th class="slim-col">QV</th>
-            <th class="slim-col"><b>Score</b></th>
+            <th class="slim-col">Ans. Vts.</th>
+            <th class="slim-col">Qns. Vts.</th>
+            <th class="slim-col">Ans. 1st</th>
+            <th class="slim-col">Ans. 2nd</th>
+            <th class="slim-col">Ans. 3rd</th>
+            <th class="slim-col">Qns. 1st</th>
+            <th class="slim-col">Num. Ans.</th>
+            <th class="slim-col">Num. Qns.</th>
+            <th class="slim-col score-col"><b>Total Score</b></th>
         </tr>
     </thead>
-    @foreach (var row in Model.Top)
+    @{
+     int r = 0;
+    foreach (var row in Model.Top)
 {
-    <tr>
+    string rowclass = r % 2 == 1 ? "oddrow" : "";
+    <tr class="@rowclass">
         <td>
         @if (row.Rank == 1 || row.Rank == 2 || row.Rank == 3)
             {
@@ -63,8 +100,17 @@
         <td><a href="#"><b>@row.User.DisplayName</b></a></td>
         <td class="number">@row.Av</td>
         <td class="number">@row.Qv</td>
-        <td class="number"><b>@row.Score</b></td>
+        <td class="number">@row.A1</td>
+        <td class="number">@row.A2</td>
+        <td class="number">@row.A3</td>
+        <td class="number">@row.Q1</td>
+        <td class="number">@row.Ac</td>
+        <td class="number">@row.Qc</td>
+        <td class="number score-col @rowclass"><b>@row.Score</b></td>
     </tr>
+    r++;
 }
+}
+
 </table>
 
