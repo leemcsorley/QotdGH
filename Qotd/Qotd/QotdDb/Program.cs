@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Qotd.Data;
 using QotdMvc.Data;
+using Qotd.Entities;
 
 namespace QotdDb
 {

@@ -8,6 +8,8 @@ using System.ComponentModel.DataAnnotations;
 using Qotd.PresentationObjects;
 using System.Linq.Expressions;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Objects;
+using System.Data.Entity.Infrastructure;
 
 namespace Qotd.Data
 {
@@ -37,7 +39,28 @@ namespace Qotd.Data
 
         public DbSet<UserActivityLink> UserActivityLinks { get; set; }
 
+        public DbSet<ScoreEntry> ScoreEntries { get; set; }
+
+        public ObjectContext ObjectContext
+        {
+            get
+            {
+                return ((IObjectContextAdapter)this).ObjectContext;
+            }
+        }
+
         #region IDataProvider Members
+
+        public void UpdateUserRankings()
+        {
+            string sql = @"with cte as (
+ select {0}, rank() over (order by {2} desc, {3} desc, {4} desc, {5} desc, {6} desc, {7} desc) as row_rank
+  from {1})
+update cte
+  set {0} = row_rank";
+            ObjectContext.ExecuteStoreCommand(string.Format(sql, "OverallRank", "Users", "Score", "NumAnswers", "NumQuestions", "NumAnswersVoted", "NumQuestionsVoted", "NumComments"));
+            ObjectContext.ExecuteStoreCommand(string.Format(sql, "OverallRankThisPeriod", "Users", "ScoreThisPeriod", "NumAnswersThisPeriod", "NumQuestionsThisPeriod", "NumAnswersVotedThisPeriod", "NumQuestionsVotedThisPeriod", "NumCommentsThisPeriod"));
+        }
 
         public User GetUserByFacebookId(string facebookId)
         {
@@ -76,7 +99,7 @@ namespace Qotd.Data
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
             return GetQuestions(Questions.Where(q => q.DateFor == date)
-                .OrderByDescending(q => q.VotesTotal).ThenByDescending(q => q.CreatedOn)
+                .OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod)
                 .Skip(skip).Take(take), null);
         }
 
@@ -92,7 +115,7 @@ namespace Qotd.Data
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
             return GetQuestions(Questions.Where(q => q.DateFor == date)
-                .OrderByDescending(q => q.VotesTotal).ThenByDescending(q => q.CreatedOn)
+                .OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod)
                 .Skip(skip).Take(take), userId);
         }
 
@@ -168,13 +191,13 @@ namespace Qotd.Data
         public AnswerPO[] GetAnswersRated(Guid questionId, int skip, int take)
         {
             return GetAnswers(Answers.Where(a => a.QuestionId == questionId)
-                .OrderByDescending(a => a.VotesTotal).ThenByDescending(a => a.CreatedOn).Skip(skip).Take(take), null);
+                .OrderByDescending(a => a.VotesTotal).ThenBy(a => a.denorm_User_OverallRankThisPeriod).Skip(skip).Take(take), null);
         }
 
         public AnswerPO[] GetAnswersRated(Guid userId, Guid questionId, int skip, int take)
         {
             return GetAnswers(Answers.Where(a => a.QuestionId == questionId)
-                .OrderByDescending(a => a.VotesTotal).ThenByDescending(a => a.CreatedOn).Skip(skip).Take(take), userId);
+                .OrderByDescending(a => a.VotesTotal).ThenBy(a => a.denorm_User_OverallRankThisPeriod).Skip(skip).Take(take), userId);
         }
 
         public Answer GetAnswerById(Guid answerId)
@@ -238,13 +261,100 @@ namespace Qotd.Data
             }
         }
 
-        public void VoteAnswer(Guid answerId, Guid userId, int voteDelta)
+        public LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take)
         {
-            if (!UserVoteAnswers.Any(u => u.AnswerId == answerId && u.UserId == userId))
+            var us = Users.OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
+
+            LeaderboardRowPO[] top = us.Select(u => new LeaderboardRowPO() { User = u }).ToArray();
+            LeaderboardRowPO[] aroundUser = null;
+            if (!us.Any(u => u.Id == userId))
+            {
+                int ur = Users.Where(u => u.Id == userId).Select(u => u.OverallRankThisPeriod).Single();
+
+                aroundUser = Users.Where(u => u.OverallRankThisPeriod > (ur - 3) && u.OverallRankThisPeriod < (ur + 3))
+                    .ToArray()
+                    .Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRankThisPeriod, Score = u.ScoreThisPeriod,
+                                                          A1 = u.NumAnswersWonThisPeriod,
+                                                          A2 = u.NumAnswersSecondThisPeriod,
+                                                          A3 = u.NumAnswersThirdThisPeriod,
+                                                          Ac = u.NumAnswersThisPeriod,
+                                                          Qc = u.NumQuestionsThisPeriod,
+                                                          Q1 = u.NumQuestionsWonThisPeriod,
+                                                          Qv = u.TotalQuestionVotesThisPeriod,
+                                                          Av = u.TotalAnswerVotesThisPeriod
+                    }).ToArray();
+            }
+            return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
+        }
+
+        public LeaderboardPO GetLeaderboard(Guid userId, int skip, int take)
+        {
+            var us = Users.OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
+
+            LeaderboardRowPO[] top = us.Select(u => new LeaderboardRowPO() { User = u }).ToArray();
+            LeaderboardRowPO[] aroundUser = null;
+            if (!us.Any(u => u.Id == userId))
+            {
+                int ur = Users.Where(u => u.Id == userId).Select(u => u.OverallRank).Single();
+
+                aroundUser = Users.Where(u => u.OverallRank > (ur - 3) && u.OverallRank < (ur + 3))
+                    .ToArray()
+                    .Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRank, Score = u.Score,
+                                                          A1 = u.NumAnswersWon,
+                                                          A2 = u.NumAnswersSecond,
+                                                          A3 = u.NumAnswersThird,
+                                                          Ac = u.NumAnswers,
+                                                          Qc = u.NumQuestions,
+                                                          Q1 = u.NumQuestionsWon,
+                                                          Qv = u.TotalQuestionVotes,
+                                                          Av = u.TotalAnswerVotes
+                    }).ToArray();
+            }
+            return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
+        }
+
+        public LeaderboardPO GetLeaderboard(int skip, int take)
+        {
+            var us = Users.OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
+
+            return new LeaderboardPO() { Top = us.Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRank, Score = u.Score,
+                A1 = u.NumAnswersWon,
+                A2 = u.NumAnswersSecond,
+                A3 = u.NumAnswersThird,
+                Ac = u.NumAnswers,
+                Qc = u.NumQuestions,
+                Q1 = u.NumQuestionsWon,
+                Qv = u.TotalQuestionVotes,
+                Av = u.TotalAnswerVotes
+            }).ToArray() };
+        }
+
+        public LeaderboardPO GetLeaderboardThisPeriod(int skip, int take)
+        {
+            var us = Users.OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
+
+            return new LeaderboardPO() { Top = us.Select(u => new LeaderboardRowPO() { User = u, Rank = u.OverallRankThisPeriod, Score = u.ScoreThisPeriod,
+                                                                                       A1 = u.NumAnswersWonThisPeriod,
+                                                                                       A2 = u.NumAnswersSecondThisPeriod,
+                                                                                       A3 = u.NumAnswersThirdThisPeriod,
+                                                                                       Ac = u.NumAnswersThisPeriod,
+                                                                                       Qc = u.NumQuestionsThisPeriod,
+                                                                                       Q1 = u.NumQuestionsWonThisPeriod,
+                                                                                       Qv = u.TotalQuestionVotesThisPeriod,
+                                                                                       Av = u.TotalAnswerVotesThisPeriod
+            }).ToArray()
+            };
+        }
+
+
+        public void VoteAnswer(Guid answerId, User user, int voteDelta)
+        {
+            // TODO - create activity
+            if (!UserVoteAnswers.Any(u => u.AnswerId == answerId && u.UserId == user.Id))
             {
                 UserVoteAnswer uva = new UserVoteAnswer()
                 {
-                    UserId = userId,
+                    UserId = user.Id,
                     VoteDelta = voteDelta,
                     AnswerId = answerId
                 };
@@ -253,18 +363,32 @@ namespace Qotd.Data
                 ans.VotesTotal += voteDelta;
                 if (voteDelta < 0) ans.VotesDown -= voteDelta;
                 else ans.VotesUp += voteDelta;
+                user.AddAction(ActivityType.VoteAnswer);
+                User auser = ans.User;
+                if (voteDelta == 1)
+                {
+                    auser.AddAction(ActivityType.ReceiveVoteUpAnswer);
+                }
+                else if (voteDelta == -1)
+                {
+                    auser.AddAction(ActivityType.ReceiveVoteDownAnswer);
+                }
+                else throw new System.NotImplementedException();
                 MarkAddedOrUpdated(ans);
+                MarkAddedOrUpdated(user);
+                MarkAddedOrUpdated(auser);
                 SaveChanges();
             }
         }
 
-        public void VoteQuestion(Guid questionId, Guid userId, int voteDelta)
+        public void VoteQuestion(Guid questionId, User user, int voteDelta)
         {
-            if (!UserVoteQuestions.Any(u => u.QuestionId == questionId && u.UserId == userId))
+            // TODO - create activity
+            if (!UserVoteQuestions.Any(u => u.QuestionId == questionId && u.UserId == user.Id))
             {
                 UserVoteQuestion uva = new UserVoteQuestion()
                 {
-                    UserId = userId,
+                    UserId = user.Id,
                     VoteDelta = voteDelta,
                     QuestionId = questionId
                 };
@@ -273,7 +397,20 @@ namespace Qotd.Data
                 ans.VotesTotal += voteDelta;
                 if (voteDelta < 0) ans.VotesDown -= voteDelta;
                 else ans.VotesUp += voteDelta;
+                user.AddAction(ActivityType.VoteQuestion);
+                User quser = ans.User;
+                if (voteDelta == 1)
+                {
+                    quser.AddAction(ActivityType.ReceiveVoteUpQuestion);
+                }
+                else if (voteDelta == -1)
+                {
+                    quser.AddAction(ActivityType.ReceiveVoteDownQuestion);
+                }
+                else throw new System.NotImplementedException();
                 MarkAddedOrUpdated(ans);
+                MarkAddedOrUpdated(user);
+                MarkAddedOrUpdated(quser);
                 SaveChanges();
             }
         }
@@ -315,6 +452,7 @@ namespace Qotd.Data
             modelBuilder.Entity<Comment>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<Activity>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<Notification>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            modelBuilder.Entity<ScoreEntry>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
             modelBuilder.Entity<User>().Ignore(u => u.ActionEntriesThisPeriod);
 

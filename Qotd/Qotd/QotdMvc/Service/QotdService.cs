@@ -37,7 +37,9 @@ namespace QotdMvc.Service
                 Question = question
             };
             Denormaliser.Denormalise(activity);
+            question.User.AddAction(ActivityType.PostQuestion);
 
+            DataProvider.MarkAddedOrUpdated(question.User);
             DataProvider.MarkAddedOrUpdated(activity);
             DataProvider.MarkAddedOrUpdated(question);
             DataProvider.SaveChanges();
@@ -58,7 +60,9 @@ namespace QotdMvc.Service
                 Answer = answer
             };
             Denormaliser.Denormalise(activity);
+            answer.User.AddAction(ActivityType.PostAnswer);
 
+            DataProvider.MarkAddedOrUpdated(answer.User);
             DataProvider.MarkAddedOrUpdated(activity);
             DataProvider.MarkAddedOrUpdated(answer);
             DataProvider.SaveChanges();
@@ -95,6 +99,8 @@ namespace QotdMvc.Service
                 VisibleWithoutLink = true
             };
             Denormaliser.Denormalise(activity);
+            comment.User.AddAction(ActivityType.PostComment);
+            DataProvider.MarkAddedOrUpdated(comment.User);
             DataProvider.MarkAddedOrUpdated(activity);
             DataProvider.MarkAddedOrUpdated(comment);
             DataProvider.MarkAddedOrUpdated(answer);

@@ -12,6 +12,7 @@ namespace QotdConsole
     {
         static void Main(string[] args)
         {
+            int loop = 0;
             while (true)
             {
                 using (QotdContext db = new QotdContext())
@@ -19,7 +20,13 @@ namespace QotdConsole
                     Thread.Sleep(500);
                         
                     db.CreateActivitiesAndNotifications();
+
+                    if (loop % 10 == 0)
+                        db.UpdateUserRankings();
                 }
+                loop++;
+                if (loop > 1000) 
+                    loop = 0;
             }
         }
     }

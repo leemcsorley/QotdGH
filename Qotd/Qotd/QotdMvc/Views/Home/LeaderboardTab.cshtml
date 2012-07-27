@@ -1,0 +1,18 @@
+﻿<div class="tabbable">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href="#this-period" data-toggle="tab" class="ajax-tab" rel="@Url.Action("LeaderboardThisPeriod", "Home")">Last 4 Weeks</a>
+        </li>
+        <li>
+            <a href="#overall" data-toggle="tab" class="ajax-tab" rel="@Url.Action("LeaderboardOverall", "Home")">Overall</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="this-period">
+            @Html.Partial("Leaderboard", (Qotd.PresentationObjects.LeaderboardPO)ViewBag.Leaderboard)
+        </div>
+        <div class="tab-pane" id="overall">
+                                        
+        </div>
+    </div>
+</div>

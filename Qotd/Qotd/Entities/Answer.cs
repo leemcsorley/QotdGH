@@ -52,5 +52,9 @@ namespace Qotd.Entities
         public virtual string denorm_User_DisplayName { get; set; }
 
         public virtual string denorm_User_ProfileImageUrl { get; set; }
+
+        public virtual int denorm_User_OverallRank { get; set; }
+
+        public virtual int denorm_User_OverallRankThisPeriod { get; set; }
     }
 }

@@ -46,7 +46,7 @@
         </div> 
         <!-- Content -->
         <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">
-            <div><b>@Model.Question.MainText</b></div>
+            <div><h3>@QotdMvc.DisplayHelper.QuestionMainText(Model.Question.MainText)</h3></div>
             <div>@Model.Question.SubText</div>
         </div>
         <!-- Controls footer -->

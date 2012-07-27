@@ -13,6 +13,7 @@ namespace QotdMvc.Controllers
     public class HomeController : BaseController
     {
         private const int DEFAULT_TAKE = 20;
+        private const int DEFAULT_TAKE_LEADERBOARD = 50;
         
         //
         // GET: /Home/
@@ -48,7 +49,7 @@ namespace QotdMvc.Controllers
                 ViewBag.Questions = DataProvider.GetQuestionsLatest(UserEntity.Id, skip, take);
             else
                 ViewBag.Questions = DataProvider.GetQuestionsLatest(skip, take);
-            ViewBag.Skip = take;
+            ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "QuestionsLatest";
             return View("Questions");
@@ -60,7 +61,7 @@ namespace QotdMvc.Controllers
                 ViewBag.Questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take);
             else
                 ViewBag.Questions = DataProvider.GetQuestionsRated(skip, take);
-            ViewBag.Skip = take;
+            ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "QuestionsRated";
             return View("Questions");
@@ -72,7 +73,7 @@ namespace QotdMvc.Controllers
                 ViewBag.Questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take);
             else
                 ViewBag.Questions = DataProvider.GetQuestionsRated(skip, take);
-            ViewBag.Skip = take;
+            ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "QuestionsRated";
             return View("QuestionsTab");
@@ -84,7 +85,7 @@ namespace QotdMvc.Controllers
                 ViewBag.Answers = DataProvider.GetAnswersLatest(UserEntity.Id, TodaysQuestion.Id, skip, take);
             else
                 ViewBag.Answers = DataProvider.GetAnswersLatest(TodaysQuestion.Id, skip, take);
-            ViewBag.Skip = take;
+            ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "AnswersLatest";
             return View("Answers");
@@ -96,7 +97,7 @@ namespace QotdMvc.Controllers
                 ViewBag.Answers = DataProvider.GetAnswersRated(UserEntity.Id, TodaysQuestion.Id, skip, take);
             else
                 ViewBag.Answers = DataProvider.GetAnswersRated(TodaysQuestion.Id, skip, take);
-            ViewBag.Skip = take;
+            ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "AnswersRated";
             return View("AnswersTab");
@@ -108,10 +109,41 @@ namespace QotdMvc.Controllers
                 ViewBag.Answers = DataProvider.GetAnswersRated(UserEntity.Id, TodaysQuestion.Id, skip, take);
             else
                 ViewBag.Answers = DataProvider.GetAnswersRated(TodaysQuestion.Id, skip, take);
-            ViewBag.Skip = take;
+            ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "AnswersRated";
             return View("Answers");
+        }
+
+        public ActionResult LeaderboardTab()
+        {
+            LeaderboardPO leaderboard;
+            if (UserEntity == null)
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(0, DEFAULT_TAKE_LEADERBOARD);
+            else
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, 0, DEFAULT_TAKE_LEADERBOARD);
+            ViewBag.Leaderboard = leaderboard;
+            return View();
+        }
+
+        public ActionResult LeaderboardOverall(int skip = 0, int take = DEFAULT_TAKE_LEADERBOARD)
+        {
+            LeaderboardPO leaderboard;
+            if (UserEntity == null)
+                leaderboard = DataProvider.GetLeaderboard(skip, DEFAULT_TAKE_LEADERBOARD);
+            else
+                leaderboard = DataProvider.GetLeaderboard(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD);
+            return View("Leaderboard", leaderboard);
+        }
+
+        public ActionResult LeaderboardThisPeriod(int skip = 0, int take = DEFAULT_TAKE_LEADERBOARD)
+        {
+            LeaderboardPO leaderboard;
+            if (UserEntity == null)
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(skip, DEFAULT_TAKE_LEADERBOARD);
+            else
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD);
+            return View("Leaderboard", leaderboard);
         }
 
         [HttpGet]
@@ -124,14 +156,14 @@ namespace QotdMvc.Controllers
         [HttpGet]
         public ActionResult VoteUp(Guid answerId)
         {
-            DataProvider.VoteAnswer(answerId, UserEntity.Id, 1);
+            DataProvider.VoteAnswer(answerId, UserEntity, 1);
             return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
         }
 
         [HttpGet]
         public ActionResult VoteDown(Guid answerId)
         {
-            DataProvider.VoteAnswer(answerId, UserEntity.Id, -1);
+            DataProvider.VoteAnswer(answerId, UserEntity, -1);
             return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
         }
 

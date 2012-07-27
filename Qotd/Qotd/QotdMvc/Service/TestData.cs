@@ -104,9 +104,9 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                         for (int j = 0; j < numVotes; j++)
                         {
                             if (RND.Next(0, 2) == 0)
-                                dp.VoteQuestion(q.Id, users[j].Id, 1);
+                                dp.VoteQuestion(q.Id, users[j], 1);
                             else
-                                dp.VoteQuestion(q.Id, users[j].Id, -1);
+                                dp.VoteQuestion(q.Id, users[j], -1);
                         }
                     }
                     if (date <= now)
@@ -135,9 +135,9 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                             for (int j = 0; j < numVotes; j++)
                             {
                                 if (RND.Next(0, 2) == 0)
-                                    dp.VoteAnswer(answer.Id, users[j].Id, 1);
+                                    dp.VoteAnswer(answer.Id, users[j], 1);
                                 else
-                                    dp.VoteAnswer(answer.Id, users[j].Id, -1);
+                                    dp.VoteAnswer(answer.Id, users[j], -1);
                             }
 
                             // comments
@@ -157,6 +157,9 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                                 Console.WriteLine(perc + "%");
                             }
                         }
+
+                        // pick winning answer
+                        dp.PickWinningAnswers(date);
                     }
                 }
 

@@ -1,0 +1,70 @@
+﻿@model Qotd.PresentationObjects.LeaderboardPO
+<style type="text/css">
+    table
+    {
+        width: 100%
+    }
+    
+    thead
+    {
+    	background-color: #eeeeee;
+    	
+    }
+    
+    th, td
+    {
+    	padding: 8px 8px;
+    }
+    
+    td
+    {
+    	border-bottom: 1px solid #dddddd;
+    }
+    
+    th, td .slim-col
+    {
+    	width: 32px
+    }
+    
+    td.number
+    {
+    	text-align: right;
+    }
+    
+    .gold { color: #8B8B00 }
+    .silver { color: #aaaaaa }
+    .bronze { color: #CD6600 }
+             
+</style>
+<table>
+    <thead>
+        <tr>
+            <th class="slim-col"></th>
+            <th class="slim-col"></th>
+            <th class="slim-col">Rank</th>
+            <th colspan="2">User</th>
+            <th class="slim-col">AV</th>
+            <th class="slim-col">QV</th>
+            <th class="slim-col"><b>Score</b></th>
+        </tr>
+    </thead>
+    @foreach (var row in Model.Top)
+{
+    <tr>
+        <td>
+        @if (row.Rank == 1 || row.Rank == 2 || row.Rank == 3)
+            {
+                <i class="@QotdMvc.DisplayHelper.GetRankIconClass(row.Rank)" style="font-size: 2em"></i>
+            }
+        </td>
+        <td>-</td>
+        <td class="number"><b>@row.Rank</b></td>
+        <td style="text-align: right"><img style="width: 18px; height: 18px" src="@QotdMvc.DisplayHelper.ImgUrl(row.User.ProfileImageUrl)" alt="profile picture"/></td>
+        <td><a href="#"><b>@row.User.DisplayName</b></a></td>
+        <td class="number">@row.Av</td>
+        <td class="number">@row.Qv</td>
+        <td class="number"><b>@row.Score</b></td>
+    </tr>
+}
+</table>
+

@@ -13,14 +13,17 @@ namespace Qotd.Entities
         LikeComment,
         VoteQuestion,
         VoteAnswer,
-        ReceiveVoteQuestion,
-        ReceiveVoteAnswer,
+        ReceiveVoteUpQuestion,
+        ReceiveVoteUpAnswer,
+        ReceiveVoteDownQuestion,
+        ReceiveVoteDownAnswer,
         PickSide,
         Join,
         AnswerWin,
         AnswerSecond,
         AnswerThird,
-        QuestionWin
+        QuestionWin,
+        ReceiveScore
     }
 
     public class Activity : EntityBase

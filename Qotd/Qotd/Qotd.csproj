@@ -59,6 +59,7 @@
     <Compile Include="Entities\Notification.cs" />
     <Compile Include="Entities\Question.cs" />
     <Compile Include="Entities\QuestionContainer.cs" />
+    <Compile Include="Entities\ScoreEntry.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Entities\UserActivityLink.cs" />
     <Compile Include="Entities\UserLikeComment.cs" />
@@ -70,7 +71,9 @@
     <Compile Include="PresentationObjects\ActivityPO.cs" />
     <Compile Include="PresentationObjects\AnswerPO.cs" />
     <Compile Include="PresentationObjects\CommentPO.cs" />
+    <Compile Include="PresentationObjects\LeaderboardPO.cs" />
     <Compile Include="PresentationObjects\QuestionPO.cs" />
+    <Compile Include="PresentationObjects\LeaderboardRowPO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="Utils\StringUtils.cs" />

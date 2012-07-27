@@ -14,18 +14,45 @@ namespace Qotd.WorkerImpl
             if (date == null) date = DateTime.Now.Date;
             var qs = db.Questions.Where(q => q.DateFor == date).ToArray();
 
-            bool first = true;
-            foreach (Question question in qs.OrderByDescending(q => q.VotesTotal).ThenBy(q => q.CreatedOn))
+            int count = 0;
+            foreach (Question question in qs.OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod))
             {
-                if (first)
+                if (count == 0)
                 {
                     question.WinningQuestion = true;
-                    first = false;
+                    question.User.AddAction(ActivityType.QuestionWin, question);
                 }
                 else
                 {
                     question.WinningQuestion = false;
                 }
+                count++;
+            }
+            db.SaveChanges();
+        }
+
+        public static void PickWinningAnswers(this QotdContext db, DateTime? date = null)
+        {
+            if (date == null) date = DateTime.Now.Date;
+            var qs = db.Questions.Where(q => q.DateFor == date && q.WinningQuestion.HasValue && q.WinningQuestion.Value).Single();
+
+            int count = 0;
+            foreach (Answer answer in db.Answers.Where(a => a.QuestionId == qs.Id)
+                .OrderByDescending(a => a.VotesTotal).ThenBy(a => a.denorm_User_OverallRankThisPeriod).Take(3))
+            {
+                switch (count)
+                {
+                    case 0:
+                        answer.User.AddAction(ActivityType.AnswerWin, answer);
+                        break;
+                    case 1:
+                        answer.User.AddAction(ActivityType.AnswerSecond, answer);
+                        break;
+                    case 2:
+                        answer.User.AddAction(ActivityType.AnswerThird, answer);
+                        break;
+                }
+                count++;
             }
             db.SaveChanges();
         }

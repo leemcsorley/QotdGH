@@ -53,10 +53,18 @@ namespace Qotd.Data
 
         void LikeComment(Guid commentId, Guid userId);
 
-        void VoteAnswer(Guid answerId, Guid userId, int voteDelta);
+        void VoteAnswer(Guid answerId, User user, int voteDelta);
 
-        void VoteQuestion(Guid questionId, Guid userId, int voteDelta);
+        void VoteQuestion(Guid questionId, User user, int voteDelta);
 
         ActivityPO[] GetActivities(DateTime? date, int take);
+
+        LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take);
+
+        LeaderboardPO GetLeaderboard(Guid userId, int skip, int take);
+
+        LeaderboardPO GetLeaderboard(int skip, int take);
+
+        LeaderboardPO GetLeaderboardThisPeriod(int skip, int take);
     }
 }
