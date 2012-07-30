@@ -17,20 +17,22 @@ namespace Qotd.PresentationObjects
 
         public CommentPO[] Comments { get; set; }
 
-        public string UserDisplayName { get; set; }
+        public UserPO User { get; set; }
 
-        public string UserProfileImageUrl
-        {
-            get
-            {
-                if (_userProfileImageUrl.StartsWith("\\"))
-                    return Config.UploadImagesUrl + _userProfileImageUrl;
-                return _userProfileImageUrl;
-            }
-            set
-            {
-                _userProfileImageUrl = value;
-            }
-        }
+        //public string UserDisplayName { get; set; }
+
+        //public string UserProfileImageUrl
+        //{
+        //    get
+        //    {
+        //        if (_userProfileImageUrl.StartsWith("\\"))
+        //            return Config.UploadImagesUrl + _userProfileImageUrl;
+        //        return _userProfileImageUrl;
+        //    }
+        //    set
+        //    {
+        //        _userProfileImageUrl = value;
+        //    }
+        //}
     }
 }

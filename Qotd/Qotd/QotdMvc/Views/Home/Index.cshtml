@@ -6,6 +6,21 @@
     function onReady()
     {
         jQuery("time.timeago").timeago();
+
+        $('.hovercard').popover();
+    };
+
+    function alert(url)
+    {
+        $.get(url, function(data)
+        {
+            $('#alert-box').html(data);
+            $('#alert-box').show();
+            setTimeout(function()
+            {
+                $('#alert-box').fadeOut('slow');
+            }, 10000);
+        });
     };
 
     $(document).ready(
@@ -22,7 +37,7 @@
                 {
                     if (data.error)
                         alert(data.error);
-
+                    alert('@Url.Action("AnswerSuccess", "Alert")');
                     $('a[href*="#tab1"]').click();
                     $.get('@Url.Action("Answer", "Home")' + '?answerId=' + data.answerId, function(data2)
                     {
@@ -38,11 +53,17 @@
                     if (data.error)
                         alert(data.error);
 
+                    $("#questionForm")[0].reset();
+                    alert('@Url.Action("QuestionSuccess", "Alert")');
                     $('a[href*="#tab2"]').click();
-                    $.get('@Url.Action("Question", "Home")' + '?questionId=' + data.questionId, function(data2)
+                    $('#questionModal').modal('hide');
+                    setTimeout(function()
                     {
-                        $('#new-question').html(data2);
-                    });
+                        $.get('@Url.Action("Question", "Home")' + '?questionId=' + data.questionId, function(data2)
+                        {
+                            $('#new-question').html(data2);
+                        });
+                        }, 1000);
                 }, "json");
             });
 
@@ -111,12 +132,19 @@
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h3>Write your answer...</h3>
   </div>
-  <form class="well" action="/" id="answerForm">
+  <form class="well form-horizontal" action="/" id="answerForm">
   <div class="modal-body">
-        <label>Title:</label>
-        <input type="text" class="span3" placeholder="Answer title..." name="title" />
+    <fieldset>
+        <div class="control-group">
+            <label class="control-label">Title:</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" placeholder="Answer title..." name="main"/>
+                <p class="help-block">Enter the title of your answer.</p><br />
+            </div>
+        </div>
         <label>Content:</label>
         <textarea id="answerContent" rows="12" cols="100" style="height: 210px" name="content"></textarea>
+    </fieldset>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">Close</a>
@@ -130,27 +158,41 @@
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h3>Write your question for tomorrow...</h3>
     </div>
-    <form class="well" action="@Url.Action("QuestionSubmit", "Home")" id="questionForm">
-    <div class="modal-body">
-    
-        <label>Main Text:</label>
-        <input type="text" class="span3" placeholder="Main Text..." name="main" size="80" />
-        <label>Sub Text:</label>
-        <input type="text" class="span3" placeholder="Sub Text..." name="sub" size="80" />
-        <label>More Information:</label>
-        <textarea rows="5" cols="80" name="details"></textarea>
-    </div>
-    <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">Close</a>
-    <a href="#" class="btn btn-primary" id="questionSubmit">Submit</a>
-    </div>
+    <form class="well form-horizontal" action="@Url.Action("QuestionSubmit", "Home")" id="questionForm">
+        <div class="modal-body">
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label">Main Text:</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" placeholder="Main Text..." name="main"/>
+                        <p class="help-block">Enter the main text of your question.</p><br />
+                    </div>
+                    <label class="control-label">Sub Text:</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" placeholder="Sub Text..." name="sub" />
+                        <p class="help-block">Enter the sub text of your question.</p><br />
+                    </div>
+                    <label class="control-label">More Information:</label>
+                    <div class="controls">
+                        <textarea rows="5" cols="120" name="details" class="input-xlarge"></textarea>
+                        <p class="help-block">Enter the main text of your question.</p><br />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-primary" id="questionSubmit">Submit</a>
+        </div>
     </form>
 </div>
 <!-- Page -->
 <div class="container">
     <div class="hero-unit">
         <h1>@QotdMvc.DisplayHelper.QuestionMainText(ViewBag.Question.MainText)</h1>
+        <p></p>
         <p>@ViewBag.Question.SubText</p>
+        <a href=""><span class="label label-info">More Info</span></a>
          @if (ViewBag.IsAuthenticated && ViewBag.User != null)
          {
              if (ViewBag.Question.QuestionType == Qotd.Entities.QuestionType.Debate)
@@ -163,6 +205,7 @@
          }
     </div>
     <div class="row">
+        
         <div class="span9">
             <div class="tabbable tabs-left">
                         <ul class="nav nav-tabs">
@@ -183,6 +226,8 @@
                             </li>
                         </ul>
                     <div class="tab-content">
+                        <div id="alert-box">
+                        </div>
                         <div class="tab-pane active" id="tab1">
                             @Html.Action("AnswersTab", "Home")
                         </div>

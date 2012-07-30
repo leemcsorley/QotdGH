@@ -134,7 +134,7 @@ update cte
                 pqs[i] = new QuestionPO()
                 {
                     Question = qs[i],
-                    HasUserVoted = uvqs != null ? uvqs.ContainsKey(qs[i].Id) : false,
+                    HasUserVoted = uvqs != null ? (userId == qs[i].UserId ? true : uvqs.ContainsKey(qs[i].Id)) : false,
                     UserDisplayName = qs[i].denorm_User_DisplayName,
                     UserProfileImageUrl = qs[i].denorm_User_ProfileImageUrl
                 };
@@ -163,14 +163,23 @@ update cte
             var pans = new AnswerPO[ans.Length];
             for (int i = 0; i < ans.Length; i++)
             {
+                var a = ans[i];
                 pans[i] = new AnswerPO()
                 {
-                    Answer = ans[i],
-                    HasUserVoted = uvas != null ? uvas.ContainsKey(ans[i].Id) : false,
-                    Comments = (cmts.ContainsKey(ans[i].Id) ? cmts[ans[i].Id] : null),
+                    Answer = a,
+                    HasUserVoted = uvas != null ? (userId == a.UserId ? true : uvas.ContainsKey(a.Id)) : false,
+                    Comments = (cmts.ContainsKey(a.Id) ? cmts[a.Id] : null),
                         // denormalised
-                    UserDisplayName = ans[i].denorm_User_DisplayName,
-                    UserProfileImageUrl = ans[i].denorm_User_ProfileImageUrl
+                    User = new UserPO()
+                    {
+                        User = new User()
+                        {
+                            DisplayName = a.denorm_User_DisplayName,
+                            ProfileImageUrl = a.denorm_User_ProfileImageUrl,
+                            OverallRank = a.denorm_User_OverallRank,
+                            OverallRankThisPeriod = a.denorm_User_OverallRankThisPeriod
+                        }
+                    }
                 };
             }
             return pans;
@@ -208,6 +217,11 @@ update cte
         public AnswerPO GetAnswerById(Guid answerId, Guid userId)
         {
             return GetAnswers(Answers.Where(a => a.Id == answerId), userId).SingleOrDefault();
+        }
+
+        public QuestionPO GetQuestionById(Guid questionId, Guid userId)
+        {
+            return GetQuestions(Questions.Where(q => q.Id == questionId), userId).SingleOrDefault();
         }
 
         public CommentPO GetCommentById(Guid commentId, Guid userId)

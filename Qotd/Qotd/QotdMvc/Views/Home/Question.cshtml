@@ -10,7 +10,7 @@
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
         {
         <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <a href="@Url.Action("VoteUpQuestion", "Home", new { answerId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-up" style="font-size: 22px;"></i></a>
+            <a href="@Url.Action("VoteUpQuestion", "Home", new { questionId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-up" style="font-size: 22px;"></i></a>
         </div>
         }
         else
@@ -27,7 +27,7 @@
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
         {
         <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <a href="@Url.Action("VoteDownQuestion", "Home", new { answerId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-down" style="font-size: 22px;"></i></a>
+            <a href="@Url.Action("VoteDownQuestion", "Home", new { questionId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-down" style="font-size: 22px;"></i></a>
         </div>
         }
         else
@@ -46,11 +46,12 @@
         </div> 
         <!-- Content -->
         <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">
-            <div><h3>@QotdMvc.DisplayHelper.QuestionMainText(Model.Question.MainText)</h3></div>
+            <div><h2>@QotdMvc.DisplayHelper.QuestionMainText(Model.Question.MainText)</h2></div>
             <div>@Model.Question.SubText</div>
         </div>
         <!-- Controls footer -->
         <div style="float: left; overflow: hidden; clear: left; margin-top: 8px; font-size: 11px; margin-bottom: 8px;">
+            <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-info-sign"></i>&nbsp;More Info</a></div>
             <div style="float: left; margin-right: 16px;"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Question.CreatedOn.ToString("s")"></time></div>
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {

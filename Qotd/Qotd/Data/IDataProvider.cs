@@ -45,6 +45,8 @@ namespace Qotd.Data
 
         QuestionPO[] GetQuestionsRated(int skip, int take);
 
+        QuestionPO GetQuestionById(Guid questionId, Guid userId);
+
         Answer GetAnswerById(Guid answerId);
 
         CommentPO[] GetComments(Guid answerId, Guid userId);

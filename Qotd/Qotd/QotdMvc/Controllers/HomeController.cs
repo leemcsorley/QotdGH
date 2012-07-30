@@ -43,6 +43,11 @@ namespace QotdMvc.Controllers
             return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
         }
 
+        public ActionResult Question(Guid questionId)
+        {
+            return View("Question", DataProvider.GetQuestionById(questionId, UserEntity.Id));
+        }
+
         public ActionResult QuestionsLatest(int skip = 0, int take = DEFAULT_TAKE)
         {
             if (UserEntity != null)
@@ -165,6 +170,20 @@ namespace QotdMvc.Controllers
         {
             DataProvider.VoteAnswer(answerId, UserEntity, -1);
             return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
+        }
+
+        [HttpGet]
+        public ActionResult VoteUpQuestion(Guid questionId)
+        {
+            DataProvider.VoteQuestion(questionId, UserEntity, 1);
+            return View("Question", DataProvider.GetQuestionById(questionId, UserEntity.Id));
+        }
+
+        [HttpGet]
+        public ActionResult VoteDownQuestion(Guid questionId)
+        {
+            DataProvider.VoteQuestion(questionId, UserEntity, -1);
+            return View("Question", DataProvider.GetQuestionById(questionId, UserEntity.Id));
         }
 
         [HttpGet, ValidateInput(false)]
