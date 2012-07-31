@@ -4,7 +4,7 @@
     <div style="width: 60px; float: left; text-align: center; margin-right: 8px">
         <!-- Profile image -->
         <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <img src="@Model.UserProfileImageUrl" alt="profile picture"/>
+            <img src="@Model.User.User.ProfileImageUrl" alt="profile picture"/>
         </div>
         <!-- Up arrow -->
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
@@ -41,7 +41,7 @@
     <div style="overflow: hidden;">
         <!-- Header -->
         <div style="overflow: hidden;">
-            <span style="font-weight: bold"><a href="#">@Model.UserDisplayName</a></span>
+            <span style="font-weight: bold">@Html.Partial("UserLink", Model.User)</span>
             <span>asks:</span>
         </div> 
         <!-- Content -->

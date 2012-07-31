@@ -41,6 +41,12 @@ namespace Qotd.Data
 
         public DbSet<ScoreEntry> ScoreEntries { get; set; }
 
+        public DbSet<UserFollow> UserFollows { get; set; }
+
+        public DbSet<UserFollowAnswer> UserFollowAnswers { get; set; }
+
+        public DbSet<UserFollowQuestion> UserFollowQuestions { get; set; }
+
         public ObjectContext ObjectContext
         {
             get
@@ -72,9 +78,24 @@ update cte
             return Users.SingleOrDefault(u => u.Email == email);
         }
 
-        public User GetUserByUsername(string username)
+        public UserPO GetUserByUsername(string username)
         {
-            return Users.SingleOrDefault(u => u.Username == username);
+            var user = Users.SingleOrDefault(u => u.Username == username);
+            return new UserPO()
+            {
+                User = user,
+                UnreadNotifications = Notifications.Count(n => n.UserId == user.Id && (!n.IsRead))
+            };
+        }
+
+        public UserPO GetUserById(Guid userId)
+        {
+            return GetUsers(Users.Where(u => u.Id == userId)).SingleOrDefault();
+        }
+
+        private UserPO[] GetUsers(IQueryable<User> users)
+        {
+            return users.ToArray().Select(u => new UserPO() { User = u }).ToArray();
         }
 
         public Question GetTodaysQuestion()
@@ -131,12 +152,20 @@ update cte
             var pqs = new QuestionPO[qs.Length];
             for (int i = 0; i < qs.Length; i++)
             {
+                var q = qs[i];
                 pqs[i] = new QuestionPO()
                 {
-                    Question = qs[i],
-                    HasUserVoted = uvqs != null ? (userId == qs[i].UserId ? true : uvqs.ContainsKey(qs[i].Id)) : false,
-                    UserDisplayName = qs[i].denorm_User_DisplayName,
-                    UserProfileImageUrl = qs[i].denorm_User_ProfileImageUrl
+                    Question = q,
+                    HasUserVoted = uvqs != null ? (userId == q.UserId ? true : uvqs.ContainsKey(q.Id)) : false,
+                    User = new UserPO()
+                    {
+                        User = new User()
+                        {
+                            Id = q.UserId,
+                            ProfileImageUrl = q.denorm_User_ProfileImageUrl,
+                            DisplayName = q.denorm_User_DisplayName
+                        }
+                    }
                 };
             }
             return pqs;
@@ -174,6 +203,7 @@ update cte
                     {
                         User = new User()
                         {
+                            Id = a.UserId,
                             DisplayName = a.denorm_User_DisplayName,
                             ProfileImageUrl = a.denorm_User_ProfileImageUrl,
                             OverallRank = a.denorm_User_OverallRank,
@@ -183,6 +213,26 @@ update cte
                 };
             }
             return pans;
+        }
+
+        public QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take)
+        {
+            DateTime date = DateTime.Now.AddDays(1).Date;
+            return GetQuestions(UserFollowQuestions.Where(u => u.SourceUserId == userId && u.Question.DateFor == date)
+                .Select(u => u.Question)
+                .OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod)
+                .Skip(skip).Take(take), userId);
+        }
+
+        public AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take)
+        {
+            return GetAnswers(UserFollowAnswers
+                .Where(u => u.SourceUserId == userId && u.Answer.QuestionId == questionId)
+                .Select(u => u.Answer)
+                .OrderByDescending(a => a.VotesTotal)
+                .ThenBy(a => a.denorm_User_OverallRankThisPeriod)
+                .Skip(skip)
+                .Take(take), userId);
         }
 
         public AnswerPO[] GetAnswersLatest(Guid questionId, int skip, int take)
@@ -229,6 +279,65 @@ update cte
             return GetComments(Comments.Where(c => c.Id == commentId), userId).SingleOrDefault();
         }
 
+        private ActivityPO[] GetHistory(IQueryable<Activity> activities)
+        {
+            var act = activities.ToArray();
+
+            var qids = act.Where(a => a.ActivityType == ActivityType.PostQuestion)
+                .Select(a => a.QuestionId.Value).ToArray();
+
+            var aids = act.Where(a => a.ActivityType == ActivityType.PostAnswer)
+                .Select(a => a.AnswerId.Value).ToArray();
+
+            var qs = GetQuestions(Questions.Where(q => qids.Contains(q.Id)), null)
+                .ToDictionary(q => q.Question.Id, q => q);
+
+            var ans = GetAnswers(Answers.Where(a => aids.Contains(a.Id)), null)
+                .ToDictionary(a => a.Answer.Id, a => a);
+
+            var apos = new ActivityPO[act.Length];
+
+            for (int i = 0; i < apos.Length; i++)
+            {
+                var a = act[i];
+                apos[i] = new ActivityPO()
+                {
+                    Activity = a,
+                    Answer = a.AnswerId.HasValue ? ans[a.AnswerId.Value] : null,
+                    Question = a.QuestionId.HasValue ? qs[a.QuestionId.Value] : null
+                };
+            }
+            return apos;
+        }
+
+        public Notification[] ReadNotifications(Guid userId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo)
+        {
+            return GetHistory(
+                Activities.Where(a => (a.ActivityTypeValue == (byte)ActivityType.QuestionWin ||
+                                       a.ActivityTypeValue == (byte)ActivityType.AnswerWin ||
+                                       a.ActivityTypeValue == (byte)ActivityType.AnswerSecond ||
+                                       a.ActivityTypeValue == (byte)ActivityType.AnswerThird) &&
+                                       a.Date >= dateFrom && a.Date < dateTo)
+               .OrderByDescending(a => a.Date));
+        }
+
+        public ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take)
+        {
+            return GetHistory(
+                Activities.Where(a => (a.ActivityTypeValue == (byte)ActivityType.PostAnswer ||
+                                      a.ActivityTypeValue == (byte)ActivityType.PostQuestion) &&
+                                      a.SourceUserId == userId)
+                .OrderByDescending(a => a.Date)
+                .Skip(skip)
+                .Take(take));
+
+        }
+
         private CommentPO[] GetComments(IQueryable<Comment> comments, Guid? userId)
         {
             var cmts = comments.ToArray();
@@ -242,12 +351,20 @@ update cte
             var toReturn = new CommentPO[cmts.Length];
             for (int i = 0; i < toReturn.Length; i++)
             {
+                var c = cmts[i];
                 toReturn[i] = new CommentPO()
                 {
-                    Comment = cmts[i],
-                    HasUserLiked = userId.HasValue ? ulcs.Contains(cmts[i].Id) : false,
-                    UserDisplayName = cmts[i].denorm_User_DisplayName,
-                    UserProfileImageUrl = cmts[i].denorm_User_ProfileImageUrl
+                    Comment = c,
+                    HasUserLiked = userId.HasValue ? ulcs.Contains(c.Id) : false,
+                    User = new UserPO()
+                    {
+                        User = new User()
+                        {
+                            DisplayName = c.denorm_User_DisplayName,
+                            ProfileImageUrl = c.denorm_User_ProfileImageUrl,
+                            Id = c.UserId
+                        }
+                    }
                 };
             }
             return toReturn;
@@ -451,6 +568,11 @@ update cte
                 Set<T>().Add(obj);
         }
 
+        public void MarkAdded<T>(T obj) where T : class
+        {
+            Set<T>().Add(obj);
+        }
+
         #endregion
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -472,6 +594,9 @@ update cte
             modelBuilder.Entity<UserVoteQuestion>().HasKey(t => new { t.UserId, t.QuestionId });
             modelBuilder.Entity<UserQuestionSide>().HasKey(t => new { t.UserId, t.QuestionId });
             modelBuilder.Entity<UserActivityLink>().HasKey(t => new { t.UserId, t.ActivityId });
+            modelBuilder.Entity<UserFollow>().HasKey(t => new { t.SourceUserId, t.TargetUserId });
+            modelBuilder.Entity<UserFollowAnswer>().HasKey(t => new { t.SourceUserId, t.AnswerId });
+            modelBuilder.Entity<UserFollowQuestion>().HasKey(t => new { t.SourceUserId, t.QuestionId });
 
             modelBuilder.Entity<Comment>().HasRequired(t => t.Answer)
                 .WithMany().WillCascadeOnDelete(false);
@@ -494,6 +619,18 @@ update cte
             modelBuilder.Entity<UserLikeComment>().HasRequired(t => t.Comment)
                 .WithMany().WillCascadeOnDelete(false);
             modelBuilder.Entity<UserQuestionSide>().HasRequired(t => t.Question)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollow>().HasRequired(t => t.SourceUser)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollow>().HasRequired(t => t.TargetUser)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollowAnswer>().HasRequired(t => t.SourceUser)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollowAnswer>().HasRequired(t => t.Answer)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollowQuestion>().HasRequired(t => t.SourceUser)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollowQuestion>().HasRequired(t => t.Question)
                 .WithMany().WillCascadeOnDelete(false);
         }
     }

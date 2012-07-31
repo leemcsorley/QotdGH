@@ -23,7 +23,9 @@ namespace Qotd.Entities
         AnswerSecond,
         AnswerThird,
         QuestionWin,
-        ReceiveScore
+        ReceiveScore,
+        FollowUser,
+        ReceiveFollow
     }
 
     public class Activity : EntityBase
@@ -61,6 +63,10 @@ namespace Qotd.Entities
         public virtual Guid? AnswerId { get; set; }
 
         public virtual Answer Answer { get; set; }
+
+        public virtual Guid? TargetUserId { get; set; }
+
+        public virtual User TargetUser { get; set; }
 
         // denormalised ---
 

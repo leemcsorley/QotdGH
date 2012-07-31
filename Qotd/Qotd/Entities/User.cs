@@ -97,12 +97,20 @@ namespace Qotd.Entities
                 case ActivityType.VoteQuestion:
                     user.NumQuestionsVoted++;
                     break;
+                case ActivityType.FollowUser:
+                    user.NumFollows++;
+                    break;
+                case ActivityType.ReceiveFollow:
+                    user.NumFollowing++;
+                    break;
             }
             score.Value += scoreDelta;
             user.Score += scoreDelta;
             user.ActionEntriesThisPeriod = actions.ToArray();
 
             user.ScoreThisPeriod = actions.Where(a => a.Type == ActivityType.ReceiveScore).Sum(a => (int?)a.Value).GetValueOrDefault();
+            user.NumFollowsThisPeriod = actions.Where(a => a.Type == ActivityType.FollowUser).Sum(a => (int?)a.Value).GetValueOrDefault();
+            user.NumFollowingThisPeriod = actions.Where(a => a.Type == ActivityType.ReceiveFollow).Sum(a => (int?)a.Value).GetValueOrDefault();
             user.NumAnswersWonThisPeriod = actions.Where(a => a.Type == ActivityType.AnswerWin).Sum(a => (int?)a.Value).GetValueOrDefault();
             user.NumAnswersSecondThisPeriod = actions.Where(a => a.Type == ActivityType.AnswerSecond).Sum(a => (int?)a.Value).GetValueOrDefault();
             user.NumAnswersThirdThisPeriod = actions.Where(a => a.Type == ActivityType.AnswerThird).Sum(a => (int?)a.Value).GetValueOrDefault();
@@ -139,6 +147,10 @@ namespace Qotd.Entities
 
         public virtual string FacebookId { get; set; }
 
+        public virtual int NumFollows { get; set; }
+
+        public virtual int NumFollowing { get; set; }
+
         public virtual int NumComments { get; set; }
 
         public virtual int NumAnswers { get; set; }
@@ -160,6 +172,10 @@ namespace Qotd.Entities
         public virtual int TotalAnswerVotes { get; set; }
 
         public virtual int TotalQuestionVotes { get; set; }
+
+        public virtual int NumFollowsThisPeriod { get; set; }
+
+        public virtual int NumFollowingThisPeriod { get; set; }
 
         public virtual int NumQuestionsWonThisPeriod { get; set; }
 

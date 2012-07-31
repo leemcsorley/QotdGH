@@ -15,5 +15,7 @@ namespace QotdMvc.Service
         void SaveNewAnswer(Answer answer);
 
         void SaveNewQuestion(Question question);
+
+        void FollowUser(UserFollow userFollow);
     }
 }

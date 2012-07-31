@@ -14,7 +14,30 @@ namespace QotdMvc.Controllers
     {
         private const int DEFAULT_TAKE = 20;
         private const int DEFAULT_TAKE_LEADERBOARD = 50;
-        
+
+        public ActionResult UserPopover(Guid userId)
+        {
+            return View(DataProvider.GetUserById(userId));
+        }
+
+        public ActionResult User(Guid userId)
+        {
+            ViewBag.TargetUser = DataProvider.GetUserById(userId);
+            return View();
+        }
+
+        public ActionResult HistoryForUser(Guid userId, int skip = 0, int take = DEFAULT_TAKE)
+        {
+            ViewBag.Activities = DataProvider.GetHistoryForUser(userId, skip, take);
+
+            return View("History");
+        }
+
+        public ActionResult History()
+        {
+            return View("History");
+        }
+
         //
         // GET: /Home/
         public ActionResult Index()

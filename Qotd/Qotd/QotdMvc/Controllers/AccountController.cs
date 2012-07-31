@@ -13,6 +13,7 @@ using System.Configuration;
 using DotNetOpenAuth.OAuth2;
 using QotdMvc.OAuth;
 using System.Net;
+using System.Diagnostics;
 
 namespace QotdMvc.Controllers
 {
@@ -36,6 +37,13 @@ namespace QotdMvc.Controllers
         public ActionResult Signout()
         {
             FormsAuthentication.SignOut();
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult SigninAs(Guid userId)
+        {
+            User user = DataProvider.GetUserById(userId).User;
+            FormsAuthentication.RedirectFromLoginPage(user.Username, true);
             return RedirectToAction("Index", "Home");
         }
 

@@ -47,6 +47,8 @@ namespace Qotd.Entities
 
         public virtual int? AnswerRank { get; set; }
 
+        public virtual bool LinksCreated { get; set; }
+
         // denormalised ---
 
         public virtual string denorm_User_DisplayName { get; set; }

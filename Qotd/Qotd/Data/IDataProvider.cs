@@ -12,6 +12,9 @@ namespace Qotd.Data
         void MarkAddedOrUpdated<T>(T obj)
             where T : class, IEntity;
 
+        void MarkAdded<T>(T obj)
+            where T : class;
+
         int SaveChanges();
     }
 
@@ -19,15 +22,19 @@ namespace Qotd.Data
     {
         User GetUserByEmail(string email);
 
-        User GetUserByUsername(string username);
+        UserPO GetUserByUsername(string username);
 
         User GetUserByFacebookId(string facebookId);
+
+        UserPO GetUserById(Guid userId);
 
         Question GetTodaysQuestion();
 
         bool HasUserPickedSide(Guid userId, Guid questionId);
 
         AnswerPO GetAnswerById(Guid answerId, Guid userId);
+
+        AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take);
 
         AnswerPO[] GetAnswersLatest(Guid userId, Guid questionId, int skip, int take);
 
@@ -44,6 +51,8 @@ namespace Qotd.Data
         QuestionPO[] GetQuestionsLatest(int skip, int take);
 
         QuestionPO[] GetQuestionsRated(int skip, int take);
+
+        QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take);
 
         QuestionPO GetQuestionById(Guid questionId, Guid userId);
 
@@ -68,5 +77,11 @@ namespace Qotd.Data
         LeaderboardPO GetLeaderboard(int skip, int take);
 
         LeaderboardPO GetLeaderboardThisPeriod(int skip, int take);
+
+        ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take);
+
+        ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo);
+
+        Notification[] ReadNotifications(Guid userId);
     }
 }

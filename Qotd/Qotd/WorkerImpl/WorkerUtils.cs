@@ -21,6 +21,18 @@ namespace Qotd.WorkerImpl
                 {
                     question.WinningQuestion = true;
                     question.User.AddAction(ActivityType.QuestionWin, question);
+
+                    // create activity
+                    Activity activity = new Activity()
+                    {
+                        ActivityType = ActivityType.QuestionWin,
+                        Date = date.Value,
+                        SourceUserId = question.UserId,
+                        Question = question,
+                        Text = "",
+                        VisibleWithoutLink = true
+                    };
+                    db.MarkAddedOrUpdated(activity);
                 }
                 else
                 {
@@ -40,16 +52,47 @@ namespace Qotd.WorkerImpl
             foreach (Answer answer in db.Answers.Where(a => a.QuestionId == qs.Id)
                 .OrderByDescending(a => a.VotesTotal).ThenBy(a => a.denorm_User_OverallRankThisPeriod).Take(3))
             {
+                Activity activity;
                 switch (count)
                 {
                     case 0:
                         answer.User.AddAction(ActivityType.AnswerWin, answer);
+                        activity = new Activity()
+                        {
+                            ActivityType = ActivityType.AnswerWin,
+                            Date = date.Value,
+                            SourceUserId = answer.UserId,
+                            Answer = answer,
+                            Text = "",
+                            VisibleWithoutLink = true
+                        };
+                        db.MarkAddedOrUpdated(activity);
                         break;
                     case 1:
                         answer.User.AddAction(ActivityType.AnswerSecond, answer);
+                        activity = new Activity()
+                        {
+                            ActivityType = ActivityType.AnswerSecond,
+                            Date = date.Value,
+                            SourceUserId = answer.UserId,
+                            Answer = answer,
+                            Text = "",
+                            VisibleWithoutLink = true
+                        };
+                        db.MarkAddedOrUpdated(activity);
                         break;
                     case 2:
                         answer.User.AddAction(ActivityType.AnswerThird, answer);
+                        activity = new Activity()
+                        {
+                            ActivityType = ActivityType.AnswerThird,
+                            Date = date.Value,
+                            SourceUserId = answer.UserId,
+                            Answer = answer,
+                            Text = "",
+                            VisibleWithoutLink = true
+                        };
+                        db.MarkAddedOrUpdated(activity);
                         break;
                 }
                 count++;
@@ -64,6 +107,62 @@ namespace Qotd.WorkerImpl
             var wq = db.Questions.Where(q => q.DateFor == date && q.WinningQuestion == true).Single();
             qc.TodaysQuestion = wq;
             db.SaveChanges();
+        }
+
+        public static void CreateUserFollowLinks(this QotdContext db)
+        {
+            DateTime date = DateTime.Now.AddDays(-7);
+            foreach (var uf in db.UserFollows.Where(u => !u.LinksCreated).ToArray())
+            {
+                foreach (var qid in db.Questions.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == uf.TargetUserId).Select(q => q.Id).ToArray())
+                {
+                    UserFollowQuestion ufq = new UserFollowQuestion()
+                    {
+                        QuestionId = qid,
+                        SourceUserId = uf.SourceUserId
+                    };
+                    db.MarkAdded(ufq);
+                }
+                foreach (var aid in db.Answers.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == uf.TargetUserId).Select(q => q.Id).ToArray())
+                {
+                    UserFollowAnswer ufa = new UserFollowAnswer()
+                    {
+                        AnswerId = aid,
+                        SourceUserId = uf.SourceUserId
+                    };
+                    db.MarkAdded(ufa);
+                }
+                uf.LinksCreated = true;
+                db.SaveChanges();
+            }
+            foreach (var question in db.Questions.Where(q => (!q.LinksCreated)).ToArray())
+            {
+                foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == question.UserId).ToArray())
+                {
+                    UserFollowQuestion ufq = new UserFollowQuestion()
+                    {
+                        QuestionId = question.Id,
+                        SourceUserId = uf.SourceUserId
+                    };
+                    db.MarkAdded(ufq);
+                }
+                question.LinksCreated = true;
+                db.SaveChanges();
+            }
+            foreach (var answer in db.Answers.Where(a => (!a.LinksCreated)).ToArray())
+            {
+                foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == answer.UserId).ToArray())
+                {
+                    UserFollowAnswer ufa = new UserFollowAnswer()
+                    {
+                        AnswerId = answer.Id,
+                        SourceUserId = uf.SourceUserId
+                    };
+                    db.MarkAdded(ufa);
+                }
+                answer.LinksCreated = true;
+                db.SaveChanges();
+            }
         }
 
         public static void CreateActivitiesAndNotifications(this QotdContext db)

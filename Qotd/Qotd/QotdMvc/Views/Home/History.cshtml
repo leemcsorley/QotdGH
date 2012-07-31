@@ -1,0 +1,32 @@
+﻿@foreach (var day in ((Qotd.PresentationObjects.ActivityPO[])ViewBag.Activities).GroupBy(a => a.Activity.Date.Date).OrderByDescending(a => a.Key))
+{
+    <div class="history-date">
+        <h2>@day.Key.ToLongDateString()</h2>
+    </div>
+    <!-- answers -->
+     int c = 0;
+     foreach (var activity in day.Where(a => a.Activity.ActivityType == Qotd.Entities.ActivityType.PostAnswer))
+     {
+         if (c == 0)
+         {
+             <div class="history-section"><b>Answers</b></div>
+         }
+         <div>
+         @Html.Partial("Answer", activity.Answer);
+         </div>
+         c++;
+     }
+    <!-- questions -->
+     c = 0;
+     foreach (var activity in day.Where(a => a.Activity.ActivityType == Qotd.Entities.ActivityType.PostQuestion))
+     {
+         if (c == 0)
+         {
+             <div class="history-section"><b>Questions</b></div>
+         }
+         <div>
+         @Html.Partial("Question", activity.Question);
+         </div>
+         c++;
+     }
+}

@@ -1,0 +1,22 @@
+﻿@model Qotd.PresentationObjects.UserPO
+<table class="table-condensed">
+    <thead>
+        <tr>
+            <th></th>
+            <th style="width: 40%">Last 4 Weeks</th>
+            <th style="width: 40%">Overall</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Ranking:</td>
+            <td class="number">@Model.User.OverallRankThisPeriod</td>
+            <td class="number">@Model.User.OverallRank</td>
+        </tr>
+        <tr>
+            <td class="score-col">Score:</td>
+            <td class="number score-col">@Model.User.ScoreThisPeriod</td>
+            <td class="number score-col">@Model.User.Score</td>
+        </tr>
+    </tbody>
+</table>

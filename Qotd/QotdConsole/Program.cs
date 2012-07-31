@@ -20,6 +20,7 @@ namespace QotdConsole
                     Thread.Sleep(500);
                         
                     db.CreateActivitiesAndNotifications();
+                    db.CreateUserFollowLinks();
 
                     if (loop % 10 == 0)
                         db.UpdateUserRankings();

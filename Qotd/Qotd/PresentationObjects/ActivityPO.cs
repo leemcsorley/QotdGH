@@ -28,5 +28,9 @@ namespace Qotd.PresentationObjects
                 _userProfileImageUrl = value;
             }
         }
+
+        public QuestionPO Question { get; set; }
+
+        public AnswerPO Answer { get; set; }
     }
 }

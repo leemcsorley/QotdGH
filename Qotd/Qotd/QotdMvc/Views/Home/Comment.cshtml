@@ -2,10 +2,10 @@
 <!-- Comment -->
 <div style="overflow: hidden; clear: left; font-size: 10px; background-color: #eeeeee; padding: 4px 4px; margin-top: 1px;">
     <div style="float:left">
-        <img src="@Model.UserProfileImageUrl" style="width: 25px; height: 25px; margin-right: 4px;" />
+        <img src="@Model.User.User.ProfileImageUrl" style="width: 25px; height: 25px; margin-right: 4px;" />
     </div>
     <div style="overflow: hidden;">
-        <div style="overflow: hidden; font-size: 13px;"><span><a href="#"><b>@Model.UserDisplayName</b></a></span>&nbsp;&nbsp;<span>@Model.Comment.Content</span></div>
+        <div style="overflow: hidden; font-size: 13px;"><span>@Html.Partial("UserLink", Model.User)</span>&nbsp;&nbsp;<span>@Model.Comment.Content</span></div>
         <div style="overflow: hidden; font-size: 9px; margin-top: 4px;">
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {

@@ -75,12 +75,29 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                     User user = new User()
                     {
                         DisplayName = names[i],
-                        ProfileImageUrl = imgpath + "\\" + "pic" + (i + 1).ToString() + ".jpg"
+                        ProfileImageUrl = imgpath + "\\" + "pic" + (i + 1).ToString() + ".jpg",
+                        Username = "TU" + i
                     };
                     service.SaveNewUser(user);
                     users.Add(user);
                 }
                 DateTime now = DateTime.Now.Date;
+                // follows
+                for (int i = 0; i < 10; i++)
+                {
+                    int num = RND.Next(0, 10);
+                    User user = users[i];
+                    foreach (var tuser in users.OrderBy(u => RND.NextDouble()).Take(num))
+                    {
+                        if (tuser == user) continue;
+                        service.FollowUser(
+                            new UserFollow()
+                            {
+                                SourceUser = user,
+                                TargetUser = tuser
+                            });
+                    }
+                }
                 for (DateTime date = now.AddDays(-NUM_DAYS); date <= now.AddDays(1); date = date.AddDays(1))
                 {
                     // questions

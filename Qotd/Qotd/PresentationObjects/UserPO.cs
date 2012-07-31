@@ -9,5 +9,7 @@ namespace Qotd.PresentationObjects
     public class UserPO
     {
         public User User { get; set; }
+
+        public int? UnreadNotifications { get; set; }
     }
 }
