@@ -56,6 +56,8 @@ namespace Qotd.WorkerImpl
                 switch (count)
                 {
                     case 0:
+                        answer.IsFirst = true;
+                        answer.AnswerRank = 1;
                         answer.User.AddAction(ActivityType.AnswerWin, answer);
                         activity = new Activity()
                         {
@@ -66,9 +68,12 @@ namespace Qotd.WorkerImpl
                             Text = "",
                             VisibleWithoutLink = true
                         };
+                        db.MarkAddedOrUpdated(answer);
                         db.MarkAddedOrUpdated(activity);
                         break;
                     case 1:
+                        answer.IsSecond = true;
+                        answer.AnswerRank = 2;
                         answer.User.AddAction(ActivityType.AnswerSecond, answer);
                         activity = new Activity()
                         {
@@ -79,9 +84,12 @@ namespace Qotd.WorkerImpl
                             Text = "",
                             VisibleWithoutLink = true
                         };
+                        db.MarkAddedOrUpdated(answer);
                         db.MarkAddedOrUpdated(activity);
                         break;
                     case 2:
+                        answer.IsThird = true;
+                        answer.AnswerRank = 3;
                         answer.User.AddAction(ActivityType.AnswerThird, answer);
                         activity = new Activity()
                         {
@@ -92,6 +100,7 @@ namespace Qotd.WorkerImpl
                             Text = "",
                             VisibleWithoutLink = true
                         };
+                        db.MarkAddedOrUpdated(answer);
                         db.MarkAddedOrUpdated(activity);
                         break;
                 }

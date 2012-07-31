@@ -4,11 +4,135 @@
 }
 <div class="row">
     <div class="span12">
-        <div class="well">
-            @ViewBag.TargetUser.User.DisplayName
+        <div class="well" style="overflow: hidden">
+            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+                <img src="@ViewBag.TargetUser.User.ProfileImageUrl" alt="profile picture" style="border: 1px solid black"/>
+            </div>
+            <div style="float: left; border-right: 1px solid #dddddd; height: 50px">&nbsp;</div>
+            <div style="float: left;">
+                <table class="table-condensed">
+                        <tbody>
+                            <tr>
+                                <td><h3>@ViewBag.TargetUser.User.DisplayName</h3></td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
         </div>
-        <div>
-            @Html.Action("HistoryForUser", "Home", new { userId = ViewBag.TargetUser.User.Id })
-        </div>
+
+        <div class="tabbable tabs-left">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tab1" data-toggle="tab" class="has-tooltip" title="" data-placement="right"><i class="icon-table" style="font-size: 15px; color: Red; padding-right: 10px"></i><b>Statistics</b></a>
+                        </li>
+                        <li>
+                            <a href="#tab2" data-toggle="tab" class="ajax-tab has-tooltip" title="" data-placement="right" rel="@Url.Action("HistoryForUser", "Home", new { userId = ViewBag.TargetUser.User.Id })"><i class="icon-globe" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>History</b></a>
+                        </li>
+                        <li>
+                            <a href="#tab3" data-toggle="tab" class="ajax-tab" rel="@Url.Action("FollowList", "Home", new { userId = ViewBag.TargetUser.User.Id })"><i class="icon-star" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Favourite Members</b></a>
+                        </li>
+                    </ul>
+                <div class="tab-content">
+                    <div id="alert-box">
+                    </div>
+                    <div class="tab-pane active" id="tab1">
+                        <div style="overflow: hidden; clear: left;">
+                <table class="table-condensed">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th style="width: 15%">Last 4 Weeks</th>
+                            <th style="width: 15%">Overall</th>
+                            <th style="width: 15%">Site Highest</th>
+                            <th style="width: 15%">Favourites Highest</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="icon-reorder"></i>&nbsp;Ranking:</td>
+                            <td class="number">@ViewBag.TargetUser.User.OverallRankThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.OverallRank</td>
+                        </tr>
+                        <tr class="row-spacer"><td colspan="5"></td></tr>
+                        <tr class="oddrow">
+                            <td><i class="icon-heart"></i>&nbsp;Total Number of Answer Votes:</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr>
+                            <td ><i class="icon-heart"></i>&nbsp;Total Number of Question Votes:</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalQuestionVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalQuestionVotes</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr class="row-spacer"><td colspan="5"></td></tr>
+                        <tr class="oddrow">
+                            <td ><i class="icon-trophy gold"></i>&nbsp;Number of Answers Won:</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersWonThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersWon</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr>
+                            <td ><i class="icon-trophy silver"></i>&nbsp;Number of Answers Second Place:</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersSecondThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersSecond</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr class="oddrow">
+                            <td ><i class="icon-trophy bronze"></i>&nbsp;Number of Answers Third Place:</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersThirdThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersThird</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr>
+                            <td ><i class="icon-trophy gold"></i>&nbsp;Number of Questions Won:</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumQuestionsWonThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumQuestionsWon</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr class="row-spacer"><td colspan="5"></td></tr>
+                        <tr class="oddrow">
+                            <td ><i class="icon-comments"></i>&nbsp;Number of Answers Submitted:</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswersThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumAnswers</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr>
+                            <td ><i class="icon-question-sign"></i>&nbsp;Number of Questions Submitted:</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumQuestionsThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.NumQuestions</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                        <tr class="row-spacer"><td colspan="5"></td></tr>
+                        <tr>
+                            <td class="score-col"><i class="icon-certificate"></i>&nbsp;Score:</td>
+                            <td class="number score-col">@ViewBag.TargetUser.User.ScoreThisPeriod</td>
+                            <td class="number score-col">@ViewBag.TargetUser.User.Score</td>
+                            <td class="number score-col">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
+                            <td class="number score-col">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+                    </div>
+                    <div class="tab-pane" id="tab2">
+                        
+                    </div>
+                    <div class="tab-pane" id="tab3">
+                        
+                    </div>
+                </div>
+            </div>
+
+        
     </div>
 </div>

@@ -158,9 +158,7 @@
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="#">
-                Question of the Day
-            </a>
+            <a class="brand" href="@Url.Action("Index", "Home")">Question of the Day</a>
             <ul class="nav"><li class="divider-vertical"></li></ul>
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {

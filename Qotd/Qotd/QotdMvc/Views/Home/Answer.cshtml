@@ -41,9 +41,24 @@
     <div style="overflow: hidden;">
         <!-- Header -->
         <div style="overflow: hidden;">
-            <span style="font-weight: bold">@Model.Answer.Title</span>
-            <span>by</span>
-            <span style="font-weight: bold;">@Html.Partial("UserLink", Model.User)</span>
+            <div style="float: left">
+                <span style="font-weight: bold">@Model.Answer.Title</span>
+                <span>by</span>
+                <span style="font-weight: bold;">@Html.Partial("UserLink", Model.User)</span>
+            </div>
+            <div style="float: right;"><span class="label label-info" style="font-size: 11px"><i class="icon-comments"></i>&nbsp;Answer</span></div>
+            @if (Model.Answer.IsFirst.HasValue && Model.Answer.IsFirst.Value)
+            {
+                <div style="float: right; margin-right: 4px"><i class="icon-trophy gold"></i>&nbsp;<span class="label" style="font-size: 11px">Winner</span></div>
+            }
+            @if (Model.Answer.IsSecond.HasValue && Model.Answer.IsSecond.Value)
+            {
+                <div style="float: right; margin-right: 4px"><i class="icon-trophy silver"></i>&nbsp;<span class="label" style="font-size: 11px">Second</span></div>
+            }
+            @if (Model.Answer.IsThird.HasValue && Model.Answer.IsThird.Value)
+            {
+                <div style="float: right; margin-right: 4px"><i class="icon-trophy bronze"></i>&nbsp;<span class="label" style="font-size: 11px">Third</span></div>
+            }
         </div> 
         <!-- Content -->
         <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">@Html.Raw(Model.Answer.Content)</div>

@@ -12,9 +12,19 @@
     	background-color: #eeeeee;
     }
     
+    th
+    {
+    	background-color: #eeeeee;
+    }
+    
     th, td
     {
     	padding: 8px 8px;
+    }
+    
+    tr
+    {
+    	background-color: White;
     }
     
     td
@@ -60,10 +70,17 @@
     	background-color: #efefff;
     }
     
+    tr.row-spacer
+    {
+    	background-color: #cccccc;
+    	height: 6px;
+    }
+    
     .gold { color: #8B8B00 }
     .silver { color: #aaaaaa }
     .bronze { color: #CD6600 }
     .red { color: #ee2222 }
+    .white { color: White }
        
     .tooltip
     {
@@ -73,16 +90,13 @@
     .history-date
     {
     	padding: 8px 8px;
-    	border: 1px solid #aaaacc;
-    	background-color: #efefff;
     	text-align: center;
     }
     
     .history-section
     {
-    	background-color: #aaaacc;
-    	color: White;
     	margin-bottom: 12px;
     	padding-left: 8px;
     	text-align: center;
     }
+   

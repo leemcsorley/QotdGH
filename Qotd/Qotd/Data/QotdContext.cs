@@ -81,6 +81,7 @@ update cte
         public UserPO GetUserByUsername(string username)
         {
             var user = Users.SingleOrDefault(u => u.Username == username);
+            if (user == null) return null;
             return new UserPO()
             {
                 User = user,
@@ -156,7 +157,7 @@ update cte
                 pqs[i] = new QuestionPO()
                 {
                     Question = q,
-                    HasUserVoted = uvqs != null ? (userId == q.UserId ? true : uvqs.ContainsKey(q.Id)) : false,
+                    HasUserVoted = uvqs != null ? (userId == q.UserId ? true : uvqs.ContainsKey(q.Id)) : true,
                     User = new UserPO()
                     {
                         User = new User()
@@ -196,7 +197,7 @@ update cte
                 pans[i] = new AnswerPO()
                 {
                     Answer = a,
-                    HasUserVoted = uvas != null ? (userId == a.UserId ? true : uvas.ContainsKey(a.Id)) : false,
+                    HasUserVoted = uvas != null ? (userId == a.UserId ? true : uvas.ContainsKey(a.Id)) : true,
                     Comments = (cmts.ContainsKey(a.Id) ? cmts[a.Id] : null),
                         // denormalised
                     User = new UserPO()
@@ -213,6 +214,17 @@ update cte
                 };
             }
             return pans;
+        }
+
+        public UserPO[] GetUsersFollowed(Guid userId)
+        {
+            return UserFollows.Where(u => u.SourceUserId == userId)
+                .Select(u => u.TargetUser)
+                .ToArray()
+                .Select(u => new UserPO()
+                {
+                    User = u
+                }).ToArray();
         }
 
         public QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take)
@@ -283,10 +295,13 @@ update cte
         {
             var act = activities.ToArray();
 
-            var qids = act.Where(a => a.ActivityType == ActivityType.PostQuestion)
+            var qids = act.Where(a => a.ActivityType == ActivityType.PostQuestion || a.ActivityType == ActivityType.QuestionWin)
                 .Select(a => a.QuestionId.Value).ToArray();
 
-            var aids = act.Where(a => a.ActivityType == ActivityType.PostAnswer)
+            var aids = act.Where(a => a.ActivityType == ActivityType.PostAnswer ||
+                                 a.ActivityType == ActivityType.AnswerWin ||
+                                 a.ActivityType == ActivityType.AnswerSecond ||
+                                 a.ActivityType == ActivityType.AnswerThird)
                 .Select(a => a.AnswerId.Value).ToArray();
 
             var qs = GetQuestions(Questions.Where(q => qids.Contains(q.Id)), null)

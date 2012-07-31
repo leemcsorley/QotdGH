@@ -61,6 +61,7 @@ namespace QotdMvc.Controllers
         {
             get
             {
+                if (UserPO == null) return null;
                 return UserPO.User;
             }
         }

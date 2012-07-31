@@ -33,8 +33,11 @@ namespace QotdMvc.Controllers
             return View("History");
         }
 
-        public ActionResult History()
+        public ActionResult History(DateTime? dateFrom = null, DateTime? dateTo = null)
         {
+            if (dateFrom == null) dateFrom = DateTime.Now.Date.AddDays(-DEFAULT_TAKE);
+            if (dateTo == null) dateTo = DateTime.Now;
+            ViewBag.Activities = DataProvider.GetHistory(dateFrom.Value, dateTo.Value);
             return View("History");
         }
 
@@ -172,6 +175,12 @@ namespace QotdMvc.Controllers
             else
                 leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD);
             return View("Leaderboard", leaderboard);
+        }
+
+        public ActionResult FollowList(Guid userId)
+        {
+            ViewBag.Users = DataProvider.GetUsersFollowed(userId);
+            return View();
         }
 
         [HttpGet]

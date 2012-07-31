@@ -1,0 +1,9 @@
+﻿@foreach (var user in ViewBag.Users)
+{
+    <div style="float: left; clear: both; margin-bottom: 8px">
+        <div style="float: left"><img src="@user.User.ProfileImageUrl" alt="profile picture"/></div>
+        <div style="float: left">
+            @Html.Partial("UserLink", (Qotd.PresentationObjects.UserPO)user)
+        </div>
+    </div>
+}

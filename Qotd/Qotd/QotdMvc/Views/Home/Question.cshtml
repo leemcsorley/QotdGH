@@ -41,8 +41,15 @@
     <div style="overflow: hidden;">
         <!-- Header -->
         <div style="overflow: hidden;">
-            <span style="font-weight: bold">@Html.Partial("UserLink", Model.User)</span>
-            <span>asks:</span>
+            <div style="float: left">
+                <span style="font-weight: bold">@Html.Partial("UserLink", Model.User)</span>
+                <span>asks:</span>
+            </div>
+            <div style="float: right;"><span class="label label-warning" style="font-size: 11px"><i class="icon-question-sign"></i>&nbsp;Question</span></div>
+            @if (Model.Question.WinningQuestion.HasValue && Model.Question.WinningQuestion.Value)
+            {
+                <div style="float: right; margin-right: 4px"><i class="icon-trophy gold"></i>&nbsp;<span class="label" style="font-size: 11px">Winner</span></div>
+            }
         </div> 
         <!-- Content -->
         <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">

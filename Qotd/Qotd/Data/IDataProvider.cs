@@ -83,5 +83,7 @@ namespace Qotd.Data
         ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo);
 
         Notification[] ReadNotifications(Guid userId);
+
+        UserPO[] GetUsersFollowed(Guid userId);
     }
 }
