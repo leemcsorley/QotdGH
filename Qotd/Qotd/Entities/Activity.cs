@@ -46,6 +46,8 @@ namespace Qotd.Entities
 
         public virtual string Text { get; set; }
 
+        public virtual string Text2 { get; set; }
+
         public virtual bool LinksCreated { get; set; }
 
         public virtual bool NotificationsCreated { get; set; }

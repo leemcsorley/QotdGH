@@ -28,5 +28,21 @@ namespace Qotd.Entities
         }
 
         public virtual byte ActivityTypeValue { get; set; }
+
+        public virtual string denorm_SourceUser_DisplayName { get; set; }
+
+        public virtual string denorm_SourceUser_ProfileImageUrl { get; set; }
+
+        public virtual Guid? QuestionId { get; set; }
+
+        public virtual Question Question { get; set; }
+
+        public virtual Guid? AnswerId { get; set; }
+
+        public virtual Answer Answer { get; set; }
+
+        public virtual Guid? CommentId { get; set; }
+
+        public virtual Comment Comment { get; set; }
     }
 }

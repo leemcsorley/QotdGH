@@ -30,13 +30,13 @@
     {
         jQuery("time.timeago").timeago();
 
-         $('.ajax-popover').bind('hover',function(event){
-            var el=$(this);
-            $.get(el.attr('data-load'),function(d){
-                el.unbind().popover({content: d}).popover('show');
-                el.removeClass('.ajax-popover');
-            });
-        });
+//         $('.ajax-popover').bind('hover',function(event){
+//            var el=$(this);
+//            $.get(el.attr('data-load'),function(d){
+//                el.unbind().popover({content: d}).popover('show');
+//                el.removeClass('.ajax-popover');
+//            });
+//        });
 
         $('.has-tooltip').tooltip();
     };
@@ -80,6 +80,12 @@
                         });
                         }, 1000);
                 }, "json");
+            });
+
+        $('#notification-dropdown').bind("click",
+            function()
+            {
+                $("#notification-menu").load("@Url.Action("Notifications", "Home")");
             });
 
         $('.ajax-link').live("click",
@@ -159,12 +165,13 @@
     <div class="navbar-inner">
         <div class="container">
             <a class="brand" href="@Url.Action("Index", "Home")">Question of the Day</a>
-            <ul class="nav"><li class="divider-vertical"></li></ul>
+            <!-- notification dropdown -->
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {
+            <ul class="nav"><li class="divider-vertical"></li></ul>
             <ul class="nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle" id="notification-dropdown" data-toggle="dropdown">
                         @if (ViewBag.UserPO.UnreadNotifications == 0)
                         {
                         <i class="icon-envelope" style="font-size: 22px; position: relative; top: 3px;"></i>
@@ -175,11 +182,13 @@
                         <span style="background-color: white; color: black; position: relative; left: -10px; top: -10px; border: 1px solid black; opacity: 1.0; font-size: 9px; font-weight: bold; padding: 2px 2px;">@ViewBag.UserPO.UnreadNotifications</span>  
                         }
                     </a>
-                    <ul class="dropdown-menu"></ul>
+                    <ul class="dropdown-menu" id="notification-menu">
+                    </ul>
                 </li>
             </ul>
-            }
             <ul class="nav"><li class="divider-vertical"></li></ul>
+            }
+            <!-- --------------------- -->
             <div class="btn-group pull-right">
                 <!-- if signed in -->
                 @if (ViewBag.IsAuthenticated && ViewBag.User != null)

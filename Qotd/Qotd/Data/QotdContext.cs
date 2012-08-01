@@ -327,7 +327,15 @@ update cte
 
         public Notification[] ReadNotifications(Guid userId)
         {
-            throw new System.NotImplementedException();
+            var nots = Notifications.Where(n => (!n.IsRead) && n.UserId == userId)
+                .OrderByDescending(n => n.Date)
+                .ToArray();
+
+            foreach (var n in nots)
+                n.IsRead = true;
+            SaveChanges();
+
+            return nots;
         }
 
         public ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo)

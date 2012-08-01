@@ -99,4 +99,14 @@
     	padding-left: 8px;
     	text-align: center;
     }
+    
+    .question
+    {
+    	background-color: white;
+    }
+    
+    .answer
+    {
+    	background-color: white;
+    }
    

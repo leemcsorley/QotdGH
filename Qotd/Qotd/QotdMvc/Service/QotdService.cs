@@ -117,8 +117,10 @@ namespace QotdMvc.Service
                 SourceUser = comment.User,
                 Text = comment.Content.Crop(128),
                 Comment = comment,
+                AnswerId = comment.AnswerId,
                 ActivityType = ActivityType.PostComment,
-                VisibleWithoutLink = true
+                VisibleWithoutLink = true,
+                Text2 = answer.Title.Crop(128)
             };
             Denormaliser.Denormalise(activity);
             comment.User.AddAction(ActivityType.PostComment);

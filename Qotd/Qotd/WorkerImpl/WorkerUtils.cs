@@ -199,7 +199,10 @@ namespace Qotd.WorkerImpl
                             IsRead = false,
                             SourceUserId = act.SourceUserId,
                             UserId = act.Comment.UserId,
-                            ActivityType = act.ActivityType
+                            ActivityType = act.ActivityType,
+                            CommentId = act.CommentId,
+                            AnswerId = act.AnswerId,
+                            Text = act.Text
                         };
                         act.NotificationsCreated = true;
                         db.MarkAddedOrUpdated(act);
@@ -207,7 +210,7 @@ namespace Qotd.WorkerImpl
                         db.SaveChanges();
                         break;
                     case ActivityType.PostComment:
-                        Guid aid = act.Comment.AnswerId;
+                        Guid aid = act.AnswerId.Value;
                         // create notifications for all the users in the comment stream and the author of the answer
                         userIds = db.Comments.Where(c => c.AnswerId == aid && c.UserId != act.SourceUserId)
                             .Select(c => c.UserId)
@@ -223,7 +226,10 @@ namespace Qotd.WorkerImpl
                                 IsRead = false,
                                 SourceUserId = act.SourceUserId,
                                 UserId = uid,
-                                ActivityType = act.ActivityType
+                                ActivityType = act.ActivityType,
+                                CommentId = act.CommentId,
+                                AnswerId = act.AnswerId,
+                                Text = act.Text
                             };
                             db.MarkAddedOrUpdated(not);
                         }

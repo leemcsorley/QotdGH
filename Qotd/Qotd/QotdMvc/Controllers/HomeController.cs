@@ -41,6 +41,20 @@ namespace QotdMvc.Controllers
             return View("History");
         }
 
+        public ActionResult Notifications()
+        {
+            var not = DataProvider.ReadNotifications(UserEntity.Id);
+            if (not.Length > 0)
+            {
+                ViewBag.Notifications = not;
+            }
+            else
+            {
+                // TODO
+            }
+            return View();
+        }
+
         //
         // GET: /Home/
         public ActionResult Index()

@@ -38,7 +38,7 @@
         }
     </div>
     <!-- Main section of post -->
-    <div style="overflow: hidden;">
+    <div style="overflow: hidden;border-bottom: 2px dashed #0079cc; margin-bottom: 8px; padding-bottom: 8px;">
         <!-- Header -->
         <div style="overflow: hidden;">
             <div style="float: left">
@@ -61,7 +61,7 @@
             }
         </div> 
         <!-- Content -->
-        <div style="overflow: hidden; clear: left; margin-top: 8px; background-color: #eeeeee; padding: 4px 4px">@Html.Raw(Model.Answer.Content)</div>
+        <div style="overflow: hidden; clear: left; margin-top: 8px; padding: 4px 4px" class="answer">@Html.Raw(Model.Answer.Content)</div>
         <!-- Controls footer -->
         <div style="float: left; overflow: hidden; clear: left; margin-top: 8px; font-size: 11px; margin-bottom: 8px;">
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
@@ -79,7 +79,7 @@
         @if (Model.Comments != null && Model.Answer.NumComments > Model.Comments.Length)
         {
             <!-- Num comments -->
-            <div style="overflow: hidden; clear: left; font-size: 10px; background-color: #eeeeee; padding: 4px 4px;">
+            <div style="overflow: hidden; clear: left; font-size: 10px; background-color: white; padding: 4px 4px;">
                 <a href="@Url.Action("Comments", "Home", new { answerId = Model.Answer.Id })" class="ajax-link"><i class="icon-edit"></i>&nbsp;View all @Model.Answer.NumComments comments...</a>
             </div>
         }
@@ -94,7 +94,7 @@
         }
         </div>
         <!-- Comment input footer -->
-        <div style="overflow: hidden; clear: left; margin-top: 1px; margin-bottom: 8px; font-size: 10px; background-color: #eeeeee; padding: 4px 4px;">
+        <div style="overflow: hidden; clear: left; margin-top: 1px; margin-bottom: 8px; font-size: 10px; background-color: #eeeeee; padding: 4px 4px; display: none;">
             <div style="float: left;">
                 <img src="@Model.User.User.ProfileImageUrl" style="width: 25px; height: 25px; margin-right: 4px;"/>
             </div>
