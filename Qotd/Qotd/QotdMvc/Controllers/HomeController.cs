@@ -14,6 +14,7 @@ namespace QotdMvc.Controllers
     {
         private const int DEFAULT_TAKE = 20;
         private const int DEFAULT_TAKE_LEADERBOARD = 50;
+        private const int DEFAULT_TAKE_NOTIFICATIONS = 20;
 
         public ActionResult UserPopover(Guid userId)
         {
@@ -28,7 +29,8 @@ namespace QotdMvc.Controllers
 
         public ActionResult HistoryForUser(Guid userId, int skip = 0, int take = DEFAULT_TAKE)
         {
-            ViewBag.Activities = DataProvider.GetHistoryForUser(userId, skip, take);
+            int count;
+            ViewBag.Activities = DataProvider.GetHistoryForUser(userId, skip, take, out count);
 
             return View("History");
         }
@@ -44,14 +46,19 @@ namespace QotdMvc.Controllers
         public ActionResult Notifications()
         {
             var not = DataProvider.ReadNotifications(UserEntity.Id);
-            if (not.Length > 0)
-            {
-                ViewBag.Notifications = not;
-            }
-            else
-            {
-                // TODO
-            }
+            ViewBag.Notifications = not;
+            return View();
+        }
+
+        public ActionResult AllNotifications(bool ajax = false, int skip = 0, int take = DEFAULT_TAKE_NOTIFICATIONS)
+        {
+            int count = 0;
+            var nots = DataProvider.GetNotifications(UserEntity.Id, skip, take, out count);
+            ViewBag.Notifications = nots; 
+            ViewBag.Skip = skip + take;
+            ViewBag.Take = take;
+            ViewBag.Layout = ajax ? "" : "~/Views/Shared/_Layout.cshtml";
+            ViewBag.More = count > skip + nots.Length;
             return View();
         }
 
@@ -78,116 +85,159 @@ namespace QotdMvc.Controllers
             return View();
         }
 
-        public ActionResult Answer(Guid answerId)
+        public ActionResult Answer(Guid answerId, bool ajax = true)
         {
-            return View("Answer", DataProvider.GetAnswerById(answerId, UserEntity.Id));
+            var answer = DataProvider.GetAnswerById(answerId, UserEntity.Id);
+            if (ajax)
+                return View("Answer", answer);
+            else
+            {
+                ViewBag.Object = answer;
+                ViewBag.Type = SingleType.Answer;
+                return View("Single");
+            }
         }
 
-        public ActionResult Question(Guid questionId)
+        public ActionResult Question(Guid questionId, bool ajax = true)
         {
-            return View("Question", DataProvider.GetQuestionById(questionId, UserEntity.Id));
+            var question = DataProvider.GetQuestionById(questionId, UserEntity.Id);
+            if (ajax)
+                return View("Question", question);
+            else
+            {
+                ViewBag.Object = question;
+                ViewBag.Type = SingleType.Question;
+                return View("Single");
+            }
         }
 
         public ActionResult QuestionsLatest(int skip = 0, int take = DEFAULT_TAKE)
         {
+            int count;
+            QuestionPO[] questions;
             if (UserEntity != null)
-                ViewBag.Questions = DataProvider.GetQuestionsLatest(UserEntity.Id, skip, take);
+                questions = DataProvider.GetQuestionsLatest(UserEntity.Id, skip, take, out count);
             else
-                ViewBag.Questions = DataProvider.GetQuestionsLatest(skip, take);
+                questions = DataProvider.GetQuestionsLatest(skip, take, out count);
             ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
+            ViewBag.Questions = questions;
             ViewBag.Action = "QuestionsLatest";
+            ViewBag.More = count > skip + questions.Length;
             return View("Questions");
         }
 
         public ActionResult QuestionsRated(int skip = 0, int take = DEFAULT_TAKE)
         {
+            int count;
+            QuestionPO[] questions;
             if (UserEntity != null)
-                ViewBag.Questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take);
+                questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take, out count);
             else
-                ViewBag.Questions = DataProvider.GetQuestionsRated(skip, take);
+                questions = DataProvider.GetQuestionsRated(skip, take, out count);
+            ViewBag.Questions = questions;
             ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "QuestionsRated";
+            ViewBag.More = count > skip + questions.Length;
             return View("Questions");
         }
 
         public ActionResult QuestionsTab(int skip = 0, int take = DEFAULT_TAKE)
         {
+            int count;
+            QuestionPO[] questions;
             if (UserEntity != null)
-                ViewBag.Questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take);
+                questions = DataProvider.GetQuestionsRated(UserEntity.Id, skip, take, out count);
             else
-                ViewBag.Questions = DataProvider.GetQuestionsRated(skip, take);
+                questions = DataProvider.GetQuestionsRated(skip, take, out count);
+            ViewBag.Questions = questions;
             ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "QuestionsRated";
+            ViewBag.More = count > skip + questions.Length;
             return View("QuestionsTab");
         }
 
         public ActionResult AnswersLatest(int skip = 0, int take = DEFAULT_TAKE)
         {
+            int count;
+            AnswerPO[] answers;
             if (UserEntity != null)
-                ViewBag.Answers = DataProvider.GetAnswersLatest(UserEntity.Id, TodaysQuestion.Id, skip, take);
+                answers = DataProvider.GetAnswersLatest(UserEntity.Id, TodaysQuestion.Id, skip, take, out count);
             else
-                ViewBag.Answers = DataProvider.GetAnswersLatest(TodaysQuestion.Id, skip, take);
+                answers = DataProvider.GetAnswersLatest(TodaysQuestion.Id, skip, take, out count);
+            ViewBag.Answers = answers;
             ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "AnswersLatest";
+            ViewBag.More = count > skip + answers.Length;
             return View("Answers");
         }
 
         public ActionResult AnswersTab(int skip = 0, int take = DEFAULT_TAKE)
         {
+            int count;
+            AnswerPO[] answers;
             if (UserEntity != null)
-                ViewBag.Answers = DataProvider.GetAnswersRated(UserEntity.Id, TodaysQuestion.Id, skip, take);
+                answers = DataProvider.GetAnswersRated(UserEntity.Id, TodaysQuestion.Id, skip, take, out count);
             else
-                ViewBag.Answers = DataProvider.GetAnswersRated(TodaysQuestion.Id, skip, take);
+                answers = DataProvider.GetAnswersRated(TodaysQuestion.Id, skip, take, out count);
+            ViewBag.Answers = answers;
             ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "AnswersRated";
+            ViewBag.More = count > skip + answers.Length;
             return View("AnswersTab");
         }
 
         public ActionResult AnswersRated(int skip = 0, int take = DEFAULT_TAKE)
         {
+            int count;
+            AnswerPO[] answers;
             if (UserEntity != null)
-                ViewBag.Answers = DataProvider.GetAnswersRated(UserEntity.Id, TodaysQuestion.Id, skip, take);
+                answers = DataProvider.GetAnswersRated(UserEntity.Id, TodaysQuestion.Id, skip, take, out count);
             else
-                ViewBag.Answers = DataProvider.GetAnswersRated(TodaysQuestion.Id, skip, take);
+                answers = DataProvider.GetAnswersRated(TodaysQuestion.Id, skip, take, out count);
+            ViewBag.Answers = answers;
             ViewBag.Skip = skip + take;
             ViewBag.Take = DEFAULT_TAKE;
             ViewBag.Action = "AnswersRated";
+            ViewBag.More = count > skip + answers.Length;
             return View("Answers");
         }
 
         public ActionResult LeaderboardTab()
         {
+            int count;
             LeaderboardPO leaderboard;
             if (UserEntity == null)
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(0, DEFAULT_TAKE_LEADERBOARD);
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(0, DEFAULT_TAKE_LEADERBOARD, out count);
             else
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, 0, DEFAULT_TAKE_LEADERBOARD);
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, 0, DEFAULT_TAKE_LEADERBOARD, out count);
             ViewBag.Leaderboard = leaderboard;
             return View();
         }
 
         public ActionResult LeaderboardOverall(int skip = 0, int take = DEFAULT_TAKE_LEADERBOARD)
         {
+            int count;
             LeaderboardPO leaderboard;
             if (UserEntity == null)
-                leaderboard = DataProvider.GetLeaderboard(skip, DEFAULT_TAKE_LEADERBOARD);
+                leaderboard = DataProvider.GetLeaderboard(skip, DEFAULT_TAKE_LEADERBOARD, out count);
             else
-                leaderboard = DataProvider.GetLeaderboard(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD);
+                leaderboard = DataProvider.GetLeaderboard(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD, out count);
             return View("Leaderboard", leaderboard);
         }
 
         public ActionResult LeaderboardThisPeriod(int skip = 0, int take = DEFAULT_TAKE_LEADERBOARD)
         {
+            int count;
             LeaderboardPO leaderboard;
             if (UserEntity == null)
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(skip, DEFAULT_TAKE_LEADERBOARD);
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(skip, DEFAULT_TAKE_LEADERBOARD, out count);
             else
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD);
+                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD, out count);
             return View("Leaderboard", leaderboard);
         }
 

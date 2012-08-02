@@ -13,13 +13,25 @@ namespace Qotd.Entities
 
         public virtual DateTime Date { get; set; }
 
+        public virtual string SourceUser1 { get; set; }
+
+        public virtual string SourceUser1ProfileImageUrl { get; set; }
+
+        public virtual string SourceUser2 { get; set; }
+
+        public virtual string SourceUser2ProfileImageUrl { get; set; }
+
+        public virtual string SourceUser3 { get; set; }
+
+        public virtual string SourceUser3ProfileImageUrl { get; set; }
+
+        public virtual int? OtherUserCount { get; set; }
+
         public virtual bool IsRead { get; set; }
 
-        public virtual Guid? SourceUserId { get; set; }
-
-        public virtual User SourceUser { get; set; }
-
         public virtual string Text { get; set; }
+
+        public virtual string Text2 { get; set; }
 
         public virtual ActivityType ActivityType
         {
@@ -28,10 +40,6 @@ namespace Qotd.Entities
         }
 
         public virtual byte ActivityTypeValue { get; set; }
-
-        public virtual string denorm_SourceUser_DisplayName { get; set; }
-
-        public virtual string denorm_SourceUser_ProfileImageUrl { get; set; }
 
         public virtual Guid? QuestionId { get; set; }
 
@@ -44,5 +52,7 @@ namespace Qotd.Entities
         public virtual Guid? CommentId { get; set; }
 
         public virtual Comment Comment { get; set; }
+
+        public virtual Guid? RelatedObjectId { get; set; }
     }
 }

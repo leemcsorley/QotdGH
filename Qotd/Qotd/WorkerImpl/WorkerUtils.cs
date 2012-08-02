@@ -174,6 +174,32 @@ namespace Qotd.WorkerImpl
             }
         }
 
+        public static void AggregateNotifications(this QotdContext db)
+        {
+            foreach (var un in db.Notifications.Where(n => (!n.IsRead) && n.RelatedObjectId.HasValue)
+                .OrderByDescending(n => n.Date)
+                .GroupBy(n => new { n.UserId, n.ActivityTypeValue, n.RelatedObjectId.Value }).Where(g => g.Count() > 1).ToArray())
+            {
+                var ns = un.ToArray();
+                ns[0].SourceUser2 = ns[1].SourceUser1;
+                ns[0].SourceUser2ProfileImageUrl = ns[1].SourceUser1ProfileImageUrl;
+                db.Notifications.Remove(ns[1]);
+                if (ns.Length > 2)
+                {
+                    ns[0].SourceUser3 = ns[2].SourceUser1;
+                    ns[0].SourceUser3ProfileImageUrl = ns[2].SourceUser1ProfileImageUrl;
+                    db.Notifications.Remove(ns[2]);
+                }
+                if (ns.Length > 3)
+                {
+                    ns[0].OtherUserCount = ns.Length - 3;
+                    for (int i = 3; i < ns.Length; i++)
+                        db.Notifications.Remove(ns[i]);
+                }
+                db.SaveChanges();
+            }
+        }
+
         public static void CreateActivitiesAndNotifications(this QotdContext db)
         {
             // create links
@@ -197,12 +223,14 @@ namespace Qotd.WorkerImpl
                         {
                             Date = act.Date,
                             IsRead = false,
-                            SourceUserId = act.SourceUserId,
+                            SourceUser1 = act.denorm_SourceUser_DisplayName,
+                            SourceUser1ProfileImageUrl = act.denorm_SourceUser_ProfileImageUrl,
                             UserId = act.Comment.UserId,
                             ActivityType = act.ActivityType,
                             CommentId = act.CommentId,
                             AnswerId = act.AnswerId,
-                            Text = act.Text
+                            Text = act.Text,
+                            RelatedObjectId = act.RelatedObjectId
                         };
                         act.NotificationsCreated = true;
                         db.MarkAddedOrUpdated(act);
@@ -224,12 +252,15 @@ namespace Qotd.WorkerImpl
                             {
                                 Date = act.Date,
                                 IsRead = false,
-                                SourceUserId = act.SourceUserId,
+                                SourceUser1 = act.denorm_SourceUser_DisplayName,
+                                SourceUser1ProfileImageUrl = act.denorm_SourceUser_ProfileImageUrl,
                                 UserId = uid,
                                 ActivityType = act.ActivityType,
                                 CommentId = act.CommentId,
                                 AnswerId = act.AnswerId,
-                                Text = act.Text
+                                Text = act.Text,
+                                Text2 = act.Text2,
+                                RelatedObjectId = act.RelatedObjectId
                             };
                             db.MarkAddedOrUpdated(not);
                         }
@@ -249,9 +280,14 @@ namespace Qotd.WorkerImpl
                         {
                             Date = act.Date,
                             IsRead = false,
-                            SourceUserId = act.SourceUserId,
+                            SourceUser1 = act.denorm_SourceUser_DisplayName,
+                            SourceUser1ProfileImageUrl = act.denorm_SourceUser_ProfileImageUrl,
                             UserId = act.Answer.UserId,
-                            ActivityType = act.ActivityType
+                            ActivityType = act.ActivityType,
+                            AnswerId = act.Answer.Id,
+                            Text = act.Text,
+                            Text2 = act.Text2,
+                            RelatedObjectId = act.RelatedObjectId
                         };
                         act.NotificationsCreated = true;
                         db.MarkAddedOrUpdated(act);
@@ -264,9 +300,14 @@ namespace Qotd.WorkerImpl
                         {
                             Date = act.Date,
                             IsRead = false,
-                            SourceUserId = act.SourceUserId,
+                            SourceUser1 = act.denorm_SourceUser_DisplayName,
+                            SourceUser1ProfileImageUrl = act.denorm_SourceUser_ProfileImageUrl,
                             UserId = act.Question.UserId,
-                            ActivityType = act.ActivityType
+                            ActivityType = act.ActivityType,
+                            QuestionId = act.Question.Id,
+                            Text = act.Text,
+                            Text2 = act.Text2,
+                            RelatedObjectId = act.RelatedObjectId
                         };
                         act.NotificationsCreated = true;
                         db.MarkAddedOrUpdated(act);

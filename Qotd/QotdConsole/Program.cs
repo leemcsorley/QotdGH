@@ -23,7 +23,10 @@ namespace QotdConsole
                     db.CreateUserFollowLinks();
 
                     if (loop % 10 == 0)
+                    {
                         db.UpdateUserRankings();
+                        db.AggregateNotifications();
+                    }
                 }
                 loop++;
                 if (loop > 1000) 

@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    switch ((QotdMvc.SingleType)ViewBag.Type)
+    {
+        case QotdMvc.SingleType.Answer:
+            <text>@Html.Partial("Answer", (Qotd.PresentationObjects.AnswerPO)ViewBag.Object)</text>
+            break;
+    }
+}

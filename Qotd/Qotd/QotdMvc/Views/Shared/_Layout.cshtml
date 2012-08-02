@@ -85,7 +85,10 @@
         $('#notification-dropdown').bind("click",
             function()
             {
-                $("#notification-menu").load("@Url.Action("Notifications", "Home")");
+                $("#notification-menu").load("@Url.Action("Notifications", "Home")", function() 
+                {
+                    jQuery("time.timeago").timeago();
+                });
             });
 
         $('.ajax-link').live("click",
@@ -182,7 +185,7 @@
                         <span style="background-color: white; color: black; position: relative; left: -10px; top: -10px; border: 1px solid black; opacity: 1.0; font-size: 9px; font-weight: bold; padding: 2px 2px;">@ViewBag.UserPO.UnreadNotifications</span>  
                         }
                     </a>
-                    <ul class="dropdown-menu" id="notification-menu">
+                    <ul class="dropdown-menu" id="notification-menu" style="width: 300px; overflow: auto; max-height: 600px">
                     </ul>
                 </li>
             </ul>

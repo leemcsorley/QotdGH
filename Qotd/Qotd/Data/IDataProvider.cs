@@ -34,25 +34,25 @@ namespace Qotd.Data
 
         AnswerPO GetAnswerById(Guid answerId, Guid userId);
 
-        AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take);
+        AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take, out int count);
 
-        AnswerPO[] GetAnswersLatest(Guid userId, Guid questionId, int skip, int take);
+        AnswerPO[] GetAnswersLatest(Guid userId, Guid questionId, int skip, int take, out int count);
 
-        AnswerPO[] GetAnswersLatest(Guid questionId, int skip, int take);
+        AnswerPO[] GetAnswersLatest(Guid questionId, int skip, int take, out int count);
 
-        AnswerPO[] GetAnswersRated(Guid userId, Guid questionId, int skip, int take);
+        AnswerPO[] GetAnswersRated(Guid userId, Guid questionId, int skip, int take, out int count);
 
-        AnswerPO[] GetAnswersRated(Guid questionId, int skip, int take);
+        AnswerPO[] GetAnswersRated(Guid questionId, int skip, int take, out int count);
 
-        QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take);
+        QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take, out int count);
 
-        QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take);
+        QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take, out int count);
 
-        QuestionPO[] GetQuestionsLatest(int skip, int take);
+        QuestionPO[] GetQuestionsLatest(int skip, int take, out int count);
 
-        QuestionPO[] GetQuestionsRated(int skip, int take);
+        QuestionPO[] GetQuestionsRated(int skip, int take, out int count);
 
-        QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take);
+        QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take, out int count);
 
         QuestionPO GetQuestionById(Guid questionId, Guid userId);
 
@@ -70,20 +70,22 @@ namespace Qotd.Data
 
         ActivityPO[] GetActivities(DateTime? date, int take);
 
-        LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take);
+        LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take, out int count);
 
-        LeaderboardPO GetLeaderboard(Guid userId, int skip, int take);
+        LeaderboardPO GetLeaderboard(Guid userId, int skip, int take, out int count);
 
-        LeaderboardPO GetLeaderboard(int skip, int take);
+        LeaderboardPO GetLeaderboard(int skip, int take, out int count);
 
-        LeaderboardPO GetLeaderboardThisPeriod(int skip, int take);
+        LeaderboardPO GetLeaderboardThisPeriod(int skip, int take, out int count);
 
-        ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take);
+        ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take, out int count);
 
         ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo);
 
         Notification[] ReadNotifications(Guid userId);
 
         UserPO[] GetUsersFollowed(Guid userId);
+
+        Notification[] GetNotifications(Guid userId, int skip, int take, out int count);
     }
 }

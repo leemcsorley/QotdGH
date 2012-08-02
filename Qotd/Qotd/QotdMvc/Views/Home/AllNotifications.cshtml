@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "All Notifications";
+    Layout = ViewBag.Layout;
+}
+@foreach (var notification in ViewBag.Notifications)
+{
+    <text><div>@Html.Partial("Notification", (Qotd.Entities.Notification)notification)</div></text>
+}
+@if (ViewBag.More)
+{
+<div class="ajax-container">
+    <div style="overflow: hidden">
+        <a href="@Url.Action("AllNotifications", "Home", new { skip = ViewBag.Skip, take = ViewBag.Take, ajax = true })" class="ajax-link"><button class="btn btn-small btn-primary" type="submit">
+            <i class="icon-chevron-down"></i>&nbsp;&nbsp;See More</button></a>
+    </div>
+</div>
+}

@@ -189,6 +189,54 @@
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
     <Content Include="Scripts\qotd.js" />
+    <Content Include="Views\Home\Activities.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Activity.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\AllNotifications.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Answer.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Answers.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\AnswersTab.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Comment.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Comments.cshtml" />
+    <Content Include="Views\Home\FollowList.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\History.cshtml" />
+    <Content Include="Views\Home\Index.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Leaderboard.cshtml" />
+    <Content Include="Views\Home\LeaderboardTab.cshtml" />
+    <Content Include="Views\Home\Notification.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Notifications.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Question.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\Questions.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\QuestionsTab.cshtml" />
+    <Content Include="Views\Home\User.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Home\UserPopover.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -220,49 +268,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Home\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Qotd.csproj">
       <Project>{FD18C5EB-5401-48BE-9D23-9F272F7F7A3D}</Project>
       <Name>Qotd</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Answers.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Answer.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Comment.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Comments.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\AnswersTab.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Activities.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Activity.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Question.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Questions.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\QuestionsTab.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Leaderboard.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\LeaderboardTab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Alert\AnswerSuccess.cshtml" />
@@ -274,22 +283,10 @@
     <Content Include="Views\Shared\UserLink.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Home\UserPopover.cshtml" />
+    <Content Include="Views\Home\Single.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Home\User.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\History.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\FollowList.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Notifications.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Home\Notification.cshtml" />
+    <Content Include="Views\Shared\QuestionLink.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

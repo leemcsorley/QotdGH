@@ -109,34 +109,42 @@ update cte
             return UserQuestionSides.Any(u => u.UserId == userId && u.QuestionId == questionId);
         }
 
-        public QuestionPO[] GetQuestionsLatest(int skip, int take)
+        public QuestionPO[] GetQuestionsLatest(int skip, int take, out int count)
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
-            return GetQuestions(Questions.Where(q => q.DateFor == date)
+            var query = Questions.Where(q => q.DateFor == date);
+            count = query.Count();
+            return GetQuestions(query
                 .OrderByDescending(q => q.CreatedOn)
                 .Skip(skip).Take(take), null);
         }
 
-        public QuestionPO[] GetQuestionsRated(int skip, int take)
+        public QuestionPO[] GetQuestionsRated(int skip, int take, out int count)
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
-            return GetQuestions(Questions.Where(q => q.DateFor == date)
+            var query = Questions.Where(q => q.DateFor == date);
+            count = query.Count();
+            return GetQuestions(query
                 .OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod)
                 .Skip(skip).Take(take), null);
         }
 
-        public QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take)
+        public QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take, out int count)
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
-            return GetQuestions(Questions.Where(q => q.DateFor == date)
+            var query = Questions.Where(q => q.DateFor == date);
+            count = query.Count();
+            return GetQuestions(query
                 .OrderByDescending(q => q.CreatedOn)
                 .Skip(skip).Take(take), userId);
         }
 
-        public QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take)
+        public QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take, out int count)
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
-            return GetQuestions(Questions.Where(q => q.DateFor == date)
+            var query = Questions.Where(q => q.DateFor == date);
+            count = query.Count();
+            return GetQuestions(query
                 .OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod)
                 .Skip(skip).Take(take), userId);
         }
@@ -227,47 +235,59 @@ update cte
                 }).ToArray();
         }
 
-        public QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take)
+        public QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take, out int count)
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
-            return GetQuestions(UserFollowQuestions.Where(u => u.SourceUserId == userId && u.Question.DateFor == date)
-                .Select(u => u.Question)
+            var query = UserFollowQuestions.Where(u => u.SourceUserId == userId && u.Question.DateFor == date)
+                .Select(u => u.Question);
+            count = query.Count();
+            return GetQuestions(query
                 .OrderByDescending(q => q.VotesTotal).ThenBy(q => q.denorm_User_OverallRankThisPeriod)
                 .Skip(skip).Take(take), userId);
         }
 
-        public AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take)
+        public AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take, out int count)
         {
-            return GetAnswers(UserFollowAnswers
+            var query = UserFollowAnswers
                 .Where(u => u.SourceUserId == userId && u.Answer.QuestionId == questionId)
-                .Select(u => u.Answer)
+                .Select(u => u.Answer);
+            count = query.Count();
+            return GetAnswers(query
                 .OrderByDescending(a => a.VotesTotal)
                 .ThenBy(a => a.denorm_User_OverallRankThisPeriod)
                 .Skip(skip)
                 .Take(take), userId);
         }
 
-        public AnswerPO[] GetAnswersLatest(Guid questionId, int skip, int take)
+        public AnswerPO[] GetAnswersLatest(Guid questionId, int skip, int take, out int count)
         {
-            return GetAnswers(Answers.Where(a => a.QuestionId == questionId)
+            var query = Answers.Where(a => a.QuestionId == questionId);
+            count = query.Count();
+            return GetAnswers(query
                 .OrderByDescending(a => a.CreatedOn).Skip(skip).Take(take), null);
         }
 
-        public AnswerPO[] GetAnswersLatest(Guid userId, Guid questionId, int skip, int take)
+        public AnswerPO[] GetAnswersLatest(Guid userId, Guid questionId, int skip, int take, out int count)
         {
-            return GetAnswers(Answers.Where(a => a.QuestionId == questionId)
+            var query = Answers.Where(a => a.QuestionId == questionId);
+            count = query.Count();
+            return GetAnswers(query
                 .OrderByDescending(a => a.CreatedOn).Skip(skip).Take(take), userId);
         }
 
-        public AnswerPO[] GetAnswersRated(Guid questionId, int skip, int take)
+        public AnswerPO[] GetAnswersRated(Guid questionId, int skip, int take, out int count)
         {
-            return GetAnswers(Answers.Where(a => a.QuestionId == questionId)
+            var query = Answers.Where(a => a.QuestionId == questionId);
+            count = query.Count();
+            return GetAnswers(query
                 .OrderByDescending(a => a.VotesTotal).ThenBy(a => a.denorm_User_OverallRankThisPeriod).Skip(skip).Take(take), null);
         }
 
-        public AnswerPO[] GetAnswersRated(Guid userId, Guid questionId, int skip, int take)
+        public AnswerPO[] GetAnswersRated(Guid userId, Guid questionId, int skip, int take, out int count)
         {
-            return GetAnswers(Answers.Where(a => a.QuestionId == questionId)
+            var query = Answers.Where(a => a.QuestionId == questionId);
+            count = query.Count();
+            return GetAnswers(query
                 .OrderByDescending(a => a.VotesTotal).ThenBy(a => a.denorm_User_OverallRankThisPeriod).Skip(skip).Take(take), userId);
         }
 
@@ -325,6 +345,17 @@ update cte
             return apos;
         }
 
+        public Notification[] GetNotifications(Guid userId, int skip, int take, out int count)
+        {
+            var query = Notifications.Where(n => n.UserId == userId);
+            count = query.Count();
+            return query
+                .OrderByDescending(n => n.Date)
+                .Skip(skip)
+                .Take(take)
+                .ToArray();
+        }
+
         public Notification[] ReadNotifications(Guid userId)
         {
             var nots = Notifications.Where(n => (!n.IsRead) && n.UserId == userId)
@@ -334,6 +365,16 @@ update cte
             foreach (var n in nots)
                 n.IsRead = true;
             SaveChanges();
+
+            int max = 5;
+            if (nots.Length < max)
+            {
+                nots = nots.Concat(
+                    Notifications.Where(n => n.IsRead && n.UserId == userId)
+                    .OrderByDescending(n => n.Date)
+                    .Take(max - nots.Length)
+                    .ToArray()).ToArray();
+            }
 
             return nots;
         }
@@ -349,12 +390,14 @@ update cte
                .OrderByDescending(a => a.Date));
         }
 
-        public ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take)
+        public ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take, out int count)
         {
-            return GetHistory(
-                Activities.Where(a => (a.ActivityTypeValue == (byte)ActivityType.PostAnswer ||
+            var query = Activities.Where(a => (a.ActivityTypeValue == (byte)ActivityType.PostAnswer ||
                                       a.ActivityTypeValue == (byte)ActivityType.PostQuestion) &&
-                                      a.SourceUserId == userId)
+                                      a.SourceUserId == userId);
+            count = query.Count();
+            return GetHistory(
+                query
                 .OrderByDescending(a => a.Date)
                 .Skip(skip)
                 .Take(take));
@@ -415,8 +458,9 @@ update cte
             }
         }
 
-        public LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take)
+        public LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take, out int count)
         {
+            count = 0;
             var us = Users.Where(u => u.OverallRankThisPeriod > 0).OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
 
             LeaderboardRowPO[] top = us.Select(UsertoLeaderboardThisPeriodFunc).ToArray();
@@ -463,8 +507,9 @@ update cte
                 Av = u.TotalAnswerVotesThisPeriod
             };
 
-        public LeaderboardPO GetLeaderboard(Guid userId, int skip, int take)
+        public LeaderboardPO GetLeaderboard(Guid userId, int skip, int take, out int count)
         {
+            count = 0;
             var us = Users.Where(u => u.OverallRank > 0).OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
 
             LeaderboardRowPO[] top = us.Select(UserToLeaderboardFunc).ToArray();
@@ -480,15 +525,17 @@ update cte
             return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
         }
 
-        public LeaderboardPO GetLeaderboard(int skip, int take)
+        public LeaderboardPO GetLeaderboard(int skip, int take, out int count)
         {
+            count = 0;
             var us = Users.Where(u => u.OverallRank > 0).OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
 
             return new LeaderboardPO() { Top = us.Select(UserToLeaderboardFunc).ToArray() };
         }
 
-        public LeaderboardPO GetLeaderboardThisPeriod(int skip, int take)
+        public LeaderboardPO GetLeaderboardThisPeriod(int skip, int take, out int count)
         {
+            count = 0;
             var us = Users.Where(u => u.OverallRankThisPeriod > 0).OrderBy(u => u.OverallRankThisPeriod).Skip(skip).Take(take).ToArray();
 
             return new LeaderboardPO()
@@ -525,6 +572,24 @@ update cte
                     auser.AddAction(ActivityType.ReceiveVoteDownAnswer);
                 }
                 else throw new System.NotImplementedException();
+
+                // create activity
+                Activity activity = new Activity()
+                {
+                    ActivityType = ActivityType.VoteAnswer,
+                    Answer = ans,
+                    SourceUserId = user.Id,
+                    denorm_SourceUser_DisplayName = user.DisplayName,
+                    denorm_SourceUser_ProfileImageUrl = user.ProfileImageUrl,
+                    Date = DateTime.Now,
+                    LinksCreated = false,
+                    VisibleWithoutLink = true,
+                    NotificationsCreated = false,
+                    TargetUserId = ans.UserId,
+                    Text = ans.Title
+                };
+
+                MarkAddedOrUpdated(activity);
                 MarkAddedOrUpdated(ans);
                 MarkAddedOrUpdated(user);
                 MarkAddedOrUpdated(auser);
@@ -559,6 +624,25 @@ update cte
                     quser.AddAction(ActivityType.ReceiveVoteDownQuestion);
                 }
                 else throw new System.NotImplementedException();
+
+                // create activity
+                Activity activity = new Activity()
+                {
+                    ActivityType = ActivityType.VoteQuestion,
+                    Question = ans,
+                    SourceUserId = user.Id,
+                    denorm_SourceUser_DisplayName = user.DisplayName,
+                    denorm_SourceUser_ProfileImageUrl = user.ProfileImageUrl,
+                    Date = DateTime.Now,
+                    LinksCreated = false,
+                    VisibleWithoutLink = true,
+                    NotificationsCreated = false,
+                    TargetUserId = ans.UserId,
+                    Text = ans.MainText
+                };
+
+                MarkAddedOrUpdated(activity);
+
                 MarkAddedOrUpdated(ans);
                 MarkAddedOrUpdated(user);
                 MarkAddedOrUpdated(quser);
@@ -585,10 +669,27 @@ update cte
 
         #region IUnitOfWork Members
 
+        private static readonly Dictionary<Type, Action<object>> OnAddedOrUpdated
+            = new Dictionary<Type, Action<object>>()
+            {
+                { typeof(Activity), a => 
+                    {
+                        Activity act = (Activity)a;
+                        if (act.CommentId.HasValue)
+                            act.RelatedObjectId = act.CommentId;
+                        else if (act.AnswerId.HasValue)
+                            act.RelatedObjectId = act.AnswerId;
+                        else if (act.QuestionId.HasValue)
+                            act.RelatedObjectId = act.QuestionId;
+                    } }
+            };
+
         public void MarkAddedOrUpdated<T>(T obj) where T : class, IEntity
         {
             if (obj.Id == default(Guid))
                 Set<T>().Add(obj);
+            if (OnAddedOrUpdated.ContainsKey(typeof(T)))
+                OnAddedOrUpdated[typeof(T)](obj);
         }
 
         public void MarkAdded<T>(T obj) where T : class

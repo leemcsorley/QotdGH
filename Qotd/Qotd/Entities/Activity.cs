@@ -70,6 +70,8 @@ namespace Qotd.Entities
 
         public virtual User TargetUser { get; set; }
 
+        public virtual Guid? RelatedObjectId { get; set; }
+
         // denormalised ---
 
         public virtual string denorm_SourceUser_DisplayName { get; set; }
