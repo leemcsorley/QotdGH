@@ -73,7 +73,8 @@ namespace QotdMvc.Controllers
                                 DisplayName = graph.Name,
                                 FacebookId = graph.Id.ToString(),
                                 Username = "_FB" + graph.Id,
-                                ProfileImageUrl = String.Format(FB_PIC_URL, graph.Id)
+                                ProfileImageUrl = String.Format(FB_PIC_URL, graph.Id),
+                                JoinedOn = DateTime.Now
                             };
                             QotdService.SaveNewUser(user);
                         }

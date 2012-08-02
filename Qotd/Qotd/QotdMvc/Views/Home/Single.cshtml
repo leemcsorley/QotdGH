@@ -8,5 +8,8 @@
         case QotdMvc.SingleType.Answer:
             <text>@Html.Partial("Answer", (Qotd.PresentationObjects.AnswerPO)ViewBag.Object)</text>
             break;
+            case QotdMvc.SingleType.Question:
+            <text>@Html.Partial("Question", (Qotd.PresentationObjects.QuestionPO)ViewBag.Object)</text>
+            break;
     }
 }

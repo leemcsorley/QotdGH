@@ -25,7 +25,7 @@
     foreach (var activity in day.Where(a => a.Activity.ActivityType == Qotd.Entities.ActivityType.PostAnswer ||
                                             a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerWin ||
                                             a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerSecond ||
-                                            a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerThird).OrderByDescending(a => a.Answer.Answer.AnswerRank))
+                                            a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerThird).OrderBy(a => a.Answer.Answer.AnswerRank))
     {
         if (c == 0)
         {

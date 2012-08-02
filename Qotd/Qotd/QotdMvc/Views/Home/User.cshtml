@@ -8,15 +8,24 @@
             <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
                 <img src="@ViewBag.TargetUser.User.ProfileImageUrl" alt="profile picture" style="border: 1px solid black"/>
             </div>
-            <div style="float: left; border-right: 1px solid #dddddd; height: 50px">&nbsp;</div>
+            <div style="float: left; border-right: 1px solid #dddddd; height: 50px; margin-right: 10px;">&nbsp;</div>
             <div style="float: left;">
-                <table class="table-condensed">
-                        <tbody>
-                            <tr>
-                                <td><h3>@ViewBag.TargetUser.User.DisplayName</h3></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div><h3>@ViewBag.TargetUser.User.DisplayName</h3></div>
+                <div style="margin-top: 8px">Member Since <b>@ViewBag.TargetUser.User.JoinedOn.ToLongDateString()</b></div>
+            </div>
+            <div style="float: right;">
+                  <ul class="nav nav-pills" style="border-bottom: 1px solid #dddddd; margin-bottom: 6px; padding-bottom: 6px;">
+                    <li class="active"><a href="#last4" data-toggle="tab">Last 4 Weeks</a></li>
+                    <li><a href="#overall" data-toggle="tab">Overall</a></li>
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="last4">
+                        @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = false })
+                    </div>
+                    <div class="tab-pane" id="overall">
+                        @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = true })
+                    </div>
+                  </div>
             </div>
         </div>
 

@@ -289,6 +289,8 @@
     </form>
 </div>
 <div class="container">
+@if (ViewBag.HideQuestion == null || (!ViewBag.HideQuestion))
+{
     <div class="hero-unit">
         <h1>@QotdMvc.DisplayHelper.QuestionMainText(ViewBag.Question.MainText)</h1>
         <p></p>
@@ -305,6 +307,7 @@
              <a href="#answerModal" class="@QotdMvc.DisplayHelper.AnswerButtonClass(ViewBag.Question.QuestionType, ViewBag.HasPickedSide)" data-toggle="modal" style="margin-right: 8px; width: 155px"><i class="icon-edit icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Submit an Answer&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i></a>
          }
     </div>
+}
     @RenderBody()
 </div>
 </body>

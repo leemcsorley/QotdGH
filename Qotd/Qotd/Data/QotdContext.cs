@@ -47,6 +47,10 @@ namespace Qotd.Data
 
         public DbSet<UserFollowQuestion> UserFollowQuestions { get; set; }
 
+        public DbSet<SiteStatistics> SiteStatistics { get; set; }
+
+        public DbSet<Admin> Admins { get; set; }
+
         public ObjectContext ObjectContext
         {
             get
@@ -710,6 +714,8 @@ update cte
             modelBuilder.Entity<Activity>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<Notification>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<ScoreEntry>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            modelBuilder.Entity<SiteStatistics>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            modelBuilder.Entity<Admin>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
             modelBuilder.Entity<User>().Ignore(u => u.ActionEntriesThisPeriod);
 

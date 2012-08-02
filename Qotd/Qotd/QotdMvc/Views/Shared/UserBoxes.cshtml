@@ -1,0 +1,17 @@
+﻿@model QotdMvc.Models.UserBoxes
+<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
+    <div style="text-align: center; overflow: hidden; font-size: 10px">Total Score</div>
+    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.User.User.Score : Model.User.User.ScoreThisPeriod)</div>
+</div>
+<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
+    <div style="text-align: center; overflow: hidden; font-size: 10px">Overall Rank</div>
+    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.User.User.OverallRank : Model.User.User.OverallRankThisPeriod)</div>
+</div>
+<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
+    <div style="text-align: center; overflow: hidden; font-size: 10px">Favourited By</div>
+    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.User.User.NumFollowing : Model.User.User.NumFollowingThisPeriod)</div>
+</div>
+<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
+    <div style="text-align: center; overflow: hidden; font-size: 10px">Num Favourites</div>
+    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.User.User.NumFollows : Model.User.User.NumFollowsThisPeriod)</div>
+</div>

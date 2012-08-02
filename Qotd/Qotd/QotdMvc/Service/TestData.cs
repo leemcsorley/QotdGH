@@ -76,7 +76,8 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                     {
                         DisplayName = names[i],
                         ProfileImageUrl = imgpath + "\\" + "pic" + (i + 1).ToString() + ".jpg",
-                        Username = "TU" + i
+                        Username = "TU" + i,
+                        JoinedOn = DateTime.Now.AddDays(-RND.Next(0, 100))
                     };
                     service.SaveNewUser(user);
                     users.Add(user);

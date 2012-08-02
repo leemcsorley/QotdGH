@@ -135,6 +135,8 @@ namespace Qotd.Entities
 
         public virtual int OverallRankThisPeriod { get; set; }
 
+        public virtual DateTime JoinedOn { get; set; }
+
         public virtual string Username { get; set; }
 
         public virtual string DisplayName { get; set; }

@@ -24,6 +24,7 @@ namespace QotdMvc.Controllers
         public ActionResult User(Guid userId)
         {
             ViewBag.TargetUser = DataProvider.GetUserById(userId);
+            ViewBag.HideQuestion = false;
             return View();
         }
 

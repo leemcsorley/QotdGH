@@ -52,6 +52,7 @@
     <Compile Include="Data\QotdContext.cs" />
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Entities\Activity.cs" />
+    <Compile Include="Entities\Admin.cs" />
     <Compile Include="Entities\Answer.cs" />
     <Compile Include="Entities\Comment.cs" />
     <Compile Include="Entities\EntityBase.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Entities\Question.cs" />
     <Compile Include="Entities\QuestionContainer.cs" />
     <Compile Include="Entities\ScoreEntry.cs" />
+    <Compile Include="Entities\SiteStatistics.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Entities\UserActivityLink.cs" />
     <Compile Include="Entities\UserFollow.cs" />

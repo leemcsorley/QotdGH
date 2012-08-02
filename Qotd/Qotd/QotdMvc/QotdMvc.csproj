@@ -98,6 +98,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\UserBoxes.cs" />
     <Compile Include="Service\IQotdService.cs" />
     <Compile Include="OAuth\FacebookClient.cs" />
     <Compile Include="OAuth\FacebookGraph.cs" />
@@ -262,7 +263,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
+    <Content Include="Views\Shared\UserBoxes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

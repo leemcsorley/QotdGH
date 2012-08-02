@@ -9,6 +9,24 @@ namespace Qotd.WorkerImpl
 {
     public static class WorkerUtils
     {
+        public static void UpdateSiteStatistics(this QotdContext db)
+        {
+            var admin = db.Admins.Single();
+            SiteStatistics stats = new SiteStatistics()
+            {
+                Date = DateTime.Now,
+                MaxNumAnswers = db.Users.Max(u => u.NumAnswers),
+                MaxNumAnswersSecond = db.Users.Max(u => u.NumAnswersSecond),
+                MaxNumAnswersThird = db.Users.Max(u => u.NumAnswersThird),
+                MaxNumAnswersSecondThisPeriod = db.Users.Max(u => u.NumAnswersSecondThisPeriod),
+
+            };
+            admin.LatestSiteStatistics = stats;
+            db.MarkAddedOrUpdated(stats);
+            db.MarkAddedOrUpdated(admin);
+            db.SaveChanges();
+        }
+
         public static void PickWinningQuestion(this QotdContext db, DateTime? date = null)
         {
             if (date == null) date = DateTime.Now.Date;
