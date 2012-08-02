@@ -6,12 +6,21 @@
         <li>
             <a href="#recent" data-toggle="tab" class="ajax-tab" rel="@Url.Action("AnswersLatest", "Home")">Most Recent</a>
         </li>
+        @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+        {
+        <li>
+            <a href="#followed" data-toggle="tab" class="ajax-tab" rel="@Url.Action("AnswersFollowed", "Home")">Favourites</a>
+        </li>
+        }
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="rated">
             @Html.Action("AnswersRated", "Home")
         </div>
         <div class="tab-pane" id="recent">
+                                        
+        </div>
+        <div class="tab-pane" id="followed">
                                         
         </div>
     </div>
