@@ -19,8 +19,8 @@ namespace QotdMvc.Controllers
         public ActionResult Tags(string q)
         {
             return Json(
-                DataProvider.GetTags(q)
-                .Select(t => new { id = t.Id, name = t.Value }).ToArray(), JsonRequestBehavior.AllowGet);
+                    DataProvider.GetTags(q)
+                    .Select(t => new { value = t.Id, name = t.Value }).ToArray(), JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult UserPopover(Guid userId)
@@ -325,7 +325,7 @@ namespace QotdMvc.Controllers
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult QuestionSubmit(string main, string sub, string details)
+        public ActionResult QuestionSubmit(string main, string sub, string details, string tags)
         {
             try
             {
@@ -354,7 +354,7 @@ namespace QotdMvc.Controllers
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult AnswerSubmit(string title, string content)
+        public ActionResult AnswerSubmit(string title, string content, string answerTags)
         {
             try
             {

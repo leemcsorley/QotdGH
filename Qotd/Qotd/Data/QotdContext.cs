@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Configuration;
+using System.IO;
 
 namespace Qotd.Data
 {
@@ -74,6 +75,10 @@ namespace Qotd.Data
         private static void InitialiseLucene()
         {
             string tindex = ConfigurationManager.AppSettings["LucenePath"];
+            if (File.Exists(Path.Combine(tindex, "write.lock")))
+            {
+                File.Delete(Path.Combine(tindex, "write.lock"));
+            }
             Lucene.Net.Store.Directory dir;
             try
             {

@@ -10,7 +10,7 @@
     <link href="@Url.Content("~/Content/tipsy/tipsy.css")" rel="Stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/Styles.css")" rel="Stylesheet" type="text/css" />
     @*<link href="@Url.Content("~/Content/token-input-facebook.css")" rel="Stylesheet" type="text/css" />*@
-    <link href="@Url.Content("~/Content/token-input.css")" rel="Stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/autoSuggest.css")" rel="Stylesheet" type="text/css" />
     <script src="@Url.Content("~/Scripts/jquery-1.7.2.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Content/bootstrap/js/bootstrap.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Content/redactor/redactor.js")" type="text/javascript"></script>
@@ -18,7 +18,7 @@
     <script src="@Url.Content("~/Content/tipsy/jquery.tipsy.hovercard.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery.timeago.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/qotd.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/jquery.tokeninput.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.autoSuggest.js")" type="text/javascript"></script>
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -49,10 +49,14 @@
             buttons: [ 'bold', 'italic', 'unorderedlist', 'orderedlist', '|', 'alignleft', 'aligncenter', '|', 'link', '|', 'fullscreen' ]
         });
 
-        $('.tag-input').tokenInput('@Url.Action("Tags", "Home")');
+        $('.tag-input').autoSuggest('@Url.Action("Tags", "Home")', {selectedItemProp: "name", searchObjProps: "name"});
 
 	    $('#answerSubmit').click(
             function () {
+                var telem = $("[name=answerTags]");
+                var tvals = telem.closest(".as-values").val();
+                alert(tvals);
+                telem.val(tvals);
                 $.post("@Url.Action("AnswerSubmit")", $("#answerForm").serialize(), function(data)
                 {
                     if (data.error)
@@ -245,8 +249,13 @@
         <div class="control-group">
             <label class="control-label">Title:</label>
             <div class="controls">
-                <input type="text" class="input-xlarge" placeholder="Answer title..." name="main"/>
+                <input type="text" class="input-xlarge" placeholder="Answer title..." name="title"/>
                 <p class="help-block">Enter the title of your answer.</p><br />
+            </div>
+            <label class="control-label">Tags:</label>
+            <div class="controls">
+                <input type="text" class="tag-input" name="answerTags"/>
+                <p class="help-block">Enter the tags for your question.</p><br />
             </div>
         </div>
         <label>Content:</label>

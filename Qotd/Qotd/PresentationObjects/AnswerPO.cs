@@ -21,7 +21,7 @@ namespace Qotd.PresentationObjects
 
         public string[] Tags
         {
-            get { return Answer.TagValues.Split(' '); }
+            get { if (String.IsNullOrEmpty(Answer.TagValues)) return new string[0]; else return Answer.TagValues.Split(' '); }
         }
 
         //public string UserDisplayName { get; set; }
