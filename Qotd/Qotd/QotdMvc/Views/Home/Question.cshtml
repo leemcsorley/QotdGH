@@ -56,6 +56,10 @@
             <div><h2>@QotdMvc.DisplayHelper.QuestionMainText(Model.Question.MainText)</h2></div>
             <div>@Model.Question.SubText</div>
         </div>
+        <!-- Tags -->
+        <div style="float: left; overflow: hidden; clear: left; margin-top: 4px; font-size: 10px; margin-bottom: 4px;">
+            @Html.Partial("TagList", Model.Tags)
+        </div>
         <!-- Controls footer -->
         <div style="float: left; overflow: hidden; clear: left; margin-top: 8px; font-size: 11px; margin-bottom: 8px;">
             <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-info-sign"></i>&nbsp;More Info</a></div>

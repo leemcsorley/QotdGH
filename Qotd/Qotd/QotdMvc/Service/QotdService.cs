@@ -22,6 +22,25 @@ namespace QotdMvc.Service
             get { return _dataProvider; }
         }
 
+        public void FollowTag(UserFollowTag userFollow)
+        {
+            // create the activity
+            Activity activity = new Activity()
+            {
+                ActivityType = ActivityType.FollowTag,
+                SourceUser = userFollow.SourceUser,
+                Date = DateTime.Now,
+                Text = "",
+                VisibleWithoutLink = true,
+            };
+            Denormaliser.Denormalise(activity);
+            userFollow.SourceUser.AddAction(ActivityType.FollowTag);
+
+            DataProvider.MarkAddedOrUpdated(userFollow.SourceUser);
+            DataProvider.MarkAdded(userFollow);
+            DataProvider.SaveChanges();
+        }
+
         public void FollowUser(UserFollow userFollow)
         {
             // create the activity

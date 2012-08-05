@@ -17,5 +17,7 @@ namespace QotdMvc.Service
         void SaveNewQuestion(Question question);
 
         void FollowUser(UserFollow userFollow);
+
+        void FollowTag(UserFollowTag userFollow);
     }
 }

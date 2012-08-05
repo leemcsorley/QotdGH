@@ -14,5 +14,7 @@ namespace Qotd.Entities
         public virtual Answer Answer { get; set; }
 
         public virtual Guid AnswerId { get; set; }
+
+        public virtual FollowSource Source { get; set; }
     }
 }

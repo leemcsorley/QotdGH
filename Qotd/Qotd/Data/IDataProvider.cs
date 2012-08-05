@@ -87,5 +87,11 @@ namespace Qotd.Data
         UserPO[] GetUsersFollowed(Guid userId);
 
         Notification[] GetNotifications(Guid userId, int skip, int take, out int count);
+
+        SearchResultPO[] Search(string search, int skip, int take);
+
+        Tag[] GetTags();
+
+        Tag[] GetTags(string startsWith);
     }
 }

@@ -16,6 +16,13 @@ namespace QotdMvc.Controllers
         private const int DEFAULT_TAKE_LEADERBOARD = 50;
         private const int DEFAULT_TAKE_NOTIFICATIONS = 20;
 
+        public ActionResult Tags(string q)
+        {
+            return Json(
+                DataProvider.GetTags(q)
+                .Select(t => new { id = t.Id, name = t.Value }).ToArray(), JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult UserPopover(Guid userId)
         {
             return View(DataProvider.GetUserById(userId));

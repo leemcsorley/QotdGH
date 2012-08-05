@@ -49,6 +49,8 @@ namespace Qotd.Entities
 
         public virtual bool LinksCreated { get; set; }
 
+        public virtual string TagValues { get; set; }
+
         // denormalised ---
 
         public virtual string denorm_User_DisplayName { get; set; }

@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Objects;
 using System.Data.Entity.Infrastructure;
+using System.Configuration;
 
 namespace Qotd.Data
 {
@@ -47,6 +48,10 @@ namespace Qotd.Data
 
         public DbSet<UserFollowQuestion> UserFollowQuestions { get; set; }
 
+        public DbSet<UserFollowTag> UserFollowTags { get; set; }
+
+        public DbSet<Tag> Tags { get; set; }
+
         public DbSet<SiteStatistics> SiteStatistics { get; set; }
 
         public DbSet<Admin> Admins { get; set; }
@@ -59,7 +64,39 @@ namespace Qotd.Data
             }
         }
 
+        protected static Lucene.Net.Index.IndexWriter IndexWriter;
+
+        static QotdContext()
+        {
+            InitialiseLucene();
+        }
+
+        private static void InitialiseLucene()
+        {
+            string tindex = ConfigurationManager.AppSettings["LucenePath"];
+            Lucene.Net.Store.Directory dir;
+            try
+            {
+                dir = Lucene.Net.Store.FSDirectory.GetDirectory(tindex);
+            }
+            catch (Exception)
+            {
+                dir = Lucene.Net.Store.FSDirectory.GetDirectory(tindex, true);
+            }
+
+            Lucene.Net.Analysis.Analyzer analyser = new Lucene.Net.Analysis.Standard.StandardAnalyzer();
+
+            Lucene.Net.Index.IndexWriter indexWriter = new Lucene.Net.Index.IndexWriter(dir, analyser);
+
+            IndexWriter = indexWriter;
+        }
+
         #region IDataProvider Members
+
+        public QotdContext()
+        {
+            
+        }
 
         public void UpdateUserRankings()
         {
@@ -669,14 +706,60 @@ update cte
                 }).ToArray();
         }
 
+        public SearchResultPO[] Search(string search, int skip, int take)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Tag[] GetTags()
+        {
+            return Tags.ToArray();
+        }
+
+        public Tag[] GetTags(string startsWith)
+        {
+            return Tags.Where(t => t.Value.StartsWith(startsWith)).ToArray();
+        }
+
         #endregion
 
         #region IUnitOfWork Members
 
-        private static readonly Dictionary<Type, Action<object>> OnAddedOrUpdated
-            = new Dictionary<Type, Action<object>>()
+        private enum AddedOrUpdated
+        {
+            Added, Updated
+        }
+
+        private static void AddSearchItem(Guid id, SearchItemType type, AddedOrUpdated state, params string[] text)
+        {
+            string value = String.Join(" ", text);
+            if (state == AddedOrUpdated.Updated)
             {
-                { typeof(Activity), a => 
+                IndexWriter.DeleteDocuments(new Lucene.Net.Index.Term("Id", id.ToString()));
+            }
+
+            Lucene.Net.Documents.Field idField = new Lucene.Net.Documents.Field("Id", id.ToString(),
+                Lucene.Net.Documents.Field.Store.YES,
+                Lucene.Net.Documents.Field.Index.NOT_ANALYZED,
+                Lucene.Net.Documents.Field.TermVector.YES);
+            Lucene.Net.Documents.Document doc = new Lucene.Net.Documents.Document();
+            doc.Add(idField);
+            Lucene.Net.Documents.Field valueField = new Lucene.Net.Documents.Field("Value", value,
+                Lucene.Net.Documents.Field.Store.YES,
+                Lucene.Net.Documents.Field.Index.ANALYZED,
+                Lucene.Net.Documents.Field.TermVector.YES);
+            doc.Add(valueField);
+            Lucene.Net.Documents.Field typeField = new Lucene.Net.Documents.Field("Type", type.ToString(),
+                Lucene.Net.Documents.Field.Store.YES,
+                Lucene.Net.Documents.Field.Index.NOT_ANALYZED,
+                Lucene.Net.Documents.Field.TermVector.NO);
+            doc.Add(typeField);
+        }
+
+        private static readonly Dictionary<Type, Action<object, AddedOrUpdated>> OnAddedOrUpdated
+            = new Dictionary<Type, Action<object, AddedOrUpdated>>()
+            {
+                { typeof(Activity), (a, u) => 
                     {
                         Activity act = (Activity)a;
                         if (act.CommentId.HasValue)
@@ -685,7 +768,28 @@ update cte
                             act.RelatedObjectId = act.AnswerId;
                         else if (act.QuestionId.HasValue)
                             act.RelatedObjectId = act.QuestionId;
-                    } }
+                    } 
+                },
+                { typeof(User), (o, s) =>
+                    {
+                        User user = (User)o;
+                        AddSearchItem(user.Id, SearchItemType.User, s, user.DisplayName, user.Email);
+                    }
+                    },
+                { typeof (Answer), (o, s) =>
+                    {
+                        Answer answer = (Answer)o;
+                        AddSearchItem(answer.Id, SearchItemType.AnswerContent, s, answer.Title, answer.Content);
+                        AddSearchItem(answer.Id, SearchItemType.AnswerTags, s, answer.TagValues); 
+                    }
+                    },
+                { typeof(Question), (o, s) =>
+                    {
+                        Question question = (Question)o;
+                        AddSearchItem(question.Id, SearchItemType.QuestionContent, s, question.MainText, question.SubText, question.Details);
+                        AddSearchItem(question.Id, SearchItemType.QuestionTags, s, question.TagValues);
+                    }
+                    }
             };
 
         public void MarkAddedOrUpdated<T>(T obj) where T : class, IEntity
@@ -693,12 +797,14 @@ update cte
             if (obj.Id == default(Guid))
                 Set<T>().Add(obj);
             if (OnAddedOrUpdated.ContainsKey(typeof(T)))
-                OnAddedOrUpdated[typeof(T)](obj);
+                OnAddedOrUpdated[typeof(T)](obj, obj.Id == default(Guid) ? AddedOrUpdated.Added : AddedOrUpdated.Updated);
         }
 
         public void MarkAdded<T>(T obj) where T : class
         {
             Set<T>().Add(obj);
+            if (OnAddedOrUpdated.ContainsKey(typeof(T)))
+                OnAddedOrUpdated[typeof(T)](obj, AddedOrUpdated.Added);
         }
 
         #endregion
@@ -716,6 +822,7 @@ update cte
             modelBuilder.Entity<ScoreEntry>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<SiteStatistics>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             modelBuilder.Entity<Admin>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            modelBuilder.Entity<Tag>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
             modelBuilder.Entity<User>().Ignore(u => u.ActionEntriesThisPeriod);
 
@@ -727,6 +834,7 @@ update cte
             modelBuilder.Entity<UserFollow>().HasKey(t => new { t.SourceUserId, t.TargetUserId });
             modelBuilder.Entity<UserFollowAnswer>().HasKey(t => new { t.SourceUserId, t.AnswerId });
             modelBuilder.Entity<UserFollowQuestion>().HasKey(t => new { t.SourceUserId, t.QuestionId });
+            modelBuilder.Entity<UserFollowTag>().HasKey(t => new { t.SourceUserId, t.TagId });
 
             modelBuilder.Entity<Comment>().HasRequired(t => t.Answer)
                 .WithMany().WillCascadeOnDelete(false);
@@ -761,6 +869,8 @@ update cte
             modelBuilder.Entity<UserFollowQuestion>().HasRequired(t => t.SourceUser)
                 .WithMany().WillCascadeOnDelete(false);
             modelBuilder.Entity<UserFollowQuestion>().HasRequired(t => t.Question)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<UserFollowTag>().HasRequired(t => t.SourceUser)
                 .WithMany().WillCascadeOnDelete(false);
         }
     }

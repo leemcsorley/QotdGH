@@ -25,7 +25,8 @@ namespace Qotd.Entities
         QuestionWin,
         ReceiveScore,
         FollowUser,
-        ReceiveFollow
+        ReceiveFollow,
+        FollowTag
     }
 
     public class Activity : EntityBase

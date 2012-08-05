@@ -9,6 +9,8 @@
     <link href="@Url.Content("~/Content/fontawesome/css/font-awesome.css")" rel="Stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/tipsy/tipsy.css")" rel="Stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/Styles.css")" rel="Stylesheet" type="text/css" />
+    @*<link href="@Url.Content("~/Content/token-input-facebook.css")" rel="Stylesheet" type="text/css" />*@
+    <link href="@Url.Content("~/Content/token-input.css")" rel="Stylesheet" type="text/css" />
     <script src="@Url.Content("~/Scripts/jquery-1.7.2.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Content/bootstrap/js/bootstrap.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Content/redactor/redactor.js")" type="text/javascript"></script>
@@ -16,6 +18,7 @@
     <script src="@Url.Content("~/Content/tipsy/jquery.tipsy.hovercard.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery.timeago.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/qotd.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.tokeninput.js")" type="text/javascript"></script>
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -45,6 +48,8 @@
         $('#answerContent').redactor({
             buttons: [ 'bold', 'italic', 'unorderedlist', 'orderedlist', '|', 'alignleft', 'aligncenter', '|', 'link', '|', 'fullscreen' ]
         });
+
+        $('.tag-input').tokenInput('@Url.Action("Tags", "Home")');
 
 	    $('#answerSubmit').click(
             function () {
@@ -278,6 +283,11 @@
                     <div class="controls">
                         <textarea rows="5" cols="120" name="details" class="input-xlarge"></textarea>
                         <p class="help-block">Enter the main text of your question.</p><br />
+                    </div>
+                    <label class="control-label">Tags:</label>
+                    <div class="controls">
+                        <input type="text" class="tag-input" name="tags" />
+                        <p class="help-block">Enter the tags for your question.</p><br />
                     </div>
                 </div>
             </fieldset>

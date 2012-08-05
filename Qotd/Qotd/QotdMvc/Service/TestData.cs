@@ -57,6 +57,17 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                 QuestionContainer qc = new QuestionContainer() { Name = "Default" };
                 dp.MarkAddedOrUpdated(qc);
 
+                // tags
+                string[] tvals = new string[] { "Science", "Art", "Mathematics", "Philosophy", "Politics", "Media", "History", "Sport", "Celebrity", "Computing", "Shopping", "Economics", "Books", "Film", "Television" };
+                List<Tag> tags = new List<Tag>();
+                for (int i = 0; i < tvals.Length; i++)
+                {
+                    Tag tag = new Tag() { Value = tvals[i] };
+                    tags.Add(tag);
+                    dp.MarkAdded(tag);
+                    dp.SaveChanges();
+                }
+
                 // users
                 List<User> users = new List<User>();
                 string[] names = new string[] {
@@ -87,6 +98,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                 for (int i = 0; i < 10; i++)
                 {
                     int num = RND.Next(0, 10);
+                    int tnum = RND.Next(0, 5);
                     User user = users[i];
                     foreach (var tuser in users.OrderBy(u => RND.NextDouble()).Take(num))
                     {
@@ -96,6 +108,15 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                             {
                                 SourceUser = user,
                                 TargetUser = tuser
+                            });
+                    }
+                    foreach (var tag in tags.OrderBy(u => RND.NextDouble()).Take(tnum))
+                    {
+                        service.FollowTag(
+                            new UserFollowTag()
+                            {
+                                SourceUser = user,
+                                Tag = tag
                             });
                     }
                 }
@@ -115,7 +136,9 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                             MainText = GenText(8),
                             SubText = GenText(16),
                             Details = GenText(80),
-                            QuestionType = QuestionType.Open
+                            QuestionType = QuestionType.Open,
+                            TagValues = String.Join(" ", tags.OrderBy(t => RND.NextDouble()).Take(RND.Next(0, 5))
+                                            .Select(t => t.Value).ToArray())
                         };
                         service.SaveNewQuestion(q);
                         int numVotes = RND.Next(0, users.Count);
@@ -146,7 +169,9 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                                 NumComments = 0,
                                 Question = tq,
                                 Title = GenText(5),
-                                Content = GenText(RND.Next(0, 300))
+                                Content = GenText(RND.Next(0, 300)),
+                                TagValues = String.Join(" ", tags.OrderBy(t => RND.NextDouble()).Take(RND.Next(0, 5))
+                                            .Select(t => t.Value).ToArray())
                             };
                             service.SaveNewAnswer(answer);
                             int numVotes = RND.Next(0, users.Count);

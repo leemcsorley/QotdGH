@@ -19,6 +19,11 @@ namespace Qotd.PresentationObjects
 
         public UserPO User { get; set; }
 
+        public string[] Tags
+        {
+            get { return Answer.TagValues.Split(' '); }
+        }
+
         //public string UserDisplayName { get; set; }
 
         //public string UserProfileImageUrl
