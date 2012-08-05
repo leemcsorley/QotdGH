@@ -162,10 +162,10 @@ namespace QotdMvc.Controllers
 
         public ActionResult AnswersFollowed(int skip = 0, int take = DEFAULT_TAKE)
         {
-            ViewBag.Answers = DataProvider.GetAnswersFollowed(UserEntity.Id, TodaysQuestion.Id, skip, take);
-            ViewBag.Skip = skip + take;
-            ViewBag.Take = DEFAULT_TAKE;
-            ViewBag.Action = "AnswersFollowed";
+            //ViewBag.Answers = DataProvider.GetAnswersFollowed(UserEntity.Id, TodaysQuestion.Id, skip, take);
+            //ViewBag.Skip = skip + take;
+            //ViewBag.Take = DEFAULT_TAKE;
+            //ViewBag.Action = "AnswersFollowed";
             return View("Answers");
         }
 
