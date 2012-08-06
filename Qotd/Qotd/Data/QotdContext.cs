@@ -281,10 +281,11 @@ update cte
                 }).ToArray();
         }
 
-        public QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take, out int count)
+        public QuestionPO[] GetQuestionsFollowed(Guid userId, FollowSource source, int skip, int take, out int count)
         {
             DateTime date = DateTime.Now.AddDays(1).Date;
-            var query = UserFollowQuestions.Where(u => u.SourceUserId == userId && u.Question.DateFor == date)
+            var query = UserFollowQuestions.Where(u => u.SourceUserId == userId && u.Question.DateFor == date 
+                && (u.FollowSourceValue & (byte)source) > 0)
                 .Select(u => u.Question);
             count = query.Count();
             return GetQuestions(query
@@ -292,10 +293,10 @@ update cte
                 .Skip(skip).Take(take), userId);
         }
 
-        public AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take, out int count)
+        public AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, FollowSource source, int skip, int take, out int count)
         {
             var query = UserFollowAnswers
-                .Where(u => u.SourceUserId == userId && u.Answer.QuestionId == questionId)
+                .Where(u => u.SourceUserId == userId && u.Answer.QuestionId == questionId && (u.FollowSourceValue & (byte)source) > 0)
                 .Select(u => u.Answer);
             count = query.Count();
             return GetAnswers(query

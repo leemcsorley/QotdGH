@@ -15,6 +15,12 @@ namespace Qotd.Entities
 
         public virtual Guid AnswerId { get; set; }
 
-        public virtual FollowSource Source { get; set; }
+        public virtual FollowSource Source
+        {
+            get { return (FollowSource)FollowSourceValue; }
+            set { FollowSourceValue = (byte)value; }
+        }
+
+        public virtual byte FollowSourceValue { get; set; }
     }
 }

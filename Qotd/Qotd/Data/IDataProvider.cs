@@ -34,7 +34,7 @@ namespace Qotd.Data
 
         AnswerPO GetAnswerById(Guid answerId, Guid userId);
 
-        AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, int skip, int take, out int count);
+        AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, FollowSource source, int skip, int take, out int count);
 
         AnswerPO[] GetAnswersLatest(Guid userId, Guid questionId, int skip, int take, out int count);
 
@@ -52,7 +52,7 @@ namespace Qotd.Data
 
         QuestionPO[] GetQuestionsRated(int skip, int take, out int count);
 
-        QuestionPO[] GetQuestionsFollowed(Guid userId, int skip, int take, out int count);
+        QuestionPO[] GetQuestionsFollowed(Guid userId, FollowSource source, int skip, int take, out int count);
 
         QuestionPO GetQuestionById(Guid questionId, Guid userId);
 

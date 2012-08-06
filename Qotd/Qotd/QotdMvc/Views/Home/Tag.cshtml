@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "Tag";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="span12">
+        <div class="well" style="overflow: hidden">
+            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
+                <img src="@ViewBag.TargetUser.User.ProfileImageUrl" alt="profile picture" style="border: 1px solid black"/>
+            </div>
+            <div style="float: left; border-right: 1px solid #dddddd; height: 50px; margin-right: 10px;">&nbsp;</div>
+            <div style="float: left;">
+                <div><h3>@ViewBag.TargetUser.User.DisplayName</h3></div>
+                <div style="margin-top: 8px">Member Since <b>@ViewBag.TargetUser.User.JoinedOn.ToLongDateString()</b></div>
+            </div>
+            <div style="float: right;">
+                  <ul class="nav nav-pills" style="border-bottom: 1px solid #dddddd; margin-bottom: 6px; padding-bottom: 6px;">
+                    <li class="active"><a href="#last4" data-toggle="tab">Last 4 Weeks</a></li>
+                    <li><a href="#overall" data-toggle="tab">Overall</a></li>
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="last4">
+                        @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = false })
+                    </div>
+                    <div class="tab-pane" id="overall">
+                        @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = true })
+                    </div>
+                  </div>
+            </div>
+        </div>
+
+        <div class="tabbable tabs-left">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tab1" data-toggle="tab" class="has-tooltip" title="" data-placement="right"><i class="icon-table" style="font-size: 15px; color: Red; padding-right: 10px"></i><b>Statistics</b></a>
+                        </li>
+                        <li>
+                            <a href="#tab2" data-toggle="tab" class="ajax-tab has-tooltip" title="" data-placement="right" rel="@Url.Action("HistoryForUser", "Home", new { userId = ViewBag.TargetUser.User.Id })"><i class="icon-globe" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>History</b></a>
+                        </li>
+                        <li>
+                            <a href="#tab3" data-toggle="tab" class="ajax-tab" rel="@Url.Action("FollowList", "Home", new { userId = ViewBag.TargetUser.User.Id })"><i class="icon-star" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Favourite Members</b></a>
+                        </li>
+                    </ul>
+                <div class="tab-content">
+                    <div id="alert-box"></div>
+                    <div class="tab-pane active" id="tab1">
+                        
+                    </div>
+                    <div class="tab-pane" id="tab2">
+                        
+                    </div>
+                    <div class="tab-pane" id="tab3">
+                        
+                    </div>
+                </div>
+            </div>
+
+        
+    </div>
+</div>
