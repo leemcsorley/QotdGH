@@ -19,11 +19,6 @@ namespace Qotd.PresentationObjects
 
         public UserPO User { get; set; }
 
-        public string[] Tags
-        {
-            get { if (String.IsNullOrEmpty(Answer.TagValues)) return new string[0]; else return Answer.TagValues.Split(' '); }
-        }
-
         //public string UserDisplayName { get; set; }
 
         //public string UserProfileImageUrl
