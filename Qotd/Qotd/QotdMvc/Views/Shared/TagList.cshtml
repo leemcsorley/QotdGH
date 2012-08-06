@@ -1,8 +1,17 @@
-﻿@model string[]
+﻿@model Qotd.Entities.TagEntry[]
 @foreach (var t in Model)
 {
-    if (!String.IsNullOrEmpty(t))
+    if (!String.IsNullOrEmpty(t.Value))
     {
-   <div style="display: inline-block; padding: 2px 2px; border: 1px solid #dddddd"><a href="#">#@t</a></div> 
+        <div style="display: inline-block; padding: 2px 2px; border: 1px solid #dddddd">
+            @if (t.Approved)
+            {
+            <a href="#">#@t.Value</a>
+                }
+                else
+                {
+                <text>@t.Value</text>
+            }
+        </div> 
     }
 }

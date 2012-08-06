@@ -11,5 +11,9 @@ namespace Qotd.PresentationObjects
         public User User { get; set; }
 
         public int? UnreadNotifications { get; set; }
+
+        public bool IsFollowedByCurrent { get; set; }
+
+        public bool IsFollowingCurrent { get; set; }
     }
 }

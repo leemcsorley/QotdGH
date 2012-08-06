@@ -13,19 +13,44 @@
                 <div><h3>@ViewBag.TargetUser.User.DisplayName</h3></div>
                 <div style="margin-top: 8px">Member Since <b>@ViewBag.TargetUser.User.JoinedOn.ToLongDateString()</b></div>
             </div>
-            <div style="float: right;">
-                  <ul class="nav nav-pills" style="border-bottom: 1px solid #dddddd; margin-bottom: 6px; padding-bottom: 6px;">
-                    <li class="active"><a href="#last4" data-toggle="tab">Last 4 Weeks</a></li>
-                    <li><a href="#overall" data-toggle="tab">Overall</a></li>
-                  </ul>
-                  <div class="tab-content">
-                    <div class="tab-pane active" id="last4">
+            <div style="float: right; padding-top: 0px;">
+                @if (ViewBag.IsAuthenticated && ViewBag.User != null && ViewBag.User.Id != ViewBag.TargetUser.User.Id)
+                {
+                    <div style="float: right; margin-left: 12px;">
+                    @if (ViewBag.TargetUser.IsFollowedByCurrent)
+                    {
+                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center;"><i class="icon-ok" style="color: #22dd22"></i> <span style="color: #000000 !important">Is a favourite</span></div>
+                    }
+                    else
+                    {
+                        <div class="btn" style="width: 160px"><i class="icon-star" style="color: #dddd22"></i> <span style="color: #000000 !important">Add as favourite</span></div>
+                    }
+                    </div>
+                    <div style="float: right;">
+                    @if (ViewBag.TargetUser.IsFollowingCurrent)
+                    {
+                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center;"><i class="icon-ok" style="color: #22dd22"></i>&nbsp;Has favourited you</div>
+                    }
+                    else
+                    {
+                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center"><i class="icon-remove"></i>&nbsp;Has not favourited you</div>
+                    }
+                    </div>
+                }
+            </div>
+            <div style="float: right; clear: right;">
+                <div style="overflow: hidden; text-align: center; font-weight: bold; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #dddddd;">
+                    Last 4 Weeks
+                </div>
+                    <div style="overflow: hidden;">
                         @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = false })
                     </div>
-                    <div class="tab-pane" id="overall">
+                <div style="overflow: hidden; text-align: center; font-weight: bold; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #dddddd;">
+                    Overall
+                </div>
+                    <div style="overflow: hidden;">
                         @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = true })
                     </div>
-                  </div>
             </div>
         </div>
 
@@ -46,92 +71,8 @@
                     </div>
                     <div class="tab-pane active" id="tab1">
                         <div style="overflow: hidden; clear: left;">
-                <table class="table-condensed">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th style="width: 15%">Last 4 Weeks</th>
-                            <th style="width: 15%">Overall</th>
-                            <th style="width: 15%">Site Highest</th>
-                            <th style="width: 15%">Favourites Highest</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><i class="icon-reorder"></i>&nbsp;Ranking:</td>
-                            <td class="number">@ViewBag.TargetUser.User.OverallRankThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.OverallRank</td>
-                        </tr>
-                        <tr class="row-spacer"><td colspan="5"></td></tr>
-                        <tr class="oddrow">
-                            <td><i class="icon-heart"></i>&nbsp;Total Number of Answer Votes:</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr>
-                            <td ><i class="icon-heart"></i>&nbsp;Total Number of Question Votes:</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalQuestionVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalQuestionVotes</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr class="row-spacer"><td colspan="5"></td></tr>
-                        <tr class="oddrow">
-                            <td ><i class="icon-trophy gold"></i>&nbsp;Number of Answers Won:</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersWonThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersWon</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr>
-                            <td ><i class="icon-trophy silver"></i>&nbsp;Number of Answers Second Place:</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersSecondThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersSecond</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr class="oddrow">
-                            <td ><i class="icon-trophy bronze"></i>&nbsp;Number of Answers Third Place:</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersThirdThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersThird</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr>
-                            <td ><i class="icon-trophy gold"></i>&nbsp;Number of Questions Won:</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumQuestionsWonThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumQuestionsWon</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr class="row-spacer"><td colspan="5"></td></tr>
-                        <tr class="oddrow">
-                            <td ><i class="icon-comments"></i>&nbsp;Number of Answers Submitted:</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswersThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumAnswers</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr>
-                            <td ><i class="icon-question-sign"></i>&nbsp;Number of Questions Submitted:</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumQuestionsThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.NumQuestions</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                        <tr class="row-spacer"><td colspan="5"></td></tr>
-                        <tr>
-                            <td class="score-col"><i class="icon-certificate"></i>&nbsp;Score:</td>
-                            <td class="number score-col">@ViewBag.TargetUser.User.ScoreThisPeriod</td>
-                            <td class="number score-col">@ViewBag.TargetUser.User.Score</td>
-                            <td class="number score-col">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-                            <td class="number score-col">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            @Html.Partial("UserStats", (Qotd.PresentationObjects.UserPO)ViewBag.TargetUser)
+                        </div>
                     </div>
                     <div class="tab-pane" id="tab2">
                         

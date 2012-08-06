@@ -15,14 +15,22 @@
             @{
                 switch (Model.Activity.ActivityType)
                 {
+                    case Qotd.Entities.ActivityType.PostQuestion:
+                        <text><span>&nbsp;posted a question <i class="icon-question-sign"></i>&nbsp;- &quot</span><span><a href="@Url.Action("Question", "Home", new { ajax = false, questionId = Model.Activity.QuestionId.Value })">@Model.Activity.Text</a></span><span>&quot</span>
+                        </text>
+                        break;
+                    case Qotd.Entities.ActivityType.VoteAnswer:
+                        <text><span>&nbsp;voted on answer <i class="icon-comments"></i>&nbsp;- &quot</span><span>@Model.Activity.Text</span><span>&quot</span>
+                        </text>
+                                                                                                            break;
                     case Qotd.Entities.ActivityType.PostComment:
                         <text><span>&nbsp;posted a comment <i class="icon-comment"></i>&nbsp;- &quot</span><span>@Model.Activity.Text</span><span>&quot</span>
                         </text>
-                        break;
+                                                                                                            break;
                     case Qotd.Entities.ActivityType.PostAnswer:
                         <text>&nbsp;posted an answer
                         </text>
-                        break;
+                                                                                                            break;
                 }
             }
         </div> 

@@ -30,7 +30,7 @@ namespace QotdMvc.Controllers
 
         public ActionResult User(Guid userId)
         {
-            ViewBag.TargetUser = DataProvider.GetUserById(userId);
+            ViewBag.TargetUser = DataProvider.GetUserById(userId, UserEntity == null ? (Guid?)null : UserEntity.Id);
             ViewBag.HideQuestion = false;
             return View();
         }
@@ -89,7 +89,8 @@ namespace QotdMvc.Controllers
 
         public ActionResult Activities()
         {
-            ViewBag.Activities = DataProvider.GetActivities(null, DEFAULT_TAKE);
+            var activities = DataProvider.GetActivities(null, DEFAULT_TAKE);
+            ViewBag.Activities = activities;
             return View();
         }
 

@@ -62,7 +62,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                 List<Tag> tags = new List<Tag>();
                 for (int i = 0; i < tvals.Length; i++)
                 {
-                    Tag tag = new Tag() { Value = tvals[i] };
+                    Tag tag = new Tag() { Value = tvals[i], Approved = true };
                     tags.Add(tag);
                     dp.MarkAdded(tag);
                     dp.SaveChanges();
@@ -137,8 +137,8 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                             SubText = GenText(16),
                             Details = GenText(80),
                             QuestionType = QuestionType.Open,
-                            TagValues = String.Join(" ", tags.OrderBy(t => RND.NextDouble()).Take(RND.Next(0, 5))
-                                            .Select(t => t.Value).ToArray())
+                            TagEntries = tags.OrderBy(t => RND.NextDouble()).Take(RND.Next(0, 5))
+                                            .Select(t => new TagEntry { Value = t.Value, Approved = t.Approved, TagId = t.Id }).ToArray()
                         };
                         service.SaveNewQuestion(q);
                         int numVotes = RND.Next(0, users.Count);
@@ -170,8 +170,8 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                                 Question = tq,
                                 Title = GenText(5),
                                 Content = GenText(RND.Next(0, 300)),
-                                TagValues = String.Join(" ", tags.OrderBy(t => RND.NextDouble()).Take(RND.Next(0, 5))
-                                            .Select(t => t.Value).ToArray())
+                                TagEntries = tags.OrderBy(t => RND.NextDouble()).Take(RND.Next(0, 5))
+                                            .Select(t => new TagEntry() { Value = t.Value, Approved = t.Approved, TagId = t.Id }).ToArray()
                             };
                             service.SaveNewAnswer(answer);
                             int numVotes = RND.Next(0, users.Count);

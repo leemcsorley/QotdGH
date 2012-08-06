@@ -14,10 +14,5 @@ namespace Qotd.PresentationObjects
         public bool HasUserVoted { get; set; }
 
         public UserPO User { get; set; }
-
-        public string[] Tags
-        {
-            get { return Question.TagValues.Split(' '); }
-        }
     }
 }

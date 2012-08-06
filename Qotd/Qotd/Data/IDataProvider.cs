@@ -26,7 +26,7 @@ namespace Qotd.Data
 
         User GetUserByFacebookId(string facebookId);
 
-        UserPO GetUserById(Guid userId);
+        UserPO GetUserById(Guid userId, Guid? currentUserId = null);
 
         Question GetTodaysQuestion();
 

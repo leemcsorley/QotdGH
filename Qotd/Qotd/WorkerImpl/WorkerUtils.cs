@@ -9,6 +9,73 @@ namespace Qotd.WorkerImpl
 {
     public static class WorkerUtils
     {
+        public static void ProcessTags(this QotdContext db)
+        {
+            var alltags = db.Tags.ToArray().ToDictionary(t => t.Value.ToLower(), t => t);
+            foreach (var ans in db.Answers.Where(a => !a.TagsProcessed).ToArray())
+            {
+                var tes = ans.TagEntries;
+                foreach (var te in tes)
+                {
+                    Tag tag;
+                    if (alltags.ContainsKey(te.Value.ToLower()))
+                    {
+                        tag = alltags[te.Value.ToLower()];
+                        te.Approved = tag.Approved;
+                    }
+                    else
+                    {
+                        tag = new Tag()
+                        {
+                            Approved = false,
+                            Value = te.Value
+                        };
+                        db.MarkAdded(tag);
+                    }
+                    AnswerTag at = new AnswerTag()
+                    {
+                        Answer = ans,
+                        Tag = tag
+                    };
+                    db.MarkAdded(at);
+                }
+                ans.TagEntries = tes;
+                ans.TagsProcessed = true;
+                db.SaveChanges();
+            }
+            foreach (var qst in db.Questions.Where(q => !q.TagsProcessed).ToArray())
+            {
+                var tes = qst.TagEntries;
+                Tag tag;
+                foreach (var te in tes)
+                {
+                    if (alltags.ContainsKey(te.Value.ToLower()))
+                    {
+                        tag = alltags[te.Value.ToLower()];
+                        te.Approved = tag.Approved;
+                    }
+                    else
+                    {
+                        tag = new Tag()
+                        {
+                            Approved = false,
+                            Value = te.Value
+                        };
+                        db.MarkAdded(tag);
+                    }
+                    QuestionTag qt = new QuestionTag()
+                    {
+                        Question = qst,
+                        Tag = tag
+                    };
+                    db.MarkAdded(qt);
+                }
+                qst.TagEntries = tes;
+                qst.TagsProcessed = true;
+                db.SaveChanges();
+            }
+        }
+        
         public static void UpdateSiteStatistics(this QotdContext db)
         {
             var admin = db.Admins.Single();
@@ -139,45 +206,113 @@ namespace Qotd.WorkerImpl
         public static void CreateUserFollowLinks(this QotdContext db)
         {
             DateTime date = DateTime.Now.AddDays(-7);
+            // for new user follows
             foreach (var uf in db.UserFollows.Where(u => !u.LinksCreated).ToArray())
             {
                 foreach (var qid in db.Questions.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == uf.TargetUserId).Select(q => q.Id).ToArray())
                 {
-                    UserFollowQuestion ufq = new UserFollowQuestion()
+                    UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uf.SourceUserId && u.QuestionId == qid);
+                    if (ufq == null)
                     {
-                        QuestionId = qid,
-                        SourceUserId = uf.SourceUserId
-                    };
-                    db.MarkAdded(ufq);
+                        ufq = new UserFollowQuestion()
+                        {
+                            QuestionId = qid,
+                            SourceUserId = uf.SourceUserId
+                        };
+                        db.MarkAdded(ufq);
+                    }
+                    ufq.Source = ufq.Source | FollowSource.UserFollow;
                 }
                 foreach (var aid in db.Answers.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == uf.TargetUserId).Select(q => q.Id).ToArray())
                 {
-                    UserFollowAnswer ufa = new UserFollowAnswer()
+                    UserFollowAnswer ufa = db.UserFollowAnswers.SingleOrDefault(u => u.SourceUserId == uf.SourceUserId && u.AnswerId == aid);
+                    if (ufa == null)
                     {
-                        AnswerId = aid,
-                        SourceUserId = uf.SourceUserId
-                    };
-                    db.MarkAdded(ufa);
+                        ufa = new UserFollowAnswer()
+                        {
+                            AnswerId = aid,
+                            SourceUserId = uf.SourceUserId
+                        };
+                        db.MarkAdded(ufa);
+                    }
+                    ufa.Source = ufa.Source | FollowSource.UserFollow;
                 }
                 uf.LinksCreated = true;
                 db.SaveChanges();
             }
+            // for new tag follows
+            foreach (var uft in db.UserFollowTags.Where(u => !u.LinksCreated).ToArray())
+            {
+                foreach (var qid in db.QuestionTags.Where(q => q.TagId == uft.TagId && q.Question.CreatedOn >= date && q.Question.LinksCreated).Select(q => q.QuestionId).ToArray())
+                {
+                    UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.QuestionId == qid);
+                    if (ufq == null)
+                    {
+                        ufq = new UserFollowQuestion()
+                        {
+                            QuestionId = qid,
+                            SourceUserId = uft.SourceUserId
+                        };
+                        db.MarkAdded(ufq);
+                    }
+                    ufq.Source = ufq.Source | FollowSource.TagFollow;
+                }
+                foreach (var aid in db.AnswerTags.Where(a => a.TagId == uft.TagId && a.Answer.CreatedOn >= date && a.Answer.LinksCreated).Select(a => a.AnswerId).ToArray())
+                {
+                    UserFollowAnswer ufa = db.UserFollowAnswers.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.AnswerId == aid);
+                    if (ufa == null)
+                    {
+                        ufa = new UserFollowAnswer()
+                        {
+                            AnswerId = aid,
+                            SourceUserId = uft.SourceUserId
+                        };
+                        db.MarkAdded(ufa);
+                    }
+                    ufa.Source = ufa.Source | FollowSource.TagFollow;
+                }
+            }
+            // for new questions
             foreach (var question in db.Questions.Where(q => (!q.LinksCreated)).ToArray())
             {
+                // users
                 foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == question.UserId).ToArray())
                 {
-                    UserFollowQuestion ufq = new UserFollowQuestion()
+                    UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uf.SourceUserId && u.QuestionId == question.Id);
+                    if (ufq == null)
                     {
-                        QuestionId = question.Id,
-                        SourceUserId = uf.SourceUserId
-                    };
-                    db.MarkAdded(ufq);
+                        ufq = new UserFollowQuestion()
+                        {
+                            QuestionId = question.Id,
+                            SourceUserId = uf.SourceUserId
+                        };
+                        db.MarkAdded(ufq);
+                    }
+                    ufq.Source = ufq.Source | FollowSource.UserFollow;
                 }
+                // tags
+                foreach (var te in question.TagEntries.Where(t => t.Approved))
+                    foreach (var uft in db.UserFollowTags.Where(u => u.TagId == te.TagId))
+                    {
+                        UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.QuestionId == question.Id);
+                        if (ufq == null)
+                        {
+                            ufq = new UserFollowQuestion()
+                            {
+                                QuestionId = question.Id,
+                                SourceUserId = uft.SourceUserId
+                            };
+                            db.MarkAdded(ufq);
+                        }
+                        ufq.Source = ufq.Source | FollowSource.TagFollow;
+                    }
                 question.LinksCreated = true;
                 db.SaveChanges();
             }
+            // for new answers
             foreach (var answer in db.Answers.Where(a => (!a.LinksCreated)).ToArray())
             {
+                // users
                 foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == answer.UserId).ToArray())
                 {
                     UserFollowAnswer ufa = new UserFollowAnswer()
@@ -187,6 +322,22 @@ namespace Qotd.WorkerImpl
                     };
                     db.MarkAdded(ufa);
                 }
+                // tags
+                foreach (var te in answer.TagEntries.Where(t => t.Approved))
+                    foreach (var uft in db.UserFollowTags.Where(u => u.TagId == te.TagId))
+                    {
+                        UserFollowAnswer ufq = db.UserFollowAnswers.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.AnswerId == answer.Id);
+                        if (ufq == null)
+                        {
+                            ufq = new UserFollowAnswer()
+                            {
+                                AnswerId = answer.Id,
+                                SourceUserId = uft.SourceUserId
+                            };
+                            db.MarkAdded(ufq);
+                        }
+                        ufq.Source = ufq.Source | FollowSource.TagFollow;
+                    }
                 answer.LinksCreated = true;
                 db.SaveChanges();
             }

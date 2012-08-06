@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Qotd.Entities
 {
@@ -13,6 +15,8 @@ namespace Qotd.Entities
 
     public class Question : EntityBase
     {
+        private TagEntry[] _tagEntries;
+
         public virtual string MainText { get; set; }
 
         public virtual string SubText { get; set; }
@@ -57,7 +61,7 @@ namespace Qotd.Entities
 
         public virtual bool LinksCreated { get; set; }
 
-        public virtual string TagValues { get; set; }
+        public virtual bool TagsProcessed { get; set; }
 
         // denormalised ---
 
@@ -68,5 +72,36 @@ namespace Qotd.Entities
         public virtual int denorm_User_OverallRank { get; set; }
 
         public virtual int denorm_User_OverallRankThisPeriod { get; set; }
+
+        // complex serialised properties
+        public virtual TagEntry[] TagEntries
+        {
+            get
+            {
+                if (_tagEntries == null && TagEntries_Data != null)
+                {
+                    using (MemoryStream ms = new MemoryStream(TagEntries_Data))
+                    {
+                        BinaryFormatter bf = new BinaryFormatter();
+                        _tagEntries = (TagEntry[])bf.Deserialize(ms);
+                    }
+                }
+                return _tagEntries;
+            }
+            set
+            {
+                _tagEntries = value;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    bf.Serialize(ms, _tagEntries);
+                    TagEntries_Data = new byte[ms.Length];
+                    ms.Seek(0, SeekOrigin.Begin);
+                    ms.Read(TagEntries_Data, 0, (int)ms.Length);
+                }
+            }
+        }
+
+        public virtual byte[] TagEntries_Data { get; set; }
     }
 }

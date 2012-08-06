@@ -1,80 +1,6 @@
 ﻿   .modal {width:940px;left:36%;}
     
     .ajax-container { padding: 0px 0px; margin: 0px 0px }
-   
-    table
-    {
-        width: 100%
-    }
-    
-    thead
-    {
-    	background-color: #eeeeee;
-    }
-    
-    th
-    {
-    	background-color: #eeeeee;
-    }
-    
-    th, td
-    {
-    	padding: 8px 8px;
-    }
-    
-    tr
-    {
-    	background-color: White;
-    }
-    
-    td
-    {
-    	border-bottom: 1px solid #dddddd;
-    }
-    
-    .score-col
-    {
-    	color: White;
-    }
-    
-    th.score-col
-    {
-    	background-color: #333333;
-    }
-    
-    td.score-col
-    {   
-    	background-color: #666666;
-    	font-size: 1.4em;
-    	border-bottom: 1px solid #333333;
-    }
-    
-    td.score-col.oddrow
-    {
-    	background-color: #555555;
-    	
-    }
-    
-    th.slim-col
-    {
-    	width: 22px
-    }
-    
-    td.number
-    {
-    	text-align: right;
-    }
-    
-    tr.oddrow
-    {
-    	background-color: #efefff;
-    }
-    
-    tr.row-spacer
-    {
-    	background-color: #cccccc;
-    	height: 6px;
-    }
     
     .gold { color: #8B8B00 }
     .silver { color: #aaaaaa }
@@ -109,4 +35,15 @@
     {
     	background-color: white;
     }
+    
+    .number
+    {
+		text-align: right !important;
+    }
+    
+    th
+    {
+    	text-align: center !important;
+    }
+    
    

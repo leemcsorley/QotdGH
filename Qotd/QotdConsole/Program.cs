@@ -21,6 +21,7 @@ namespace QotdConsole
                         
                     db.CreateActivitiesAndNotifications();
                     db.CreateUserFollowLinks();
+                    db.ProcessTags();
 
                     if (loop % 10 == 0)
                     {

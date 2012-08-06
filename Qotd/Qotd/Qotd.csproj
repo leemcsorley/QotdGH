@@ -60,12 +60,14 @@
     <Compile Include="Entities\Activity.cs" />
     <Compile Include="Entities\Admin.cs" />
     <Compile Include="Entities\Answer.cs" />
+    <Compile Include="Entities\AnswerTag.cs" />
     <Compile Include="Entities\Comment.cs" />
     <Compile Include="Entities\EntityBase.cs" />
     <Compile Include="Entities\IEntity.cs" />
     <Compile Include="Entities\Notification.cs" />
     <Compile Include="Entities\Question.cs" />
     <Compile Include="Entities\QuestionContainer.cs" />
+    <Compile Include="Entities\QuestionTag.cs" />
     <Compile Include="Entities\ScoreEntry.cs" />
     <Compile Include="Entities\SiteStatistics.cs" />
     <Compile Include="Entities\Tag.cs" />

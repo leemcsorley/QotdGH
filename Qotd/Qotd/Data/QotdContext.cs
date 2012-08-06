@@ -57,6 +57,10 @@ namespace Qotd.Data
 
         public DbSet<Admin> Admins { get; set; }
 
+        public DbSet<AnswerTag> AnswerTags { get; set; }
+
+        public DbSet<QuestionTag> QuestionTags { get; set; }
+
         public ObjectContext ObjectContext
         {
             get
@@ -135,9 +139,15 @@ update cte
             };
         }
 
-        public UserPO GetUserById(Guid userId)
+        public UserPO GetUserById(Guid userId, Guid? currentUserId = null)
         {
-            return GetUsers(Users.Where(u => u.Id == userId)).SingleOrDefault();
+            var user = GetUsers(Users.Where(u => u.Id == userId)).SingleOrDefault();
+            if (user != null && currentUserId.HasValue)
+            {
+                user.IsFollowedByCurrent = UserFollows.Any(u => u.SourceUserId == currentUserId.Value && u.TargetUserId == user.User.Id);
+                user.IsFollowingCurrent = UserFollows.Any(u => u.TargetUserId == currentUserId.Value && u.SourceUserId == user.User.Id);
+            }
+            return user;
         }
 
         private UserPO[] GetUsers(IQueryable<User> users)
@@ -709,7 +719,7 @@ update cte
                     Activity = a,
                     UserDisplayName = a.denorm_SourceUser_DisplayName,
                     UserProfileImageUrl = a.denorm_SourceUser_ProfileImageUrl
-                }).ToArray();
+                }).OrderByDescending(a => a.Activity.Date).ToArray();
         }
 
         public SearchResultPO[] Search(string search, int skip, int take)
@@ -786,14 +796,14 @@ update cte
                     {
                         Answer answer = (Answer)o;
                         AddSearchItem(answer.Id, SearchItemType.AnswerContent, s, answer.Title, answer.Content);
-                        AddSearchItem(answer.Id, SearchItemType.AnswerTags, s, answer.TagValues); 
+                        AddSearchItem(answer.Id, SearchItemType.AnswerTags, s, answer.TagEntries.GetTagString()); 
                     }
                     },
                 { typeof(Question), (o, s) =>
                     {
                         Question question = (Question)o;
                         AddSearchItem(question.Id, SearchItemType.QuestionContent, s, question.MainText, question.SubText, question.Details);
-                        AddSearchItem(question.Id, SearchItemType.QuestionTags, s, question.TagValues);
+                        AddSearchItem(question.Id, SearchItemType.QuestionTags, s, question.TagEntries.GetTagString());
                     }
                     }
             };
@@ -841,6 +851,8 @@ update cte
             modelBuilder.Entity<UserFollowAnswer>().HasKey(t => new { t.SourceUserId, t.AnswerId });
             modelBuilder.Entity<UserFollowQuestion>().HasKey(t => new { t.SourceUserId, t.QuestionId });
             modelBuilder.Entity<UserFollowTag>().HasKey(t => new { t.SourceUserId, t.TagId });
+            modelBuilder.Entity<AnswerTag>().HasKey(t => new { t.AnswerId, t.TagId });
+            modelBuilder.Entity<QuestionTag>().HasKey(t => new { t.QuestionId, t.TagId });
 
             modelBuilder.Entity<Comment>().HasRequired(t => t.Answer)
                 .WithMany().WillCascadeOnDelete(false);
@@ -877,6 +889,14 @@ update cte
             modelBuilder.Entity<UserFollowQuestion>().HasRequired(t => t.Question)
                 .WithMany().WillCascadeOnDelete(false);
             modelBuilder.Entity<UserFollowTag>().HasRequired(t => t.SourceUser)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<AnswerTag>().HasRequired(t => t.Answer)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<AnswerTag>().HasRequired(t => t.Tag)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<QuestionTag>().HasRequired(t => t.Question)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<QuestionTag>().HasRequired(t => t.Tag)
                 .WithMany().WillCascadeOnDelete(false);
         }
     }
