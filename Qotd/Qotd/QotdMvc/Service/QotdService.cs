@@ -35,7 +35,7 @@ namespace QotdMvc.Service
             };
             Denormaliser.Denormalise(activity);
             userFollow.SourceUser.AddAction(ActivityType.FollowTag);
-
+            userFollow.Tag.AddAction(ActivityType.ReceiveFollow);
             DataProvider.MarkAddedOrUpdated(userFollow.SourceUser);
             DataProvider.MarkAdded(userFollow);
             DataProvider.SaveChanges();

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Qotd.Utils;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Qotd.Entities
 {
@@ -23,8 +26,10 @@ namespace Qotd.Entities
         public Guid TagId { get; set; }
     }
 
-    public class Tag : EntityBase
+    public class Tag : EntityBase, IActionEntryStats
     {
+        private ActionEntry[] _actionEntriesThisPeriod;
+
         public virtual string Value { get; set; }
 
         public virtual int NumFollowing { get; set; }
@@ -48,5 +53,44 @@ namespace Qotd.Entities
         public virtual int NumQuestionsWonThisPeriod { get; set; }
 
         public virtual bool Approved { get; set; }
+
+        public virtual int NumAnswersSecond { get; set; }
+
+        public virtual int NumAnswersSecondThisPeriod { get; set; }
+
+        public virtual int NumAnswersThird { get; set; }
+
+        public virtual int NumAnswersThirdThisPeriod { get; set; }
+
+        // complex serialized properties
+        public virtual ActionEntry[] ActionEntriesThisPeriod
+        {
+            get
+            {
+                if (_actionEntriesThisPeriod == null && ActionEntriesThisPeriod_Data != null)
+                {
+                    using (MemoryStream ms = new MemoryStream(ActionEntriesThisPeriod_Data))
+                    {
+                        BinaryFormatter bf = new BinaryFormatter();
+                        _actionEntriesThisPeriod = (ActionEntry[])bf.Deserialize(ms);
+                    }
+                }
+                return _actionEntriesThisPeriod;
+            }
+            set
+            {
+                _actionEntriesThisPeriod = value;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    bf.Serialize(ms, _actionEntriesThisPeriod);
+                    ActionEntriesThisPeriod_Data = new byte[ms.Length];
+                    ms.Seek(0, SeekOrigin.Begin);
+                    ms.Read(ActionEntriesThisPeriod_Data, 0, (int)ms.Length);
+                }
+            }
+        }
+
+        public virtual byte[] ActionEntriesThisPeriod_Data { get; set; }
     }
 }

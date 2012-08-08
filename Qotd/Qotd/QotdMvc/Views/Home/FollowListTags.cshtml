@@ -1,0 +1,6 @@
+﻿@foreach (var tag in ViewBag.Tags)
+{
+    <text>
+    @Html.Partial("TagTile", (Qotd.PresentationObjects.TagPO)tag)
+    </text>
+}

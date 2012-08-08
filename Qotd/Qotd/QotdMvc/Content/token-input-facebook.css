@@ -1,10 +1,10 @@
 /* Example tokeninput style #2: Facebook style */
 ul.token-input-list-facebook {
     overflow: hidden; 
-    height: auto !important; 
-    height: 1%;
-    width: 400px;
-    border: 1px solid #8496ba;
+    height: 26px !important; 
+    
+    width: 450px;
+    border: 1px solid #cccccc;
     cursor: text;
     font-size: 12px;
     font-family: Verdana;
@@ -14,7 +14,10 @@ ul.token-input-list-facebook {
     padding: 0;
     background-color: #fff;
     list-style-type: none;
-    clear: left;
+    clear: none;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
 }
 
 ul.token-input-list-facebook li input {
@@ -24,18 +27,21 @@ ul.token-input-list-facebook li input {
     background-color: white;
     margin: 2px 0;
     -webkit-appearance: caret;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
 }
 
 li.token-input-token-facebook {
     overflow: hidden; 
     height: auto !important; 
-    height: 15px;
-    margin: 3px;
+    height: 13px;
+    margin: 2px;
     padding: 1px 3px;
-    background-color: #eff2f7;
+    background-color: #eeeeee;
     color: #000;
     cursor: default;
-    border: 1px solid #ccd5e4;
+    border: 1px solid #dddddd;
     font-size: 11px;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -72,7 +78,7 @@ li.token-input-input-token-facebook {
 
 div.token-input-dropdown-facebook {
     position: absolute;
-    width: 400px;
+    width: 450px;
     background-color: #fff;
     overflow: hidden;
     border-left: 1px solid #ccc;

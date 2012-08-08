@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using Qotd.Data;
 using Qotd.Entities;
+using Qotd.Utils;
+using System.Transactions;
+using System.Data.SqlClient;
 
 namespace Qotd.WorkerImpl
 {
@@ -11,68 +14,105 @@ namespace Qotd.WorkerImpl
     {
         public static void ProcessTags(this QotdContext db)
         {
-            var alltags = db.Tags.ToArray().ToDictionary(t => t.Value.ToLower(), t => t);
-            foreach (var ans in db.Answers.Where(a => !a.TagsProcessed).ToArray())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TimeSpan(1, 0, 0)))
             {
-                var tes = ans.TagEntries;
-                foreach (var te in tes)
+                var alltags = db.Tags.ToArray().ToDictionary(t => t.Value.ToLower(), t => t);
+                var activities = db.Activities.Where(a => !a.Answer.TagsProcessed)
+                    .Select(a => new { a.Id, a.AnswerId }).ToArray()
+                    .GroupBy(a => a.AnswerId)
+                    .ToDictionary(a => a.Key, a => a.ToArray());
+                    // answers
+                foreach (var ans in db.Answers.Where(a => !a.TagsProcessed)
+                    .Select(a => new { a.Id, a.TagEntries_Data }).ToArray())
                 {
-                    Tag tag;
-                    if (alltags.ContainsKey(te.Value.ToLower()))
+                    var tes = ans.TagEntries_Data.Deserialise<TagEntry[]>();
+                    foreach (var te in tes)
                     {
-                        tag = alltags[te.Value.ToLower()];
-                        te.Approved = tag.Approved;
-                    }
-                    else
-                    {
-                        tag = new Tag()
+                        Tag tag;
+                        if (alltags.ContainsKey(te.Value.ToLower()))
                         {
-                            Approved = false,
-                            Value = te.Value
+                            tag = alltags[te.Value.ToLower()];
+                            te.Approved = tag.Approved;
+                        }
+                        else
+                        {
+                            tag = new Tag()
+                            {
+                                Approved = false,
+                                Value = te.Value
+                            };
+                            db.MarkAdded(tag);
+                        }
+                        tag.AddAction(ActivityType.PostAnswer, ans);
+                        AnswerTag at = new AnswerTag()
+                        {
+                            AnswerId = ans.Id,
+                            TagId = tag.Id
                         };
-                        db.MarkAdded(tag);
+                        if (activities.ContainsKey(ans.Id))
+                        {
+                            foreach (var activity in activities[ans.Id])
+                                db.MarkAdded(new ActivityTag()
+                                {
+                                    ActivityId = activity.Id,
+                                    TagId = tag.Id
+                                });
+                            db.MarkAdded(at);
+                        }
                     }
-                    AnswerTag at = new AnswerTag()
-                    {
-                        Answer = ans,
-                        Tag = tag
-                    };
-                    db.MarkAdded(at);
+                    byte[] data = null;
+                    tes.Serialise(d => data = d);
+                    db.ObjectContext.ExecuteStoreCommand("update Answers set TagsProcessed = 1, TagEntries_Data = {1} where Id = {0}", ans.Id, data);
                 }
-                ans.TagEntries = tes;
-                ans.TagsProcessed = true;
-                db.SaveChanges();
-            }
-            foreach (var qst in db.Questions.Where(q => !q.TagsProcessed).ToArray())
-            {
-                var tes = qst.TagEntries;
-                Tag tag;
-                foreach (var te in tes)
+                    // questions
+                activities = db.Activities.Where(a => !a.Question.TagsProcessed)
+                    .Select(a => new { a.Id, AnswerId = a.QuestionId }).ToArray()
+                    .GroupBy(a => a.AnswerId)
+                    .ToDictionary(a => a.Key, a => a.ToArray());
+                foreach (var ans in db.Questions.Where(a => !a.TagsProcessed)
+                    .Select(a => new { a.Id, a.TagEntries_Data }).ToArray())
                 {
-                    if (alltags.ContainsKey(te.Value.ToLower()))
+                    var tes = ans.TagEntries_Data.Deserialise<TagEntry[]>();
+                    foreach (var te in tes)
                     {
-                        tag = alltags[te.Value.ToLower()];
-                        te.Approved = tag.Approved;
-                    }
-                    else
-                    {
-                        tag = new Tag()
+                        Tag tag;
+                        if (alltags.ContainsKey(te.Value.ToLower()))
                         {
-                            Approved = false,
-                            Value = te.Value
+                            tag = alltags[te.Value.ToLower()];
+                            te.Approved = tag.Approved;
+                        }
+                        else
+                        {
+                            tag = new Tag()
+                            {
+                                Approved = false,
+                                Value = te.Value
+                            };
+                            db.MarkAdded(tag);
+                        }
+                        tag.AddAction(ActivityType.PostQuestion, ans);
+                        QuestionTag at = new QuestionTag()
+                        {
+                            QuestionId = ans.Id,
+                            TagId = tag.Id
                         };
-                        db.MarkAdded(tag);
+                        if (activities.ContainsKey(ans.Id))
+                        {
+                            foreach (var activity in activities[ans.Id])
+                                db.MarkAdded(new ActivityTag()
+                                {
+                                    ActivityId = activity.Id,
+                                    TagId = tag.Id
+                                });
+                            db.MarkAdded(at);
+                        }
                     }
-                    QuestionTag qt = new QuestionTag()
-                    {
-                        Question = qst,
-                        Tag = tag
-                    };
-                    db.MarkAdded(qt);
+                    byte[] data = null;
+                    tes.Serialise(d => data = d);
+                    db.ObjectContext.ExecuteStoreCommand("update Questions set TagsProcessed = 1, TagEntries_Data = {1} where Id = {0}", ans.Id, data);
                 }
-                qst.TagEntries = tes;
-                qst.TagsProcessed = true;
                 db.SaveChanges();
+                scope.Complete();
             }
         }
         
@@ -82,10 +122,10 @@ namespace Qotd.WorkerImpl
             SiteStatistics stats = new SiteStatistics()
             {
                 Date = DateTime.Now,
-                MaxNumAnswers = db.Users.Max(u => u.NumAnswers),
-                MaxNumAnswersSecond = db.Users.Max(u => u.NumAnswersSecond),
-                MaxNumAnswersThird = db.Users.Max(u => u.NumAnswersThird),
-                MaxNumAnswersSecondThisPeriod = db.Users.Max(u => u.NumAnswersSecondThisPeriod),
+                //MaxNumAnswers = db.Users.Max(u => u.NumAnswers),
+                //MaxNumAnswersSecond = db.Users.Max(u => u.NumAnswersSecond),
+                //MaxNumAnswersThird = db.Users.Max(u => u.NumAnswersThird),
+                //MaxNumAnswersSecondThisPeriod = db.Users.Max(u => u.NumAnswersSecondThisPeriod),
 
             };
             admin.LatestSiteStatistics = stats;
@@ -106,6 +146,14 @@ namespace Qotd.WorkerImpl
                 {
                     question.WinningQuestion = true;
                     question.User.AddAction(ActivityType.QuestionWin, question);
+                    foreach (var te in question.TagEntries)
+                    {
+                        if (te.Approved)
+                        {
+                            var tag = db.Tags.Single(t => t.Id == te.TagId);
+                            tag.AddAction(ActivityType.QuestionWin, question);
+                        }
+                    }
 
                     // create activity
                     Activity activity = new Activity()
@@ -144,6 +192,14 @@ namespace Qotd.WorkerImpl
                         answer.IsFirst = true;
                         answer.AnswerRank = 1;
                         answer.User.AddAction(ActivityType.AnswerWin, answer);
+                        foreach (var te in answer.TagEntries)
+                        {
+                            if (te.Approved)
+                            {
+                                var tag = db.Tags.Single(t => t.Id == te.TagId);
+                                tag.AddAction(ActivityType.AnswerWin, answer);
+                            }
+                        }
                         activity = new Activity()
                         {
                             ActivityType = ActivityType.AnswerWin,
@@ -160,6 +216,14 @@ namespace Qotd.WorkerImpl
                         answer.IsSecond = true;
                         answer.AnswerRank = 2;
                         answer.User.AddAction(ActivityType.AnswerSecond, answer);
+                        foreach (var te in answer.TagEntries)
+                        {
+                            if (te.Approved)
+                            {
+                                var tag = db.Tags.Single(t => t.Id == te.TagId);
+                                tag.AddAction(ActivityType.AnswerSecond, answer);
+                            }
+                        }
                         activity = new Activity()
                         {
                             ActivityType = ActivityType.AnswerSecond,
@@ -176,6 +240,14 @@ namespace Qotd.WorkerImpl
                         answer.IsThird = true;
                         answer.AnswerRank = 3;
                         answer.User.AddAction(ActivityType.AnswerThird, answer);
+                        foreach (var te in answer.TagEntries)
+                        {
+                            if (te.Approved)
+                            {
+                                var tag = db.Tags.Single(t => t.Id == te.TagId);
+                                tag.AddAction(ActivityType.AnswerThird, answer);
+                            }
+                        }
                         activity = new Activity()
                         {
                             ActivityType = ActivityType.AnswerThird,
@@ -203,143 +275,171 @@ namespace Qotd.WorkerImpl
             db.SaveChanges();
         }
 
-        public static void CreateUserFollowLinks(this QotdContext db)
+        private static void CreateLinksForNewUserFollow(QotdContext db, UserFollow userFollow, DateTime date)
         {
-            DateTime date = DateTime.Now.AddDays(-7);
-            // for new user follows
-            foreach (var uf in db.UserFollows.Where(u => !u.LinksCreated).ToArray())
+            var qst = db.Questions.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == userFollow.TargetUserId);
+            var ans = db.Answers.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == userFollow.TargetUserId);
+            foreach (var qid in qst.Select(q => q.Id).ToArray())
             {
-                foreach (var qid in db.Questions.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == uf.TargetUserId).Select(q => q.Id).ToArray())
+                var ufq = db.UserFollowQuestions.SingleOrDefault(u => u.QuestionId == qid && u.SourceUserId == userFollow.SourceUserId);
+                if (ufq == null)
                 {
-                    UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uf.SourceUserId && u.QuestionId == qid);
-                    if (ufq == null)
-                    {
-                        ufq = new UserFollowQuestion()
-                        {
-                            QuestionId = qid,
-                            SourceUserId = uf.SourceUserId
-                        };
-                        db.MarkAdded(ufq);
-                    }
-                    ufq.Source = ufq.Source | FollowSource.UserFollow;
+                    ufq = new UserFollowQuestion() { QuestionId = qid, SourceUserId = userFollow.SourceUserId };
+                    db.MarkAdded(ufq);
                 }
-                foreach (var aid in db.Answers.Where(q => q.CreatedOn >= date && q.LinksCreated && q.UserId == uf.TargetUserId).Select(q => q.Id).ToArray())
-                {
-                    UserFollowAnswer ufa = db.UserFollowAnswers.SingleOrDefault(u => u.SourceUserId == uf.SourceUserId && u.AnswerId == aid);
-                    if (ufa == null)
-                    {
-                        ufa = new UserFollowAnswer()
-                        {
-                            AnswerId = aid,
-                            SourceUserId = uf.SourceUserId
-                        };
-                        db.MarkAdded(ufa);
-                    }
-                    ufa.Source = ufa.Source | FollowSource.UserFollow;
-                }
-                uf.LinksCreated = true;
-                db.SaveChanges();
+                ufq.Source = ufq.Source | FollowSource.UserFollow;
             }
-            // for new tag follows
-            foreach (var uft in db.UserFollowTags.Where(u => !u.LinksCreated).ToArray())
+            foreach (var aid in ans.Select(q => q.Id).ToArray())
             {
-                foreach (var qid in db.QuestionTags.Where(q => q.TagId == uft.TagId && q.Question.CreatedOn >= date && q.Question.LinksCreated).Select(q => q.QuestionId).ToArray())
+                var ufa = db.UserFollowAnswers.SingleOrDefault(u => u.AnswerId == aid && u.SourceUserId == userFollow.SourceUserId);
+                if (ufa == null)
                 {
-                    UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.QuestionId == qid);
-                    if (ufq == null)
-                    {
-                        ufq = new UserFollowQuestion()
-                        {
-                            QuestionId = qid,
-                            SourceUserId = uft.SourceUserId
-                        };
-                        db.MarkAdded(ufq);
-                    }
-                    ufq.Source = ufq.Source | FollowSource.TagFollow;
-                }
-                foreach (var aid in db.AnswerTags.Where(a => a.TagId == uft.TagId && a.Answer.CreatedOn >= date && a.Answer.LinksCreated).Select(a => a.AnswerId).ToArray())
-                {
-                    UserFollowAnswer ufa = db.UserFollowAnswers.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.AnswerId == aid);
-                    if (ufa == null)
-                    {
-                        ufa = new UserFollowAnswer()
-                        {
-                            AnswerId = aid,
-                            SourceUserId = uft.SourceUserId
-                        };
-                        db.MarkAdded(ufa);
-                    }
-                    ufa.Source = ufa.Source | FollowSource.TagFollow;
-                }
-            }
-            // for new questions
-            foreach (var question in db.Questions.Where(q => (!q.LinksCreated)).ToArray())
-            {
-                // users
-                foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == question.UserId).ToArray())
-                {
-                    UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uf.SourceUserId && u.QuestionId == question.Id);
-                    if (ufq == null)
-                    {
-                        ufq = new UserFollowQuestion()
-                        {
-                            QuestionId = question.Id,
-                            SourceUserId = uf.SourceUserId
-                        };
-                        db.MarkAdded(ufq);
-                    }
-                    ufq.Source = ufq.Source | FollowSource.UserFollow;
-                }
-                // tags
-                foreach (var te in question.TagEntries.Where(t => t.Approved))
-                    foreach (var uft in db.UserFollowTags.Where(u => u.TagId == te.TagId))
-                    {
-                        UserFollowQuestion ufq = db.UserFollowQuestions.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.QuestionId == question.Id);
-                        if (ufq == null)
-                        {
-                            ufq = new UserFollowQuestion()
-                            {
-                                QuestionId = question.Id,
-                                SourceUserId = uft.SourceUserId
-                            };
-                            db.MarkAdded(ufq);
-                        }
-                        ufq.Source = ufq.Source | FollowSource.TagFollow;
-                    }
-                question.LinksCreated = true;
-                db.SaveChanges();
-            }
-            // for new answers
-            foreach (var answer in db.Answers.Where(a => (!a.LinksCreated)).ToArray())
-            {
-                // users
-                foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == answer.UserId).ToArray())
-                {
-                    UserFollowAnswer ufa = new UserFollowAnswer()
-                    {
-                        AnswerId = answer.Id,
-                        SourceUserId = uf.SourceUserId
-                    };
+                    ufa = new UserFollowAnswer() { AnswerId = aid, SourceUserId = userFollow.SourceUserId };
                     db.MarkAdded(ufa);
                 }
-                // tags
-                foreach (var te in answer.TagEntries.Where(t => t.Approved))
-                    foreach (var uft in db.UserFollowTags.Where(u => u.TagId == te.TagId))
-                    {
-                        UserFollowAnswer ufq = db.UserFollowAnswers.SingleOrDefault(u => u.SourceUserId == uft.SourceUserId && u.AnswerId == answer.Id);
-                        if (ufq == null)
-                        {
-                            ufq = new UserFollowAnswer()
-                            {
-                                AnswerId = answer.Id,
-                                SourceUserId = uft.SourceUserId
-                            };
-                            db.MarkAdded(ufq);
-                        }
-                        ufq.Source = ufq.Source | FollowSource.TagFollow;
-                    }
-                answer.LinksCreated = true;
+                ufa.Source = ufa.Source | FollowSource.UserFollow;
+            }
+            db.ObjectContext.ExecuteStoreCommand("update UserFollows set LinksCreated = 1 where SourceUserId = {0} and TargetUserId = {1}", userFollow.SourceUserId, userFollow.TargetUserId);
+        }
+
+        private static void CreateLinksForNewUserFollowTag(QotdContext db, UserFollowTag userFollow, DateTime date)
+        {
+            var qst = db.QuestionTags.Where(q => q.Question.CreatedOn >= date && q.Question.LinksCreated && q.Question.TagsProcessed && q.TagId == userFollow.TagId)
+                .Select(q => q.QuestionId)
+                .Distinct();
+            var ans = db.AnswerTags.Where(q => q.Answer.CreatedOn >= date && q.Answer.LinksCreated && q.Answer.TagsProcessed && q.TagId == userFollow.TagId)
+                .Select(q => q.AnswerId)
+                .Distinct();
+            foreach (var qid in qst.ToArray())
+            {
+                var ufq = db.UserFollowQuestions.SingleOrDefault(u => u.QuestionId == qid && u.SourceUserId == userFollow.SourceUserId);
+                if (ufq == null)
+                {
+                    ufq = new UserFollowQuestion() { QuestionId = qid, SourceUserId = userFollow.SourceUserId };
+                    db.MarkAdded(ufq);
+                }
+                ufq.Source = ufq.Source | FollowSource.TagFollow;
+            }
+            foreach (var aid in ans.ToArray())
+            {
+                var ufa = db.UserFollowAnswers.SingleOrDefault(u => u.AnswerId == aid && u.SourceUserId == userFollow.SourceUserId);
+                if (ufa == null)
+                {
+                    ufa = new UserFollowAnswer() { AnswerId = aid, SourceUserId = userFollow.SourceUserId };
+                    db.MarkAdded(ufa);
+                }
+                ufa.Source = ufa.Source | FollowSource.TagFollow;
+            }
+            db.ObjectContext.ExecuteStoreCommand("update UserFollowTags set LinksCreated = 1 where SourceUserId = {0} and TagId = {1}", userFollow.SourceUserId, userFollow.TagId);
+        }
+
+        public static void CreateUserFollowLinksForNewFollows(this QotdContext db)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                DateTime date = DateTime.Now.AddDays(-7);
+                foreach (var uf in db.UserFollows.Where(u => !u.LinksCreated).ToArray())
+                    CreateLinksForNewUserFollow(db, uf, date);
+                foreach (var uf in db.UserFollowTags.Where(u => !u.LinksCreated).ToArray())
+                    CreateLinksForNewUserFollowTag(db, uf, date);
                 db.SaveChanges();
+                scope.Complete();
+            }
+        }
+
+        public static void CreateUserFollowLinksForNewContent(this QotdContext db)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                Dictionary<Tuple<Guid, Guid>, UserFollowQuestion> qcreated = new Dictionary<Tuple<Guid, Guid>, UserFollowQuestion>();
+                var qids = db.QuestionTags.Where(q => !q.Question.LinksCreated)
+                    .Select(q => new { q.QuestionId, q.TagId, q.Question.UserId })
+                    .GroupBy(q => new { q.QuestionId, q.UserId })
+                    .ToArray();
+                foreach (var aid in db.Questions.Where(a => !a.LinksCreated)
+                    .Select(a => new { a.Id, a.UserId }).ToArray())
+                {
+                    foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == aid.UserId).ToArray())
+                    {
+                        var ufa = new UserFollowQuestion()
+                        {
+                            Source = FollowSource.UserFollow,
+                            QuestionId = aid.Id,
+                            SourceUserId = uf.SourceUserId
+                        };
+                        db.MarkAdded(ufa);
+                        qcreated.Add(new Tuple<Guid, Guid>(aid.Id, uf.SourceUserId), ufa);
+                    }
+                    db.ObjectContext.ExecuteStoreCommand("update Questions set LinksCreated = 1 where Id = {0}", aid.Id);
+                }
+                foreach (var qid in qids)
+                {
+                    foreach (var qt in qid)
+                    {
+                        foreach (var uft in db.UserFollowTags.Where(u => u.TagId == qt.TagId).ToArray())
+                        {
+                            UserFollowQuestion ufq;
+                            if (!qcreated.TryGetValue(new Tuple<Guid, Guid>(qid.Key.QuestionId, uft.SourceUserId), out ufq))
+                            {
+                                ufq = new UserFollowQuestion()
+                                {
+                                    SourceUserId = uft.SourceUserId,
+                                    QuestionId = qid.Key.QuestionId
+                                };
+                                db.MarkAdded(ufq);
+                                qcreated[new Tuple<Guid, Guid>(qid.Key.QuestionId, uft.SourceUserId)] = ufq;
+                            }
+                            ufq.Source = ufq.Source | FollowSource.TagFollow;
+                        }
+                    }
+                    db.ObjectContext.ExecuteStoreCommand("update Questions set LinksCreated = 1 where Id = {0}", qid.Key.QuestionId);
+                }
+                
+                Dictionary<Tuple<Guid, Guid>, UserFollowAnswer> acreated = new Dictionary<Tuple<Guid, Guid>, UserFollowAnswer>();
+                var aids = db.AnswerTags.Where(q => !q.Answer.LinksCreated)
+                    .Select(q => new { q.AnswerId, q.TagId, q.Answer.UserId })
+                    .GroupBy(q => new { q.AnswerId, q.UserId })
+                    .ToArray();
+                foreach (var aid in db.Answers.Where(a => !a.LinksCreated)
+                    .Select(a => new { a.Id, a.UserId }).ToArray())
+                {
+                    foreach (var uf in db.UserFollows.Where(u => u.TargetUserId == aid.UserId).ToArray())
+                    {
+                        var ufa = new UserFollowAnswer()
+                        {
+                            Source = FollowSource.UserFollow,
+                            AnswerId = aid.Id,
+                            SourceUserId = uf.SourceUserId
+                        };
+                        db.MarkAdded(ufa);
+                        acreated.Add(new Tuple<Guid, Guid>(aid.Id, uf.SourceUserId), ufa);
+                    }
+                    db.ObjectContext.ExecuteStoreCommand("update Answers set LinksCreated = 1 where Id = {0}", aid.Id);
+                }
+                foreach (var aid in aids)
+                {
+                    foreach (var at in aid)
+                    {
+                        foreach (var uft in db.UserFollowTags.Where(u => u.TagId == at.TagId).ToArray())
+                        {
+                            UserFollowAnswer ufa;
+                            if (!acreated.TryGetValue(new Tuple<Guid, Guid>(aid.Key.AnswerId, uft.SourceUserId), out ufa))
+                            {
+                                ufa = new UserFollowAnswer()
+                                {
+                                    SourceUserId = uft.SourceUserId,
+                                    AnswerId = aid.Key.AnswerId
+                                };
+                                db.MarkAdded(ufa);
+                                acreated[new Tuple<Guid, Guid>(aid.Key.AnswerId, uft.SourceUserId)] = ufa;
+                            }
+                            ufa.Source = ufa.Source | FollowSource.TagFollow;
+                        }
+                    }
+                    db.ObjectContext.ExecuteStoreCommand("update Answers set LinksCreated = 1 where Id = {0}", aid.Key.AnswerId);
+                }
+                db.SaveChanges();
+                scope.Complete();
             }
         }
 

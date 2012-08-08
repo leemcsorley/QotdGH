@@ -16,6 +16,38 @@ namespace QotdMvc.Controllers
         private const int DEFAULT_TAKE_LEADERBOARD = 50;
         private const int DEFAULT_TAKE_NOTIFICATIONS = 20;
 
+        public ActionResult AddFollow(Guid userId)
+        {
+            var targetUser = DataProvider.GetUserById(userId);
+            QotdService.FollowUser(
+                new UserFollow()
+                {
+                    SourceUser = UserEntity,
+                    TargetUser = targetUser.User,
+                    LinksCreated = false
+                });
+            return RedirectToAction("User", "Home", new { userId = userId });
+        }
+
+        public ActionResult AddFollowTag(Guid tagId)
+        {
+            QotdService.FollowTag(
+                new UserFollowTag()
+                {
+                    SourceUser = UserEntity,
+                    Tag = DataProvider.GetTagById(tagId, null).Tag,
+                    LinksCreated = false
+                });
+            return RedirectToAction("Tag", "Home", new { tagId = tagId });
+        }
+
+        public ActionResult Tag(Guid tagId)
+        {
+            ViewBag.Tag = DataProvider.GetTagById(tagId, UserEntity == null ? (Guid?)null : UserEntity.Id);
+            ViewBag.HideQuestion = false;
+            return View();
+        }
+
         public ActionResult Tags(string q)
         {
             return Json(
@@ -35,11 +67,36 @@ namespace QotdMvc.Controllers
             return View();
         }
 
+        public ActionResult HistoryForTag(Guid tagId, int skip = 0, int take = DEFAULT_TAKE)
+        {
+            int count;
+            var activities = DataProvider.GetHistoryForTag(tagId, skip, take, out count);
+            ViewBag.Activities = activities;
+            ViewBag.Action = "HistoryForTag";
+            ViewBag.Skip = skip + take;
+            ViewBag.Take = take;
+            ViewBag.More = count > skip + activities.Length;
+            return View("History");
+        }
+
+        public ActionResult TodaysActivitiesForUser(Guid userId, DateTime? dateFrom = null, int take = DEFAULT_TAKE)
+        {
+            var activities = DataProvider.GetTodaysActivitiesForUser(userId, dateFrom, take);
+            ViewBag.Activities = activities;
+            ViewBag.Action = "TodaysActivitiesForUser";
+            ViewBag.Take = take;
+            return View("ActivitiesFull");
+        }
+
         public ActionResult HistoryForUser(Guid userId, int skip = 0, int take = DEFAULT_TAKE)
         {
             int count;
-            ViewBag.Activities = DataProvider.GetHistoryForUser(userId, skip, take, out count);
-
+            var activities = DataProvider.GetHistoryForUser(userId, skip, take, out count);
+            ViewBag.Activities = activities;
+            ViewBag.Action = "HistoryForUser";
+            ViewBag.Skip = skip + take;
+            ViewBag.Take = take;
+            ViewBag.More = count > skip + activities.Length;
             return View("History");
         }
 
@@ -48,6 +105,8 @@ namespace QotdMvc.Controllers
             if (dateFrom == null) dateFrom = DateTime.Now.Date.AddDays(-DEFAULT_TAKE);
             if (dateTo == null) dateTo = DateTime.Now;
             ViewBag.Activities = DataProvider.GetHistory(dateFrom.Value, dateTo.Value);
+            ViewBag.Action = "History";
+            ViewBag.Group = true;
             return View("History");
         }
 
@@ -168,12 +227,29 @@ namespace QotdMvc.Controllers
             return View("QuestionsTab");
         }
 
+        public ActionResult QuestionsFollowed(int skip = 0, int take = DEFAULT_TAKE)
+        {
+            int count;
+            QuestionPO[] questions;
+            questions = DataProvider.GetQuestionsFollowed(UserEntity.Id, FollowSource.TagFollow | FollowSource.UserFollow, skip, take, out count);
+            ViewBag.Questions = questions;
+            ViewBag.Skip = skip + take;
+            ViewBag.Take = DEFAULT_TAKE;
+            ViewBag.Action = "QuestionsFollowed";
+            ViewBag.More = count > skip + questions.Length;
+            return View("Questions");
+        }
+
         public ActionResult AnswersFollowed(int skip = 0, int take = DEFAULT_TAKE)
         {
-            //ViewBag.Answers = DataProvider.GetAnswersFollowed(UserEntity.Id, TodaysQuestion.Id, skip, take);
-            //ViewBag.Skip = skip + take;
-            //ViewBag.Take = DEFAULT_TAKE;
-            //ViewBag.Action = "AnswersFollowed";
+            int count;
+            AnswerPO[] answers;
+            answers = DataProvider.GetAnswersFollowed(UserEntity.Id, TodaysQuestion.Id, FollowSource.TagFollow | FollowSource.UserFollow, skip, take, out count);
+            ViewBag.Answers = answers;
+            ViewBag.Skip = skip + take;
+            ViewBag.Take = DEFAULT_TAKE;
+            ViewBag.Action = "AnswersFollowed";
+            ViewBag.More = count > skip + answers.Length;
             return View("Answers");
         }
 
@@ -265,6 +341,12 @@ namespace QotdMvc.Controllers
             return View();
         }
 
+        public ActionResult FollowListTags(Guid userId)
+        {
+            ViewBag.Tags = DataProvider.GetTagsFollowed(userId);
+            return View();
+        }
+
         [HttpGet]
         public ActionResult LikeComment(Guid commentId)
         {
@@ -341,7 +423,9 @@ namespace QotdMvc.Controllers
                     SubText = sub,
                     Details = details,
                     QuestionType = QuestionType.Open,
-                    User = UserEntity
+                    User = UserEntity,
+                    TagEntries = tags.Split(',').Where(s => !String.IsNullOrWhiteSpace(s))
+                        .Select(s => new TagEntry() { Value = s, Approved = false }).ToArray()
                 };
 
                 QotdService.SaveNewQuestion(question);
@@ -355,7 +439,7 @@ namespace QotdMvc.Controllers
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult AnswerSubmit(string title, string content, string answerTags)
+        public ActionResult AnswerSubmit(string title, string content, string tags)
         {
             try
             {
@@ -371,7 +455,9 @@ namespace QotdMvc.Controllers
                     User = UserEntity,
                     DebateSide = 0,
                     Comment1Id = null,
-                    Comment2Id = null
+                    Comment2Id = null,
+                    TagEntries = tags.Split(',').Where(s => !String.IsNullOrWhiteSpace(s))
+                        .Select(s => new TagEntry() { Value = s, Approved = false }).ToArray()
                 };
                 QotdService.SaveNewAnswer(answer);
 

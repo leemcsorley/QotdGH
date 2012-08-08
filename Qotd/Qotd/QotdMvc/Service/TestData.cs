@@ -150,12 +150,15 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                                 dp.VoteQuestion(q.Id, users[j], -1);
                         }
                     }
-                    if (date <= now)
+                    if (true)
                     {
-                        // pick winner
-                        dp.PickWinningQuestion(date);
-                        // transition to winning question
-                        dp.TransitionToWinningQuestion(date);
+                        if (date <= now)
+                        {
+                            // pick winner
+                            dp.PickWinningQuestion(date);
+                            // transition to winning question
+                            dp.TransitionToWinningQuestion(date);
+                        }
                         // get todays question
                         var tq = dp.GetTodaysQuestion();
                         // create answers
@@ -202,7 +205,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                         }
 
                         // pick winning answer
-                        dp.PickWinningAnswers(date);
+                        if (date <= now) dp.PickWinningAnswers(date);
                     }
                 }
 

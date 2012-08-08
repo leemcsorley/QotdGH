@@ -12,6 +12,7 @@ using System.Data.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Configuration;
 using System.IO;
+using Qotd.Utils;
 
 namespace Qotd.Data
 {
@@ -60,6 +61,8 @@ namespace Qotd.Data
         public DbSet<AnswerTag> AnswerTags { get; set; }
 
         public DbSet<QuestionTag> QuestionTags { get; set; }
+
+        public DbSet<ActivityTag> ActivityTags { get; set; }
 
         public ObjectContext ObjectContext
         {
@@ -137,6 +140,21 @@ update cte
                 User = user,
                 UnreadNotifications = Notifications.Count(n => n.UserId == user.Id && (!n.IsRead))
             };
+        }
+
+        public TagPO GetTagById(Guid tagId, Guid? currentUserId = null)
+        {
+            var tag = GetTags(Tags.Where(t => t.Id == tagId)).SingleOrDefault();
+            if (tag != null && currentUserId.HasValue)
+            {
+                tag.IsFollowedByCurrent = UserFollowTags.Any(u => u.SourceUserId == currentUserId.Value && u.TagId == tagId);
+            }
+            return tag;
+        }
+
+        private TagPO[] GetTags(IQueryable<Tag> tags)
+        {
+            return tags.ToArray().Select(t => new TagPO() { Tag = t }).ToArray();
         }
 
         public UserPO GetUserById(Guid userId, Guid? currentUserId = null)
@@ -280,6 +298,17 @@ update cte
             return pans;
         }
 
+        public TagPO[] GetTagsFollowed(Guid userId)
+        {
+            return UserFollowTags.Where(u => u.SourceUserId == userId)
+                .Select(u => u.Tag)
+                .ToArray()
+                .Select(u => new TagPO()
+                {
+                    Tag = u
+                }).ToArray();
+        }
+
         public UserPO[] GetUsersFollowed(Guid userId)
         {
             return UserFollows.Where(u => u.SourceUserId == userId)
@@ -372,13 +401,10 @@ update cte
         {
             var act = activities.ToArray();
 
-            var qids = act.Where(a => a.ActivityType == ActivityType.PostQuestion || a.ActivityType == ActivityType.QuestionWin)
+            var qids = act.Where(a => a.QuestionId.HasValue)
                 .Select(a => a.QuestionId.Value).ToArray();
 
-            var aids = act.Where(a => a.ActivityType == ActivityType.PostAnswer ||
-                                 a.ActivityType == ActivityType.AnswerWin ||
-                                 a.ActivityType == ActivityType.AnswerSecond ||
-                                 a.ActivityType == ActivityType.AnswerThird)
+            var aids = act.Where(a => a.AnswerId.HasValue)
                 .Select(a => a.AnswerId.Value).ToArray();
 
             var qs = GetQuestions(Questions.Where(q => qids.Contains(q.Id)), null)
@@ -438,13 +464,31 @@ update cte
 
         public ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo)
         {
-            return GetHistory(
+            var history = GetHistory(
                 Activities.Where(a => (a.ActivityTypeValue == (byte)ActivityType.QuestionWin ||
                                        a.ActivityTypeValue == (byte)ActivityType.AnswerWin ||
                                        a.ActivityTypeValue == (byte)ActivityType.AnswerSecond ||
                                        a.ActivityTypeValue == (byte)ActivityType.AnswerThird) &&
                                        a.Date >= dateFrom && a.Date < dateTo)
                .OrderByDescending(a => a.Date));
+            for (int i = 0; i < history.Length; i++)
+            {
+                if (history[i].Activity.AnswerId.HasValue) history[i].Activity.ActivityType = ActivityType.PostAnswer;
+                if (history[i].Activity.QuestionId.HasValue) history[i].Activity.ActivityType = ActivityType.PostQuestion;
+            }
+            return history;
+        }
+
+        public ActivityPO[] GetTodaysActivitiesForUser(Guid userId, DateTime? date, int take)
+        {
+            if (date == null)
+                date = DateTime.Now;
+            DateTime startDate = DateTime.Now.Date;
+            var query = Activities.Where(a => a.Date <= date && a.Date >= startDate && a.SourceUserId == userId);
+            return GetHistory(
+                query
+                .OrderByDescending(a => a.Date)
+                .Take(take));
         }
 
         public ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take, out int count)
@@ -459,6 +503,20 @@ update cte
                 .Skip(skip)
                 .Take(take));
 
+        }
+
+        public ActivityPO[] GetHistoryForTag(Guid tagId, int skip, int take, out int count)
+        {
+            var query = ActivityTags.Where(t => t.TagId == tagId)
+                .Select(t => t.Activity)
+                .Where(a => (a.ActivityTypeValue == (byte)ActivityType.PostAnswer ||
+                                      a.ActivityTypeValue == (byte)ActivityType.PostQuestion));
+            count = query.Count();
+            return GetHistory(
+                query
+                .OrderByDescending(a => a.Date)
+                .Skip(skip)
+                .Take(take));
         }
 
         private CommentPO[] GetComments(IQueryable<Comment> comments, Guid? userId)
@@ -841,6 +899,7 @@ update cte
             modelBuilder.Entity<Tag>().Property(t => t.Id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
             modelBuilder.Entity<User>().Ignore(u => u.ActionEntriesThisPeriod);
+            modelBuilder.Entity<Tag>().Ignore(u => u.ActionEntriesThisPeriod);
 
             modelBuilder.Entity<UserLikeComment>().HasKey(t => new { t.UserId, t.CommentId });
             modelBuilder.Entity<UserVoteAnswer>().HasKey(t => new { t.UserId, t.AnswerId });
@@ -853,6 +912,7 @@ update cte
             modelBuilder.Entity<UserFollowTag>().HasKey(t => new { t.SourceUserId, t.TagId });
             modelBuilder.Entity<AnswerTag>().HasKey(t => new { t.AnswerId, t.TagId });
             modelBuilder.Entity<QuestionTag>().HasKey(t => new { t.QuestionId, t.TagId });
+            modelBuilder.Entity<ActivityTag>().HasKey(t => new { t.ActivityId, t.TagId });
 
             modelBuilder.Entity<Comment>().HasRequired(t => t.Answer)
                 .WithMany().WillCascadeOnDelete(false);
@@ -897,6 +957,10 @@ update cte
             modelBuilder.Entity<QuestionTag>().HasRequired(t => t.Question)
                 .WithMany().WillCascadeOnDelete(false);
             modelBuilder.Entity<QuestionTag>().HasRequired(t => t.Tag)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<ActivityTag>().HasRequired(t => t.Activity)
+                .WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<ActivityTag>().HasRequired(t => t.Tag)
                 .WithMany().WillCascadeOnDelete(false);
         }
     }

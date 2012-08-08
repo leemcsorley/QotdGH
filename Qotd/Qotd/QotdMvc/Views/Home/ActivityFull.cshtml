@@ -1,0 +1,10 @@
+﻿@model Qotd.PresentationObjects.ActivityPO
+@switch (Model.Activity.ActivityType)
+{
+    case Qotd.Entities.ActivityType.PostAnswer:
+        <text>@Html.Partial("Answer", Model.Answer)</text>
+        break;
+    case Qotd.Entities.ActivityType.PostQuestion:
+        <text>@Html.Partial("Question", Model.Question)</text>
+        break;
+}

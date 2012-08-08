@@ -12,26 +12,33 @@ namespace QotdConsole
     {
         static void Main(string[] args)
         {
-            int loop = 0;
             while (true)
             {
+                Thread.Sleep(500);
+                using (QotdContext db = new QotdContext())
+                { 
+                    db.CreateActivitiesAndNotifications();
+                }
                 using (QotdContext db = new QotdContext())
                 {
-                    Thread.Sleep(500);
-                        
-                    db.CreateActivitiesAndNotifications();
-                    db.CreateUserFollowLinks();
-                    db.ProcessTags();
-
-                    if (loop % 10 == 0)
-                    {
-                        db.UpdateUserRankings();
-                        db.AggregateNotifications();
-                    }
+                    db.CreateUserFollowLinksForNewFollows();
                 }
-                loop++;
-                if (loop > 1000) 
-                    loop = 0;
+                using (QotdContext db = new QotdContext())
+                {
+                    db.CreateUserFollowLinksForNewContent();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.ProcessTags();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.UpdateUserRankings();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.AggregateNotifications();
+                }
             }
         }
     }

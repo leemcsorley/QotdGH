@@ -28,6 +28,8 @@ namespace Qotd.Data
 
         UserPO GetUserById(Guid userId, Guid? currentUserId = null);
 
+        TagPO GetTagById(Guid tagId, Guid? currentUserId = null);
+
         Question GetTodaysQuestion();
 
         bool HasUserPickedSide(Guid userId, Guid questionId);
@@ -78,13 +80,19 @@ namespace Qotd.Data
 
         LeaderboardPO GetLeaderboardThisPeriod(int skip, int take, out int count);
 
+        ActivityPO[] GetHistoryForTag(Guid tagId, int skip, int take, out int count);
+
         ActivityPO[] GetHistoryForUser(Guid userId, int skip, int take, out int count);
 
         ActivityPO[] GetHistory(DateTime dateFrom, DateTime dateTo);
 
+        ActivityPO[] GetTodaysActivitiesForUser(Guid userId, DateTime? date, int take);
+
         Notification[] ReadNotifications(Guid userId);
 
         UserPO[] GetUsersFollowed(Guid userId);
+
+        TagPO[] GetTagsFollowed(Guid userId);
 
         Notification[] GetNotifications(Guid userId, int skip, int take, out int count);
 

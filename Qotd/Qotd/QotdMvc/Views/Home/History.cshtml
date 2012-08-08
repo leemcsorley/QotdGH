@@ -1,43 +1,35 @@
 ﻿<div>
 @foreach (var day in ((Qotd.PresentationObjects.ActivityPO[])ViewBag.Activities).GroupBy(a => a.Activity.Date.Date).OrderByDescending(a => a.Key))
 {
-        <div class="history-date">
-            <span class="label label-info">@day.Key.ToLongDateString()</span>
-        </div>
-    <!-- questions -->
-    int c = 0;
-    foreach (var activity in day.Where(a => a.Activity.ActivityType == Qotd.Entities.ActivityType.PostQuestion ||
-                                            a.Activity.ActivityType == Qotd.Entities.ActivityType.QuestionWin))
+    <div class="history-date">
+        <span class="label label-info">@day.Key.ToLongDateString()</span>
+    </div>
+    if (ViewBag.Group != null && ViewBag.Group) 
     {
-        if (c == 0)
+        <!-- questions -->
+        foreach (var activity in day.Where(a => a.Activity.QuestionId.HasValue))
         {
-                 @*<div class="history-section">
-                    <span class="label label-inverse"><b>Questions</b></span>
-                 </div>*@
+            <text>@Html.Partial("ActivityFull", activity)</text>
         }
-             <div>
-             @Html.Partial("Question", activity.Question)
-             </div>
-        c++;
+         <!-- answers -->
+        foreach (var activity in day.Where(a => a.Activity.AnswerId.HasValue).OrderBy(a => a.Answer.Answer.AnswerRank))
+        {
+            <text>@Html.Partial("ActivityFull", activity)</text> 
+        }
     }
-        <!-- answers -->
-    c = 0;
-    foreach (var activity in day.Where(a => a.Activity.ActivityType == Qotd.Entities.ActivityType.PostAnswer ||
-                                            a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerWin ||
-                                            a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerSecond ||
-                                            a.Activity.ActivityType == Qotd.Entities.ActivityType.AnswerThird).OrderBy(a => a.Answer.Answer.AnswerRank))
+    else
     {
-        if (c == 0)
+        <!-- all -->
+        foreach (var activity in day)
         {
-                 @*<div class="history-section">
-                 <span class="label label-inverse"><b>Answers</b></span>
-                 </div>*@
+            <text>@Html.Partial("ActivityFull", activity)</text>
         }
-             <div>
-             @Html.Partial("Answer", activity.Answer)
-             </div>
-             c++;
-         }
-        
+    }
 }
+<div class="ajax-container">
+    <div style="overflow: hidden">
+        <a href="@Url.Action(ViewBag.Action, "Home", new { skip = ViewBag.Skip, take = ViewBag.Take })" class="ajax-link"><button class="btn btn-small btn-primary" type="submit">
+            <i class="icon-chevron-down"></i>&nbsp;&nbsp;See More</button></a>
+    </div>
+</div>
 </div>

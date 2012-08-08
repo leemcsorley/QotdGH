@@ -6,12 +6,21 @@
         <li>
             <a href="#qrecent" data-toggle="tab" class="ajax-tab" rel="@Url.Action("QuestionsLatest", "Home")">Most Recent</a>
         </li>
+        @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+        {
+        <li>
+            <a href="#qfollowed" data-toggle="tab" class="ajax-tab" rel="@Url.Action("QuestionsFollowed", "Home")">Your Feed</a>
+        </li>
+        }
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="qrated">
             @Html.Action("QuestionsRated", "Home")
         </div>
         <div class="tab-pane" id="qrecent">
+                                        
+        </div>
+        <div class="tab-pane" id="qfollowed">
                                         
         </div>
     </div>

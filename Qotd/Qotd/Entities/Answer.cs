@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Qotd.Utils;
 
 namespace Qotd.Entities
 {
@@ -72,25 +73,14 @@ namespace Qotd.Entities
             {
                 if (_tagEntries == null && TagEntries_Data != null)
                 {
-                    using (MemoryStream ms = new MemoryStream(TagEntries_Data))
-                    {
-                        BinaryFormatter bf = new BinaryFormatter();
-                        _tagEntries = (TagEntry[])bf.Deserialize(ms);
-                    }
+                    _tagEntries = TagEntries_Data.Deserialise<TagEntry[]>();
                 }
                 return _tagEntries;
             }
             set
             {
                 _tagEntries = value;
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    BinaryFormatter bf = new BinaryFormatter();
-                    bf.Serialize(ms, _tagEntries);
-                    TagEntries_Data = new byte[ms.Length];
-                    ms.Seek(0, SeekOrigin.Begin);
-                    ms.Read(TagEntries_Data, 0, (int)ms.Length);
-                }
+                value.Serialise(d => TagEntries_Data = d);
             }
         }
 

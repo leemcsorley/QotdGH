@@ -46,6 +46,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,6 +59,7 @@
     <Compile Include="Data\QotdContext.cs" />
     <Compile Include="Data\Serializer.cs" />
     <Compile Include="Entities\Activity.cs" />
+    <Compile Include="Entities\ActivityTag.cs" />
     <Compile Include="Entities\Admin.cs" />
     <Compile Include="Entities\Answer.cs" />
     <Compile Include="Entities\AnswerTag.cs" />
@@ -90,9 +92,12 @@
     <Compile Include="PresentationObjects\QuestionPO.cs" />
     <Compile Include="PresentationObjects\LeaderboardRowPO.cs" />
     <Compile Include="PresentationObjects\SearchResultPO.cs" />
+    <Compile Include="PresentationObjects\TagPO.cs" />
     <Compile Include="PresentationObjects\UserPO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ActionUtils.cs" />
     <Compile Include="Utils\Config.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="WorkerImpl\WorkerUtils.cs" />
   </ItemGroup>
