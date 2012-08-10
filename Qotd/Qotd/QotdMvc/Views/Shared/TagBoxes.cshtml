@@ -1,13 +1,13 @@
 ﻿@model QotdMvc.Models.TagBoxes
-<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
-    <div style="text-align: center; overflow: hidden; font-size: 10px">Num Answers</div>
-    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.Tag.Tag.NumAnswers : Model.Tag.Tag.NumAnswersThisPeriod)</div>
+<div class="stat-box">
+    <div class="stat-box-descriptor">Num Answers</div>
+    <div class="stat-box-number">@(Model.Overall ? Model.Tag.Tag.NumAnswers : Model.Tag.Tag.NumAnswersThisPeriod)</div>
 </div>
-<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
-    <div style="text-align: center; overflow: hidden; font-size: 10px">Num Questions</div>
-    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.Tag.Tag.NumQuestions : Model.Tag.Tag.NumQuestionsThisPeriod)</div>
+<div class="stat-box">
+    <div class="stat-box-descriptor">Num Questions</div>
+    <div class="stat-box-number">@(Model.Overall ? Model.Tag.Tag.NumQuestions : Model.Tag.Tag.NumQuestionsThisPeriod)</div>
 </div>
-<div style="float: right; background-color: White; border: 1px solid #aaaaaa; padding: 6px 6px; margin-left: 10px; width: 80px" class="well">
-    <div style="text-align: center; overflow: hidden; font-size: 10px">Favourited By</div>
-    <div style="margin: 6px 6px; text-align: center; overflow: hidden; font-size: 22px; font-weight: bold;">@(Model.Overall ? Model.Tag.Tag.NumFollowing : Model.Tag.Tag.NumFollowingThisPeriod)</div>
+<div class="stat-box">
+    <div class="stat-box-descriptor">Favourited By</div>
+    <div class="stat-box-number">@(Model.Overall ? Model.Tag.Tag.NumFollowing : Model.Tag.Tag.NumFollowingThisPeriod)</div>
 </div>

@@ -8,7 +8,7 @@
 @if (ViewBag.More)
 {
 <div class="ajax-container">
-    <div style="overflow: hidden">
+    <div class="fill">
         <a href="@Url.Action(ViewBag.Action, "Home", new { skip = ViewBag.Skip, take = ViewBag.Take })" class="ajax-link"><button class="btn btn-small btn-primary" type="submit">
             <i class="icon-chevron-down"></i>&nbsp;&nbsp;See More</button></a>
     </div>

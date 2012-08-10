@@ -96,20 +96,20 @@ namespace Qotd.Utils
             if (stats is IActionEntryExtendedStats)
                 estats = (IActionEntryExtendedStats)stats;
             // potentially optimise
-            DateTime cutoff = DateTime.Now.Date - PERIOD_LENGTH;
+            DateTime cutoff = Qotd.Utils.Config.Now.Date - PERIOD_LENGTH;
             var actions = stats.ActionEntriesThisPeriod == null ? new List<ActionEntry>() : stats.ActionEntriesThisPeriod.Where(a => a.Date > cutoff)
                 .ToList();
 
-            var existing = actions.SingleOrDefault(a => a.Date == DateTime.Now.Date && a.Type == type);
+            var existing = actions.SingleOrDefault(a => a.Date == Qotd.Utils.Config.Now.Date && a.Type == type);
             if (existing != null)
                 existing.Value++;
             else
-                actions.Add(new ActionEntry() { Date = DateTime.Now.Date, Value = 1, Type = type });
+                actions.Add(new ActionEntry() { Date = Qotd.Utils.Config.Now.Date, Value = 1, Type = type });
 
-            var score = actions.SingleOrDefault(a => a.Date == DateTime.Now.Date && a.Type == ActivityType.ReceiveScore);
+            var score = actions.SingleOrDefault(a => a.Date == Qotd.Utils.Config.Now.Date && a.Type == ActivityType.ReceiveScore);
             if (score == null)
             {
-                score = new ActionEntry() { Date = DateTime.Now.Date, Type = ActivityType.ReceiveScore };
+                score = new ActionEntry() { Date = Qotd.Utils.Config.Now.Date, Type = ActivityType.ReceiveScore };
                 actions.Add(score);
             }
 

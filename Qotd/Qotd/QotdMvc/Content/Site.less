@@ -1,0 +1,262 @@
+﻿@import "bootstrap/less/bootstrap.less";
+
+// VARS
+
+@spaceTny: 5px;
+@spaceSml: 9px;
+@space: 13px;
+
+@hspace: @space;
+@vspace: @space;
+
+// SPACER
+
+.vspacer
+{
+	overflow: hidden;
+	height: @space;
+}
+
+// FLOAT
+.fl
+{
+	float: left;
+}
+
+.fr
+{
+	float: right;
+}
+
+.cl
+{
+	clear: left;
+}
+
+.cr
+{
+	clear: right;
+}
+
+.fill
+{
+	overflow: hidden;
+}
+
+// NOTIFICATIONS
+
+#notification-icon
+{
+	font-size: 22px;
+	position: relative;
+	top: 3px;
+}
+
+#notification-number
+{
+	background-color: white;
+	color: black;
+	position: relative;
+	left: -10px;
+	top: -10px;
+	border: 1px solid black;
+	font-size: 9px;
+	font-weight: bold;
+	padding: 2px 2px;
+	.border-radius(2px);
+}
+
+#notification-menu
+{
+	width: 300px;
+	overflow: auto;
+	max-height: 700px;
+}
+
+// BOXES
+
+.stat-box
+{
+	float: right;
+	#gradient > .vertical(@white, @grayLighter);
+	border: 1px solid @grayLight;
+	padding: 6px 6px;
+	margin-left: @hspace;
+	width: 80px;
+	.border-radius(4px);
+}
+.stat-box:hover { #gradient > .vertical(@white, @white); }
+
+.stat-box-descriptor
+{
+	text-align: center;
+	overflow: hidden;
+	font-size: 10px;
+}
+
+.stat-box-number
+{
+	margin: 6px 6px;
+	text-align: center;
+	overflow: hidden;
+	font-size: 22px;
+	font-weight: bold;
+}
+
+// TAGS
+
+.tag
+{
+	display: inline-block;
+	padding: (@spaceTny / 2) @spaceTny (@spaceTny / 2) @spaceTny;
+	border: 1px solid lighten(desaturate(@linkColor, 30%), 30%);
+	.border-radius(3px);
+	font-size: 9px;
+}
+
+// TILES
+
+.tile
+{
+	#gradient > .vertical(@white, @grayLighter);
+	display: inline-block;
+	padding: @spaceSml @spaceSml;
+	margin: 4px 4px;
+	.square(120px);
+	border: 1px solid @grayLight;
+}
+
+.large-hash
+{
+	font-size: 50px;
+	font-weight: bold;
+	margin-top: @vspace;
+	margin-bottom: @vspace;
+}
+
+// SOCIAL CONTENT
+
+.social-content-container(@pad)
+{
+	border-bottom: 1px solid @grayLighter;
+	overflow: hidden;
+	padding-bottom: @pad;
+}
+
+.social-content-container-sml
+{
+	.social-content-container(@spaceTny);
+}
+
+.social-content-container-lrg
+{
+	.social-content-container(@spaceSml);
+}
+
+.social-content-left(@width, @pad)
+{
+	width: @width;
+	float: left;
+	text-align: center;
+	padding: @pad @pad;
+}
+
+.social-content-main-container
+{
+	overflow: hidden;
+}
+
+.social-content-main(@pad)
+{
+	overflow: hidden;
+	padding-top: @pad / 2;
+	padding-right: @pad;
+	padding-bottom: @pad / 2;
+}
+
+.social-content-main-sml div
+{
+	overflow: hidden;
+}
+
+.social-content-left-sml
+{
+	.social-content-left(30px, @spaceTny);
+}
+
+.social-content-main-sml
+{
+	.social-content-main(@spaceTny);
+	font-size: 11px;
+}
+
+.social-content-left-lrg
+{
+	.social-content-left(60px, @spaceSml);
+}
+
+.social-content-left-lrg div
+{
+	overflow: hidden;
+	padding-bottom: @space;
+}
+
+.social-content-main-lrg
+{
+	.social-content-main(@spaceSml);
+}
+
+.social-content-main-lrg div
+{
+	overflow: hidden;
+}
+
+.social-content-ctrl
+{
+	float: left;
+	margin-right: @space;
+}
+
+.vote-arrow
+{
+	font-size: 22px;
+}
+
+.comment
+{
+	background-color: @grayLighter;
+	margin-top: 1px;
+	.border-radius(4px);
+}
+
+.comment-form
+{
+	margin-bottom: 0px !important;
+}
+
+.comment-form input
+{
+	margin-bottom: 0px !important;
+}
+
+// IMAGES
+
+.profile
+{
+	.square(50px)
+}
+
+.profile-sml
+{
+	.square(25px)
+}
+
+// HERO
+
+.hero-color
+{
+	#gradient > .vertical(@grayLighter, @white);
+}
+
+//  HISTORY
+

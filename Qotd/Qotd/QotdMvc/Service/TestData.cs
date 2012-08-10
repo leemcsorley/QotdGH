@@ -8,6 +8,7 @@ using System.Configuration;
 using System.IO;
 using Qotd.WorkerImpl;
 using Qotd.Data;
+using Qotd.Utils;
 
 namespace QotdMvc.Data
 {
@@ -49,6 +50,8 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
 
         public static void Create(QotdContext dp)
         {
+            Func<DateTime, DateTime> RndTime = d => d.AddMinutes(RND.Next(0, 60 * 24));
+            Func<DateTime> RndDate = () => DateTime.Now.AddDays(-RND.Next(0, 10));
             double perc = 0.0;
             string imgpath = ConfigurationManager.AppSettings["UploadImagesUrl"];
             using (IQotdService service = new QotdService(dp))
@@ -88,12 +91,12 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                         DisplayName = names[i],
                         ProfileImageUrl = imgpath + "\\" + "pic" + (i + 1).ToString() + ".jpg",
                         Username = "TU" + i,
-                        JoinedOn = DateTime.Now.AddDays(-RND.Next(0, 100))
+                        JoinedOn = Qotd.Utils.Config.Now.AddDays(-RND.Next(0, 100))
                     };
                     service.SaveNewUser(user);
                     users.Add(user);
                 }
-                DateTime now = DateTime.Now.Date;
+                DateTime now = Qotd.Utils.Config.Now.Date;
                 // follows
                 for (int i = 0; i < 10; i++)
                 {
@@ -102,6 +105,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                     User user = users[i];
                     foreach (var tuser in users.OrderBy(u => RND.NextDouble()).Take(num))
                     {
+                        Config.Now = RndTime(RndDate());
                         if (tuser == user) continue;
                         service.FollowUser(
                             new UserFollow()
@@ -112,6 +116,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                     }
                     foreach (var tag in tags.OrderBy(u => RND.NextDouble()).Take(tnum))
                     {
+                        Config.Now = RndTime(RndDate());
                         service.FollowTag(
                             new UserFollowTag()
                             {
@@ -144,6 +149,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                         int numVotes = RND.Next(0, users.Count);
                         for (int j = 0; j < numVotes; j++)
                         {
+                            Config.Now = RndTime(RndDate());
                             if (RND.Next(0, 2) == 0)
                                 dp.VoteQuestion(q.Id, users[j], 1);
                             else
@@ -180,6 +186,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                             int numVotes = RND.Next(0, users.Count);
                             for (int j = 0; j < numVotes; j++)
                             {
+                                Config.Now = RndTime(RndDate());
                                 if (RND.Next(0, 2) == 0)
                                     dp.VoteAnswer(answer.Id, users[j], 1);
                                 else

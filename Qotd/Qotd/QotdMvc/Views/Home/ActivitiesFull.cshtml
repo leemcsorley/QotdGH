@@ -1,5 +1,4 @@
-﻿<!-- all -->
-@foreach (var activity in ViewBag.Activities)
+﻿@foreach (var activity in ViewBag.Activities)
 {
     <text>@Html.Partial("ActivityFull", (Qotd.PresentationObjects.ActivityPO)activity)</text>
 }

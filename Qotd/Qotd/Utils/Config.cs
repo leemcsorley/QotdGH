@@ -9,6 +9,7 @@ namespace Qotd.Utils
     public static class Config
     {
         private static string _uploadImagesUrl;
+        private static TimeSpan? _offset = null;
 
         public static string UploadImagesUrl
         {
@@ -19,6 +20,19 @@ namespace Qotd.Utils
                     _uploadImagesUrl = ConfigurationManager.AppSettings["UploadImagesUrl"];
                 }
                 return _uploadImagesUrl;
+            }
+        }
+
+        public static DateTime Now
+        {
+            get
+            {
+                if (_offset.HasValue) return DateTime.Now + _offset.Value;
+                return DateTime.Now;
+            }
+            set
+            {
+                _offset = value - DateTime.Now;
             }
         }
     }

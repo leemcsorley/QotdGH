@@ -349,7 +349,7 @@
     <None Include="Content\bootstrap\less\utilities.less" />
     <None Include="Content\bootstrap\less\variables.less" />
     <None Include="Content\bootstrap\less\wells.less" />
-    <None Include="Content\Styles.less" />
+    <None Include="Content\Site.less" />
     <Content Include="Views\Shared\UserStats.cshtml" />
     <Content Include="Views\Shared\UserTile.cshtml" />
     <Content Include="Views\Shared\TagBoxes.cshtml" />

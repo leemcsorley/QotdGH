@@ -102,8 +102,8 @@ namespace QotdMvc.Controllers
 
         public ActionResult History(DateTime? dateFrom = null, DateTime? dateTo = null)
         {
-            if (dateFrom == null) dateFrom = DateTime.Now.Date.AddDays(-DEFAULT_TAKE);
-            if (dateTo == null) dateTo = DateTime.Now;
+            if (dateFrom == null) dateFrom = Qotd.Utils.Config.Now.Date.AddDays(-DEFAULT_TAKE);
+            if (dateTo == null) dateTo = Qotd.Utils.Config.Now;
             ViewBag.Activities = DataProvider.GetHistory(dateFrom.Value, dateTo.Value);
             ViewBag.Action = "History";
             ViewBag.Group = true;
@@ -387,7 +387,7 @@ namespace QotdMvc.Controllers
         {
             try
             {
-                DateTime date = DateTime.Now;
+                DateTime date = Qotd.Utils.Config.Now;
                 // create the comment
                 Comment comment = new Comment()
                 {
@@ -412,7 +412,7 @@ namespace QotdMvc.Controllers
         {
             try
             {
-                DateTime now = DateTime.Now;
+                DateTime now = Qotd.Utils.Config.Now;
 
                 // create the question
                 Question question = new Question()
@@ -443,7 +443,7 @@ namespace QotdMvc.Controllers
         {
             try
             {
-                DateTime date = DateTime.Now;
+                DateTime date = Qotd.Utils.Config.Now;
 
                 // create the answer
                 Answer answer = new Answer()

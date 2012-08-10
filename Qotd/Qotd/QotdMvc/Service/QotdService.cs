@@ -29,7 +29,7 @@ namespace QotdMvc.Service
             {
                 ActivityType = ActivityType.FollowTag,
                 SourceUser = userFollow.SourceUser,
-                Date = DateTime.Now,
+                Date = Qotd.Utils.Config.Now,
                 Text = "",
                 VisibleWithoutLink = true,
             };
@@ -49,17 +49,29 @@ namespace QotdMvc.Service
                 ActivityType = ActivityType.FollowUser,
                 SourceUser = userFollow.SourceUser,
                 TargetUser = userFollow.TargetUser,
-                Date = DateTime.Now,
+                Date = Qotd.Utils.Config.Now,
                 Text = "",
                 VisibleWithoutLink = true,
             };
+            Activity activity2 = new Activity()
+            {
+                ActivityType = ActivityType.ReceiveFollow,
+                SourceUser = userFollow.TargetUser,
+                TargetUser = userFollow.SourceUser,
+                Date = Qotd.Utils.Config.Now,
+                Text = "",
+                VisibleWithoutLink = true
+            };
             Denormaliser.Denormalise(activity);
+            Denormaliser.Denormalise(activity2);
             userFollow.SourceUser.AddAction(ActivityType.FollowUser);
             userFollow.TargetUser.AddAction(ActivityType.ReceiveFollow);
 
             DataProvider.MarkAddedOrUpdated(userFollow.SourceUser);
             DataProvider.MarkAddedOrUpdated(userFollow.TargetUser);
             DataProvider.MarkAdded(userFollow);
+            DataProvider.MarkAddedOrUpdated(activity);
+            DataProvider.MarkAddedOrUpdated(activity2);
             DataProvider.SaveChanges();
         }
 
@@ -157,7 +169,7 @@ namespace QotdMvc.Service
             {
                 ActivityType = ActivityType.Join,
                 SourceUser = user,
-                Date = DateTime.Now,
+                Date = Qotd.Utils.Config.Now,
                 LinksCreated = false,
                 NotificationsCreated = false,
                 VisibleWithoutLink = true

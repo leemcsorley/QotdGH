@@ -121,7 +121,7 @@ namespace Qotd.WorkerImpl
             var admin = db.Admins.Single();
             SiteStatistics stats = new SiteStatistics()
             {
-                Date = DateTime.Now,
+                Date = Qotd.Utils.Config.Now,
                 //MaxNumAnswers = db.Users.Max(u => u.NumAnswers),
                 //MaxNumAnswersSecond = db.Users.Max(u => u.NumAnswersSecond),
                 //MaxNumAnswersThird = db.Users.Max(u => u.NumAnswersThird),
@@ -136,7 +136,7 @@ namespace Qotd.WorkerImpl
 
         public static void PickWinningQuestion(this QotdContext db, DateTime? date = null)
         {
-            if (date == null) date = DateTime.Now.Date;
+            if (date == null) date = Qotd.Utils.Config.Now.Date;
             var qs = db.Questions.Where(q => q.DateFor == date).ToArray();
 
             int count = 0;
@@ -178,7 +178,7 @@ namespace Qotd.WorkerImpl
 
         public static void PickWinningAnswers(this QotdContext db, DateTime? date = null)
         {
-            if (date == null) date = DateTime.Now.Date;
+            if (date == null) date = Qotd.Utils.Config.Now.Date;
             var qs = db.Questions.Where(q => q.DateFor == date && q.WinningQuestion.HasValue && q.WinningQuestion.Value).Single();
 
             int count = 0;
@@ -268,7 +268,7 @@ namespace Qotd.WorkerImpl
 
         public static void TransitionToWinningQuestion(this QotdContext db, DateTime? date = null)
         {
-            if (date == null) date = DateTime.Now.Date;
+            if (date == null) date = Qotd.Utils.Config.Now.Date;
             var qc = db.QuestionContainers.Single();
             var wq = db.Questions.Where(q => q.DateFor == date && q.WinningQuestion == true).Single();
             qc.TodaysQuestion = wq;
@@ -337,7 +337,7 @@ namespace Qotd.WorkerImpl
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                DateTime date = DateTime.Now.AddDays(-7);
+                DateTime date = Qotd.Utils.Config.Now.AddDays(-7);
                 foreach (var uf in db.UserFollows.Where(u => !u.LinksCreated).ToArray())
                     CreateLinksForNewUserFollow(db, uf, date);
                 foreach (var uf in db.UserFollowTags.Where(u => !u.LinksCreated).ToArray())

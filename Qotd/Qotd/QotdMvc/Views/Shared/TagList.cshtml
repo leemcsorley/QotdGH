@@ -3,7 +3,7 @@
 {
     if (!String.IsNullOrEmpty(t.Value))
     {
-        <div style="display: inline-block; padding: 2px 2px; border: 1px solid #dddddd">
+        <div class="tag">
             @if (t.Approved)
             {
             <a href="@Url.Action("Tag", "Home", new { tagId = t.TagId })">#@t.Value</a>

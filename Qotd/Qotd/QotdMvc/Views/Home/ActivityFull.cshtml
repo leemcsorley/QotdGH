@@ -1,13 +1,60 @@
 ﻿@model Qotd.PresentationObjects.ActivityPO
-@switch (Model.Activity.ActivityType)
+@if (Model.Activity.ActivityType == Qotd.Entities.ActivityType.PostAnswer)
 {
-    case Qotd.Entities.ActivityType.PostAnswer:
-        <text>@Html.Partial("Answer", Model.Answer)</text>
+    <text>@Html.Partial("Answer", Model.Answer)</text>
+}
+else if (Model.Activity.ActivityType == Qotd.Entities.ActivityType.PostQuestion)
+{
+    <text>@Html.Partial("Question", Model.Question)</text>
+}
+else
+{
+    <div class="social-content-container">
+    <!-- Side bar of post -->
+    <div class="social-content-left-lrg">
+        <!-- Profile image -->
+        <div>
+            <img src="@Model.UserProfileImageUrl" alt="profile picture"/>
+        </div>
+    </div>
+    <!-- Header of post -->
+    <div class="social-content-main-lrg">
+        <div>
+            <span><b>@Html.Partial("UserLink", new Qotd.PresentationObjects.UserPO() { User = new Qotd.Entities.User() { Id = Model.Activity.SourceUserId, DisplayName = Model.UserDisplayName, ProfileImageUrl = Model.UserProfileImageUrl } })</b></span>
+        </div>
+    </div>
+    <!-- Content of post-->
+    <div class="social-content-main-lrg">
+            @{
+    switch (Model.Activity.ActivityType)
+    {
+        case Qotd.Entities.ActivityType.PostComment:
+            <text><div><span>posted a comment on answer "<a href="#">@Model.Activity.Text2</a>"</span></div>
+                @Html.Partial("Comment", Model.Comment)
+            </text>
         break;
-    case Qotd.Entities.ActivityType.PostQuestion:
-        <text>@Html.Partial("Question", Model.Question)</text>
+        case Qotd.Entities.ActivityType.FollowTag:
         break;
-    case Qotd.Entities.ActivityType.PostComment:
-    
+        case Qotd.Entities.ActivityType.FollowUser:
+            <text>
+            </text>
         break;
+        case Qotd.Entities.ActivityType.ReceiveFollow:
+        break;
+        case Qotd.Entities.ActivityType.VoteAnswer:
+            <text><div><span>voted on answer "<a href="#">@Model.Activity.Text</a>"</span></div></text>
+        break;
+        case Qotd.Entities.ActivityType.VoteQuestion:
+            <text><div><span>voted on question "<a href="#">@Model.Activity.Text</a>"</span></div></text>
+        break;
+        case Qotd.Entities.ActivityType.ReceiveVoteUpAnswer:
+        break;
+    }
+            }
+    </div> 
+        <!-- Footer -->
+    <div class="social-content-main-lrg">
+            <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
+    </div>
+    </div>
 }

@@ -3,7 +3,8 @@
 <head>
     <title>@ViewBag.Title</title>
     <!-- <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />-->
-    <link href="@Url.Content("~/Content/bootstrap/less/bootstrap.less")" rel="stylesheet" type="text/css" />
+  @*  <link href="@Url.Content("~/Content/bootstrap/less/bootstrap.less")" rel="stylesheet" type="text/css" />*@
+    <link href="@Url.Content("~/Content/Site.less")" rel="Stylesheet" type="text/css" />
     <!--<link href="@Url.Content("~/Content/bootstrap/css/bootstrap-responsive.css")" rel="stylesheet" type="text/css" /> -->
     <link href="@Url.Content("~/Content/redactor/css/redactor.css")" rel="Stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/fontawesome/css/font-awesome.css")" rel="Stylesheet" type="text/css" />
@@ -26,7 +27,6 @@
       }
     </style>
 </head>
-
 <body>
 <script type="text/javascript">
     function onReady()
@@ -159,6 +159,8 @@
                 $("#notification-menu").load("@Url.Action("Notifications", "Home")", function() 
                 {
                     jQuery("time.timeago").timeago();
+                    $("#notification-number").hide();
+                    $("#notification-icon").attr("class", "icon-envelope");
                 });
             });
 
@@ -234,6 +236,7 @@
 	    onPage();
 	});
 </script>
+<!-- Side Bar -->
 <div id="side-bar" style="position: fixed; width: 18%; right: 0px; top: 0px; background-color: #f3f3f3; border: 1px solid #cccccc; padding-top: 40px;">
     @Html.Action("Activities", "Home")
 </div>
@@ -252,15 +255,15 @@
                     <a href="#" class="dropdown-toggle" id="notification-dropdown" data-toggle="dropdown">
                         @if (ViewBag.UserPO.UnreadNotifications == 0)
                         {
-                        <i class="icon-envelope" style="font-size: 22px; position: relative; top: 3px;"></i>
+                        <i class="icon-envelope" id="notification-icon"></i>
                         }
                         else
                         {
-                        <i class="icon-envelope-alt red" style="font-size: 22px; position: relative; top: 3px;"></i>
-                        <span style="background-color: white; color: black; position: relative; left: -10px; top: -10px; border: 1px solid black; opacity: 1.0; font-size: 9px; font-weight: bold; padding: 2px 2px;">@ViewBag.UserPO.UnreadNotifications</span>  
+                        <i class="icon-envelope-alt red" id="notification-icon"></i>
+                        <span id="notification-number">@ViewBag.UserPO.UnreadNotifications</span>  
                         }
                     </a>
-                    <ul class="dropdown-menu" id="notification-menu" style="width: 300px; overflow: auto; max-height: 600px">
+                    <ul class="dropdown-menu" id="notification-menu">
                     </ul>
                 </li>
             </ul>
@@ -279,7 +282,6 @@
                       <li><a href="#">Account</a></li>
                       <li class="divider"></li>
                       <li><a href="@Url.Action("Signout", "Account")">Sign out</a></li>
-   
                     </ul>
                 }
                 else
@@ -300,13 +302,13 @@
                     </ul>
                 }
             </div>
+</div>
         </div>
     </div>
-</div>
 <div class="container">
 @if (ViewBag.HideQuestion == null || (!ViewBag.HideQuestion))
 {
-    <div class="hero-unit">
+    <div class="hero-unit hero-color">
         <h1>@QotdMvc.DisplayHelper.QuestionMainText(ViewBag.Question.MainText)</h1>
         <p></p>
         <p>@ViewBag.Question.SubText</p>

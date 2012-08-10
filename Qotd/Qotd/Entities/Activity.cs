@@ -78,5 +78,9 @@ namespace Qotd.Entities
         public virtual string denorm_SourceUser_DisplayName { get; set; }
 
         public virtual string denorm_SourceUser_ProfileImageUrl { get; set; }
+
+        public virtual string denorm_TargetUser_DisplayName { get; set; }
+
+        public virtual string denorm_TargetUser_ProfileImageUrl { get; set; }
     }
 }

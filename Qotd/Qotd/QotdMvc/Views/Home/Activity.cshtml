@@ -1,17 +1,17 @@
 ﻿@model Qotd.PresentationObjects.ActivityPO
-<div style="border-bottom: 1px solid #dddddd; overflow: hidden; margin: 8px;">
+<div class="social-content-container-sml">
     <!-- Side bar of post -->
-    <div style="width: 30px; float: left; text-align: center; margin-right: 8px">
+    <div class="social-content-left-sml">
         <!-- Profile image -->
-        <div style="float: left; clear: both; width: 30px; margin-bottom: 8px">
+        <div>
             <img src="@Model.UserProfileImageUrl" alt="profile picture" style="width: 25px; height: 25px"/>
         </div>
     </div>
     <!-- Main section of post -->
-    <div style="overflow: hidden;">
+    <div class="social-content-main-sml">
         <!-- Content -->
-        <div style="overflow: hidden; margin-bottom: 8px; font-size: 9px;">
-            <span style="font-weight: bold;"><a href="#">@Model.UserDisplayName</a></span>
+        <div>
+            <span><b><a href="#">@Model.UserDisplayName</a></b></span>
             @{
                 switch (Model.Activity.ActivityType)
                 {
@@ -35,7 +35,7 @@
             }
         </div> 
         <!-- Footer -->
-        <div style="overflow: hidden; margin-bottom: 8px; font-size: 9px;">
+        <div class="social-content-main-sml">
             <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
         </div>
     </div>

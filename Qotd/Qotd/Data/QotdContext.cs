@@ -185,7 +185,7 @@ update cte
 
         public QuestionPO[] GetQuestionsLatest(int skip, int take, out int count)
         {
-            DateTime date = DateTime.Now.AddDays(1).Date;
+            DateTime date = Qotd.Utils.Config.Now.AddDays(1).Date;
             var query = Questions.Where(q => q.DateFor == date);
             count = query.Count();
             return GetQuestions(query
@@ -195,7 +195,7 @@ update cte
 
         public QuestionPO[] GetQuestionsRated(int skip, int take, out int count)
         {
-            DateTime date = DateTime.Now.AddDays(1).Date;
+            DateTime date = Qotd.Utils.Config.Now.AddDays(1).Date;
             var query = Questions.Where(q => q.DateFor == date);
             count = query.Count();
             return GetQuestions(query
@@ -205,7 +205,7 @@ update cte
 
         public QuestionPO[] GetQuestionsLatest(Guid userId, int skip, int take, out int count)
         {
-            DateTime date = DateTime.Now.AddDays(1).Date;
+            DateTime date = Qotd.Utils.Config.Now.AddDays(1).Date;
             var query = Questions.Where(q => q.DateFor == date);
             count = query.Count();
             return GetQuestions(query
@@ -215,7 +215,7 @@ update cte
 
         public QuestionPO[] GetQuestionsRated(Guid userId, int skip, int take, out int count)
         {
-            DateTime date = DateTime.Now.AddDays(1).Date;
+            DateTime date = Qotd.Utils.Config.Now.AddDays(1).Date;
             var query = Questions.Where(q => q.DateFor == date);
             count = query.Count();
             return GetQuestions(query
@@ -322,7 +322,7 @@ update cte
 
         public QuestionPO[] GetQuestionsFollowed(Guid userId, FollowSource source, int skip, int take, out int count)
         {
-            DateTime date = DateTime.Now.AddDays(1).Date;
+            DateTime date = Qotd.Utils.Config.Now.AddDays(1).Date;
             var query = UserFollowQuestions.Where(u => u.SourceUserId == userId && u.Question.DateFor == date 
                 && (u.FollowSourceValue & (byte)source) > 0)
                 .Select(u => u.Question);
@@ -397,7 +397,7 @@ update cte
             return GetComments(Comments.Where(c => c.Id == commentId), userId).SingleOrDefault();
         }
 
-        private ActivityPO[] GetHistory(IQueryable<Activity> activities)
+        private ActivityPO[] GetHistory(IQueryable<Activity> activities, bool loadComments = true)
         {
             var act = activities.ToArray();
 
@@ -407,11 +407,17 @@ update cte
             var aids = act.Where(a => a.AnswerId.HasValue)
                 .Select(a => a.AnswerId.Value).ToArray();
 
+            var cids = act.Where(a => a.CommentId.HasValue)
+                .Select(a => a.CommentId.Value).ToArray();
+
             var qs = GetQuestions(Questions.Where(q => qids.Contains(q.Id)), null)
                 .ToDictionary(q => q.Question.Id, q => q);
 
             var ans = GetAnswers(Answers.Where(a => aids.Contains(a.Id)), null)
                 .ToDictionary(a => a.Answer.Id, a => a);
+
+            var cmt = GetComments(Comments.Where(c => cids.Contains(c.Id)), null)
+                .ToDictionary(a => a.Comment.Id, a => a);
 
             var apos = new ActivityPO[act.Length];
 
@@ -422,7 +428,10 @@ update cte
                 {
                     Activity = a,
                     Answer = a.AnswerId.HasValue ? ans[a.AnswerId.Value] : null,
-                    Question = a.QuestionId.HasValue ? qs[a.QuestionId.Value] : null
+                    Question = a.QuestionId.HasValue ? qs[a.QuestionId.Value] : null,
+                    Comment = a.CommentId.HasValue ? cmt[a.CommentId.Value] : null,
+                    UserDisplayName = a.denorm_SourceUser_DisplayName,
+                    UserProfileImageUrl = a.denorm_SourceUser_ProfileImageUrl
                 };
             }
             return apos;
@@ -482,8 +491,8 @@ update cte
         public ActivityPO[] GetTodaysActivitiesForUser(Guid userId, DateTime? date, int take)
         {
             if (date == null)
-                date = DateTime.Now;
-            DateTime startDate = DateTime.Now.Date;
+                date = Qotd.Utils.Config.Now;
+            DateTime startDate = Qotd.Utils.Config.Now.Date;
             var query = Activities.Where(a => a.Date <= date && a.Date >= startDate && a.SourceUserId == userId);
             return GetHistory(
                 query
@@ -696,15 +705,34 @@ update cte
                     SourceUserId = user.Id,
                     denorm_SourceUser_DisplayName = user.DisplayName,
                     denorm_SourceUser_ProfileImageUrl = user.ProfileImageUrl,
-                    Date = DateTime.Now,
+                    Date = Qotd.Utils.Config.Now,
                     LinksCreated = false,
                     VisibleWithoutLink = true,
                     NotificationsCreated = false,
-                    TargetUserId = ans.UserId,
+                    TargetUserId = auser.Id,
+                    denorm_TargetUser_DisplayName = auser.DisplayName,
+                    denorm_TargetUser_ProfileImageUrl = auser.ProfileImageUrl,
+                    Text = ans.Title
+                };
+                Activity activity2 = new Activity()
+                {
+                    ActivityType = voteDelta > 0 ? ActivityType.ReceiveVoteUpAnswer : ActivityType.ReceiveVoteDownAnswer,
+                    Answer = ans,
+                    SourceUserId = auser.Id,
+                    denorm_SourceUser_DisplayName = auser.DisplayName,
+                    denorm_SourceUser_ProfileImageUrl = auser.ProfileImageUrl,
+                    Date = Qotd.Utils.Config.Now,
+                    LinksCreated = false,
+                    VisibleWithoutLink = true,
+                    NotificationsCreated = false,
+                    TargetUserId = user.Id,
+                    denorm_TargetUser_DisplayName = user.DisplayName,
+                    denorm_TargetUser_ProfileImageUrl = user.ProfileImageUrl,
                     Text = ans.Title
                 };
 
                 MarkAddedOrUpdated(activity);
+                MarkAddedOrUpdated(activity2);
                 MarkAddedOrUpdated(ans);
                 MarkAddedOrUpdated(user);
                 MarkAddedOrUpdated(auser);
@@ -748,15 +776,34 @@ update cte
                     SourceUserId = user.Id,
                     denorm_SourceUser_DisplayName = user.DisplayName,
                     denorm_SourceUser_ProfileImageUrl = user.ProfileImageUrl,
-                    Date = DateTime.Now,
+                    Date = Qotd.Utils.Config.Now,
                     LinksCreated = false,
                     VisibleWithoutLink = true,
                     NotificationsCreated = false,
                     TargetUserId = ans.UserId,
+                    Text = ans.MainText,
+                    denorm_TargetUser_DisplayName = quser.DisplayName,
+                    denorm_TargetUser_ProfileImageUrl = quser.ProfileImageUrl
+                };
+                Activity activity2 = new Activity()
+                {
+                    ActivityType = voteDelta > 0 ? ActivityType.ReceiveVoteUpQuestion : ActivityType.ReceiveVoteDownQuestion,
+                    Question = ans,
+                    SourceUserId = quser.Id,
+                    denorm_SourceUser_DisplayName = quser.DisplayName,
+                    denorm_SourceUser_ProfileImageUrl = quser.ProfileImageUrl,
+                    Date = Qotd.Utils.Config.Now,
+                    LinksCreated = false,
+                    VisibleWithoutLink = true,
+                    NotificationsCreated = false,
+                    TargetUserId = user.Id,
+                    denorm_TargetUser_DisplayName = user.DisplayName,
+                    denorm_TargetUser_ProfileImageUrl = user.ProfileImageUrl,
                     Text = ans.MainText
                 };
 
                 MarkAddedOrUpdated(activity);
+                MarkAddedOrUpdated(activity2);
 
                 MarkAddedOrUpdated(ans);
                 MarkAddedOrUpdated(user);
