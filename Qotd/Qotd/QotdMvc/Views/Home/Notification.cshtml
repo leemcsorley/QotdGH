@@ -1,32 +1,34 @@
 ﻿@model Qotd.Entities.Notification
-<div style="border-bottom: 1px solid #dddddd; overflow: hidden; margin: 8px;">
+<div class="social-content-container-sml">
     <!-- Side bar of post -->
-    <div style="width: 30px; float: left; text-align: center; margin-right: 8px">
+    <div class="social-content-left-sml">
         <!-- Profile image -->
-        <div style="float: left; clear: both; width: 30px; margin-bottom: 8px">
-            <img src="@Model.SourceUser1ProfileImageUrl" alt="profile picture" style="width: 25px; height: 25px"/>
+        <div>
+            <img src="@Model.SourceUser1ProfileImageUrl" alt="profile picture" class="profile-sml"/>
         </div>
     </div>
     <!-- Main section of post -->
-    <div style="overflow: hidden;">
+    <div class="social-content-main-container">
     <!-- Content -->
-    <div style="overflow: hidden; margin-bottom: 8px; font-size: 11px; color: #333333;">
-        @switch (Model.ActivityType)
-        {
-                case Qotd.Entities.ActivityType.VoteAnswer:
-                <text>@Html.Raw(QotdMvc.DisplayHelper.UserString(Model))&nbsp;voted on your answer, "<a href="@Url.Action("Answer", "Home", new { ajax = false, answerId = Model.AnswerId.Value })" style="display: inline; padding: 0px 0px; color: #08C;"><b>@Model.Text.Trim()</b></a>"</text>
-                break;
-                case Qotd.Entities.ActivityType.VoteQuestion:
-                <text>@Html.Raw(QotdMvc.DisplayHelper.UserString(Model))&nbsp;voted on your question, "<a href="@Url.Action("Question", "Home", new { ajax = false, questionId = Model.QuestionId.Value })" style="display: inline; padding: 0px 0px; color: #08C;"><b>@Model.Text.Trim()</b></a>"</text>
-                break;
-                case Qotd.Entities.ActivityType.PostComment:
-                <text>@Html.Raw(QotdMvc.DisplayHelper.UserString(Model))&nbsp;commented on your answer, "<a href="@Url.Action("Answer", "Home", new { ajax = false, answerId = Model.AnswerId.Value })" style="display: inline; padding: 0px 0px; color: #08C;"><b>@Model.Text2.Trim()</b></a>"</text>
-                break;
-        }
-    </div>
+        <div class="social-content-main-sml">
+            @switch (Model.ActivityType)
+            {
+                    case Qotd.Entities.ActivityType.VoteAnswer:
+                    <text>@Html.Raw(QotdMvc.DisplayHelper.UserString(Model))&nbsp;voted on your answer, "<a href="@Url.Action("Answer", "Home", new { ajax = false, answerId = Model.AnswerId.Value })" style="display: inline; padding: 0px 0px; color: #08C;"><b>@Model.Text.Trim()</b></a>"</text>
+                    break;
+                    case Qotd.Entities.ActivityType.VoteQuestion:
+                    <text>@Html.Raw(QotdMvc.DisplayHelper.UserString(Model))&nbsp;voted on your question, "<a href="@Url.Action("Question", "Home", new { ajax = false, questionId = Model.QuestionId.Value })" style="display: inline; padding: 0px 0px; color: #08C;"><b>@Model.Text.Trim()</b></a>"</text>
+                    break;
+                    case Qotd.Entities.ActivityType.PostComment:
+                    <text>@Html.Raw(QotdMvc.DisplayHelper.UserString(Model))&nbsp;commented on your answer, "<a href="@Url.Action("Answer", "Home", new { ajax = false, answerId = Model.AnswerId.Value })" style="display: inline; padding: 0px 0px; color: #08C;"><b>@Model.Text2.Trim()</b></a>"</text>
+                    break;
+            }
+        </div>
     <!-- Footer -->
-        <div style="overflow: hidden; margin-bottom: 8px; font-size: 9px;">
-            <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Date.ToString("s")"></time>
+        <div class="social-content-main-sml">
+            <div class="social-content-ctrl">
+                <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Date.ToString("s")"></time>
+            </div>
         </div>
     </div>
 </div>

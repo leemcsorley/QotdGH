@@ -15,6 +15,10 @@ namespace Qotd.PresentationObjects
 
         public string UserProfileImageUrl { get; set; }
 
+        public string TargetUserDisplayName { get; set; }
+
+        public string TargetUserProfileImageUrl { get; set; }
+
         public QuestionPO Question { get; set; }
 
         public AnswerPO Answer { get; set; }

@@ -1,2 +1,2 @@
 ﻿@model Qotd.PresentationObjects.UserPO
-<a href="@Url.Action("User", "Home", new { userId = Model.User.Id })" class="ajax-popover" rel="popover" data-load="@Url.Action("UserPopover", "Home", new { userId = Model.User.Id })" data-original-title="<img src='@Model.User.ProfileImageUrl' style='width: 25px; height: 25px; margin-right: 10px; border: 1px solid black'/>@Model.User.DisplayName">@Model.User.DisplayName</a>
+<a href="@Url.Action("User", "Home", new { userId = Model.User.Id })" class="ajax-popover">@Model.User.DisplayName</a>

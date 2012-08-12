@@ -1,5 +1,5 @@
 ﻿@model Qotd.PresentationObjects.ActivityPO
-<div class="social-content-container-sml">
+<div class="social-content-container-sml" style="border-bottom: 1px solid #cccccc">
     <!-- Side bar of post -->
     <div class="social-content-left-sml">
         <!-- Profile image -->
@@ -16,17 +16,21 @@
                 switch (Model.Activity.ActivityType)
                 {
                     case Qotd.Entities.ActivityType.PostQuestion:
-                        <text><span>&nbsp;posted a question <i class="icon-question-sign"></i>&nbsp;- &quot</span><span><a href="@Url.Action("Question", "Home", new { ajax = false, questionId = Model.Activity.QuestionId.Value })">@Model.Activity.Text</a></span><span>&quot</span>
+                        <text><span>&nbsp;posted a question "@Html.Partial("QuestionLink", Model.Question)"</span>
                         </text>
                         break;
                     case Qotd.Entities.ActivityType.VoteAnswer:
-                        <text><span>&nbsp;voted on answer <i class="icon-comments"></i>&nbsp;- &quot</span><span>@Model.Activity.Text</span><span>&quot</span>
+                        <text><span>&nbsp;voted on answer "@Html.Partial("AnswerLink", Model.Answer)"</span>
                         </text>
                                                                                                             break;
+                    case Qotd.Entities.ActivityType.VoteQuestion:
+                        <text><span>&nbsp;voted on question "@Html.Partial("QuestionLink", Model.Question)"</span>
+                        </text>
+                                                    break;
                     case Qotd.Entities.ActivityType.PostComment:
-                        <text><span>&nbsp;posted a comment <i class="icon-comment"></i>&nbsp;- &quot</span><span>@Model.Activity.Text</span><span>&quot</span>
+                        <text><span>&nbsp;posted a comment "@Model.Activity.Text" on answer "@Html.Partial("AnswerLink", Model.Answer)"</span>
                         </text>
-                                                                                                            break;
+                                                                                        break;
                     case Qotd.Entities.ActivityType.PostAnswer:
                         <text>&nbsp;posted an answer
                         </text>
@@ -35,8 +39,10 @@
             }
         </div> 
         <!-- Footer -->
-        <div class="social-content-main-sml">
-            <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
-        </div>
+        @*<div class="social-content-main-sml">
+            <div class="social-content-ctrl">
+                <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
+            </div>
+        </div>*@
     </div>
 </div>

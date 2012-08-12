@@ -357,6 +357,7 @@
     <Content Include="Views\Home\FollowListTags.cshtml" />
     <Content Include="Views\Home\ActivitiesFull.cshtml" />
     <Content Include="Views\Home\ActivityFull.cshtml" />
+    <Content Include="Views\Shared\AnswerLink.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

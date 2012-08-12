@@ -15,6 +15,7 @@ namespace QotdMvc.Controllers
         private const int DEFAULT_TAKE = 20;
         private const int DEFAULT_TAKE_LEADERBOARD = 50;
         private const int DEFAULT_TAKE_NOTIFICATIONS = 20;
+        private const int DEFAULT_TAKE_ACTIVITIES = 50;
 
         public ActionResult AddFollow(Guid userId)
         {
@@ -79,12 +80,15 @@ namespace QotdMvc.Controllers
             return View("History");
         }
 
-        public ActionResult TodaysActivitiesForUser(Guid userId, DateTime? dateFrom = null, int take = DEFAULT_TAKE)
+        public ActionResult TodaysActivitiesForUser(Guid userId, DateTime? skip = null, int take = DEFAULT_TAKE)
         {
-            var activities = DataProvider.GetTodaysActivitiesForUser(userId, dateFrom, take);
+            var activities = DataProvider.GetTodaysActivitiesForUser(userId, skip, take);
             ViewBag.Activities = activities;
             ViewBag.Action = "TodaysActivitiesForUser";
             ViewBag.Take = take;
+            if (activities.Length > 0)
+                ViewBag.Skip = activities[activities.Length - 1].Activity.Date;
+            ViewBag.TargetUserId = userId;
             return View("ActivitiesFull");
         }
 
@@ -148,12 +152,12 @@ namespace QotdMvc.Controllers
 
         public ActionResult Activities()
         {
-            var activities = DataProvider.GetActivities(null, DEFAULT_TAKE);
+            var activities = DataProvider.GetActivities(null, DEFAULT_TAKE_ACTIVITIES);
             ViewBag.Activities = activities;
             return View();
         }
 
-        public ActionResult Answer(Guid answerId, bool ajax = true)
+        public ActionResult Answer(Guid answerId, bool ajax = true, string pageUrl = null, string pageName = null)
         {
             var answer = DataProvider.GetAnswerById(answerId, UserEntity.Id);
             if (ajax)
@@ -162,11 +166,13 @@ namespace QotdMvc.Controllers
             {
                 ViewBag.Object = answer;
                 ViewBag.Type = SingleType.Answer;
+                ViewBag.PastPageUrl = pageUrl;
+                ViewBag.PastPageName = pageName;
                 return View("Single");
             }
         }
 
-        public ActionResult Question(Guid questionId, bool ajax = true)
+        public ActionResult Question(Guid questionId, bool ajax = true, string pageUrl = null, string pageName = null)
         {
             var question = DataProvider.GetQuestionById(questionId, UserEntity.Id);
             if (ajax)
@@ -175,6 +181,8 @@ namespace QotdMvc.Controllers
             {
                 ViewBag.Object = question;
                 ViewBag.Type = SingleType.Question;
+                ViewBag.PastPageUrl = pageUrl;
+                ViewBag.PastPageName = pageName;
                 return View("Single");
             }
         }

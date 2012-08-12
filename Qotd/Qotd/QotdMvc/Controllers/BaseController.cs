@@ -14,9 +14,16 @@ namespace QotdMvc.Controllers
     {
         private IDataProvider _dataProvider;
         private IQotdService _qotdService;
-        private User _userEntity;
         private UserPO _userPO;
         private Question _todaysQuestion;
+
+        private static readonly Dictionary<string, Func<dynamic, string>> FriendlyPageNames = new Dictionary<string, Func<dynamic, string>>()
+        {
+            { "Home-Index", d => "Home" },
+            { "Home-User", d => d.TargetUser.User.DisplayName },
+            { "Home-Question", d => "View Question"  },
+            { "Home-Answer", d => "View Answer" }
+        };
 
         protected IDataProvider DataProvider
         {
@@ -86,6 +93,16 @@ namespace QotdMvc.Controllers
             ViewBag.User = UserEntity;
             ViewBag.Question = TodaysQuestion;
             ViewBag.UserPO = UserPO;
+            string controllerName = (string)this.RouteData.Values["Controller"];
+            string actionName = (string)this.RouteData.Values["Action"];
+            ViewBag.PageController = controllerName;
+            ViewBag.PageAction = actionName;
+            string n = this.RouteData.Values["Controller"] + "-" + this.RouteData.Values["Action"];
+            if (FriendlyPageNames.ContainsKey(n))
+                ViewBag.PageFriendlyName = FriendlyPageNames[n](ViewBag);
+            if (ViewBag.PageFriendlyName == null)
+                ViewBag.PageFriendlyName = "";
+            ViewBag.PageUrl = HttpContext.Request.RawUrl;
         }
 
         protected virtual ActionResult JsonSuccess()

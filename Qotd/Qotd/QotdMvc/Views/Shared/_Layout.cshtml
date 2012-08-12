@@ -29,6 +29,10 @@
 </head>
 <body>
 <script type="text/javascript">
+
+    var gblPageUrl = "@ViewBag.PageUrl";
+    var gblPageFriendlyName = "@ViewBag.PageFriendlyName";
+
     function onReady()
     {
         jQuery("time.timeago").timeago();
@@ -40,6 +44,10 @@
 //                el.removeClass('.ajax-popover');
 //            });
 //        });
+
+        var elems = $('.social-content-background');
+        elems.css("position", "absolute");
+        elems.css("top", $(elems).parent().css("top"));
 
         $('.has-tooltip').tooltip();
     };
@@ -164,6 +172,14 @@
                 });
             });
 
+        $('.single-link').live("click",
+            function(event)
+            {
+                var href = $(this).attr("href");
+                window.location.href = href + "&pageName=" + gblPageFriendlyName + "&pageUrl=" + gblPageUrl;
+                return false;
+            });
+
         $('.ajax-link').live("click",
             function(event)
             {
@@ -189,10 +205,12 @@
                 return true;
             });
 
-        $('.comment-input').live('click',
+        $('.comment-link').live("click",
             function(event)
             {
-                $(this).next().show();
+                var ci = $(this).closest(".social-content-container").find(".comment-input");
+                $(ci).removeClass("hidden");
+                $($(ci).find("input")[0]).focus();
                 return false;
             });
 
@@ -215,6 +233,7 @@
             });
             return false;
         });
+        
     };
 
     function alert(url)
@@ -237,7 +256,7 @@
 	});
 </script>
 <!-- Side Bar -->
-<div id="side-bar" style="position: fixed; width: 18%; right: 0px; top: 0px; background-color: #f3f3f3; border: 1px solid #cccccc; padding-top: 40px;">
+<div id="side-bar" style="position: fixed; width: 18%; right: 0px; top: 0px; background-color: white; border: 1px solid white; padding-top: 40px; height: 100%">
     @Html.Action("Activities", "Home")
 </div>
 <div id="main-bar" style="position: absolute; width: 82%">
@@ -331,7 +350,7 @@
     <div id="new-question-box">
     <ul class="breadcrumb">
         <li>
-        <a href="#" rel="question-close">Home</a> <span class="divider">/</span>
+        <a href="#" rel="question-close">@ViewBag.PageFriendlyName</a> <span class="divider">/</span>
         </li>
         <li class="active">Post a Question</li>
     </ul>
@@ -369,7 +388,7 @@
     <div id="new-answer-box">
          <ul class="breadcrumb">
           <li>
-            <a href="#" rel="answer-close">Home</a> <span class="divider">/</span>
+            <a href="#" rel="answer-close">@ViewBag.PageFriendlyName</a> <span class="divider">/</span>
           </li>
           <li class="active">Submit an Answer</li>
         </ul>

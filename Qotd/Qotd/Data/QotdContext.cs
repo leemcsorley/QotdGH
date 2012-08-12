@@ -74,6 +74,9 @@ namespace Qotd.Data
 
         protected static Lucene.Net.Index.IndexWriter IndexWriter;
 
+        protected static readonly byte[] ActivityDisplayTypes = new ActivityType[] { ActivityType.FollowTag, ActivityType.FollowUser, ActivityType.Join, ActivityType.PostAnswer, ActivityType.PostQuestion,
+                ActivityType.PostComment, ActivityType.VoteAnswer, ActivityType.VoteQuestion }.Select(a => (byte)a).ToArray();
+
         static QotdContext()
         {
             InitialiseLucene();
@@ -431,7 +434,9 @@ update cte
                     Question = a.QuestionId.HasValue ? qs[a.QuestionId.Value] : null,
                     Comment = a.CommentId.HasValue ? cmt[a.CommentId.Value] : null,
                     UserDisplayName = a.denorm_SourceUser_DisplayName,
-                    UserProfileImageUrl = a.denorm_SourceUser_ProfileImageUrl
+                    UserProfileImageUrl = a.denorm_SourceUser_ProfileImageUrl,
+                    TargetUserDisplayName = a.denorm_TargetUser_DisplayName,
+                    TargetUserProfileImageUrl = a.denorm_TargetUser_ProfileImageUrl
                 };
             }
             return apos;
@@ -492,8 +497,7 @@ update cte
         {
             if (date == null)
                 date = Qotd.Utils.Config.Now;
-            DateTime startDate = Qotd.Utils.Config.Now.Date;
-            var query = Activities.Where(a => a.Date <= date && a.Date >= startDate && a.SourceUserId == userId);
+            var query = Activities.Where(a => a.Date < date && a.SourceUserId == userId);
             return GetHistory(
                 query
                 .OrderByDescending(a => a.Date)
@@ -814,17 +818,13 @@ update cte
 
         public ActivityPO[] GetActivities(DateTime? date, int take)
         {
-            var activities = (IQueryable<Activity>)Activities;
-            if (date.HasValue)
-                activities = activities.Where(a => a.Date < date.Value);
-
-            return activities.OrderByDescending(a => a.Date).Take(take).ToArray()
-                .Select(a => new ActivityPO()
-                {
-                    Activity = a,
-                    UserDisplayName = a.denorm_SourceUser_DisplayName,
-                    UserProfileImageUrl = a.denorm_SourceUser_ProfileImageUrl
-                }).OrderByDescending(a => a.Activity.Date).ToArray();
+            if (date == null)
+                date = Qotd.Utils.Config.Now;
+            var query = Activities.Where(a => a.Date < date && a.InGblActivityStream);
+            return GetHistory(
+                query
+                .OrderByDescending(a => a.Date)
+                .Take(take));
         }
 
         public SearchResultPO[] Search(string search, int skip, int take)
@@ -889,6 +889,10 @@ update cte
                             act.RelatedObjectId = act.AnswerId;
                         else if (act.QuestionId.HasValue)
                             act.RelatedObjectId = act.QuestionId;
+                        if (ActivityDisplayTypes.Contains(act.ActivityTypeValue))
+                            act.InGblActivityStream = true;
+                        else
+                            act.InGblActivityStream = false;
                     } 
                 },
                 { typeof(User), (o, s) =>

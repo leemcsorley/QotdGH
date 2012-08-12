@@ -1,72 +1,70 @@
 ﻿@model Qotd.PresentationObjects.QuestionPO
-<div style="border-bottom: 1px solid #dddddd; overflow: hidden; margin: 8px;">
+<div class="social-content-container-lrg social-content-container">
     <!-- Side bar of post -->
-    <div style="width: 60px; float: left; text-align: center; margin-right: 8px">
+    <div class="social-content-left-lrg">
         <!-- Profile image -->
-        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <img src="@Model.User.User.ProfileImageUrl" alt="profile picture"/>
+        <div>
+            <img src="@Model.User.User.ProfileImageUrl" alt="profile picture" class="profile"/>
         </div>
         <!-- Up arrow -->
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
         {
-        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <a href="@Url.Action("VoteUpQuestion", "Home", new { questionId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-up" style="font-size: 22px;"></i></a>
-        </div>
+            <div>
+                <a href="@Url.Action("VoteUpQuestion", "Home", new { questionId = Model.Question.Id })" class="ajax-link vote-arrow"><i class="icon-caret-up"></i></a>
+            </div>
         }
         else
         {
-            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-                <i class="icon-caret-up" style="font-size: 22px; color: #dddddd;"></i>
+            <div>
+                <i class="icon-caret-up vote-arrow"></i>
             </div>
         }
         <!-- Votes -->
-        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <span style="font-size: 22px">@Model.Question.VotesTotal</span>
-        </div>
+        <div class="vote-count">@Model.Question.VotesTotal</div>
         <!-- Down arrow -->
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
         {
-        <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-            <a href="@Url.Action("VoteDownQuestion", "Home", new { questionId = Model.Question.Id })" class="ajax-link"><i class="icon-caret-down" style="font-size: 22px;"></i></a>
+        <div>
+            <a href="@Url.Action("VoteDownQuestion", "Home", new { questionId = Model.Question.Id })" class="ajax-link vote-arrow"><i class="icon-caret-down"></i></a>
         </div>
         }
         else
         {
-            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-                <i class="icon-caret-down" style="font-size: 22px; color: #dddddd;"></i>
+            <div>
+                <i class="icon-caret-down vote-arrow"></i>
             </div>
         }
     </div>
     <!-- Main section of post -->
-    <div style="overflow: hidden;border-bottom: 0px dotted #f8960a; margin-bottom: 8px;">
+    <div class="social-content-main-container">
         <!-- Header -->
-        <div style="overflow: hidden;">
-            <div style="float: left">
-                <span style="font-weight: bold">@Html.Partial("UserLink", Model.User)</span>
+        <div class="social-content-main-lrg">
+            <div>
+                <span><b>@Html.Partial("UserLink", Model.User)</b></span>
                 <span>asks:</span>
-            </div>
             <div style="float: right;"><span class="label label-warning" style="font-size: 11px"><i class="icon-question-sign"></i>&nbsp;Question</span></div>
             @if (Model.Question.WinningQuestion.HasValue && Model.Question.WinningQuestion.Value)
             {
                 <div style="float: right; margin-right: 4px"><i class="icon-trophy gold"></i>&nbsp;<span class="label" style="font-size: 11px">Winner</span></div>
             }
+            </div>
         </div> 
         <!-- Content -->
-        <div style="overflow: hidden; clear: left; margin-top: 8px; padding: 4px 4px" class="question">
+        <div class="social-content-main-lrg">
             <div><h2>@QotdMvc.DisplayHelper.QuestionMainText(Model.Question.MainText)</h2></div>
             <div>@Model.Question.SubText</div>
         </div>
         <!-- Tags -->
-        <div style="float: left; overflow: hidden; clear: left; margin-top: 4px; font-size: 10px; margin-bottom: 4px;">
+        <div class="social-content-main-lrg">
             @Html.Partial("TagList", Model.Question.TagEntries)
         </div>
         <!-- Controls footer -->
-        <div style="float: left; overflow: hidden; clear: left; margin-top: 8px; font-size: 11px; margin-bottom: 8px;">
-            <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-info-sign"></i>&nbsp;More Info</a></div>
-            <div style="float: left; margin-right: 16px;"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Question.CreatedOn.ToString("s")"></time></div>
+        <div class="social-content-main-lrg">
+            <div class="social-content-ctrl"><a href="#"><i class="icon-info-sign"></i>&nbsp;More Info</a></div>
+            <div class="social-content-ctrl"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Question.CreatedOn.ToString("s")"></time></div>
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {
-                 <div style="float: left; margin-right: 16px;"><a href="#"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
+                 <div class="social-content-ctrl"><a href="#"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
             }
         </div>
     </div>

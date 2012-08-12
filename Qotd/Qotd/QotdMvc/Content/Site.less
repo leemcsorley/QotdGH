@@ -9,6 +9,13 @@
 @hspace: @space;
 @vspace: @space;
 
+// DISPLAY
+
+.hidden
+{
+	display: none;
+}
+
 // SPACER
 
 .vspacer
@@ -124,6 +131,7 @@
 	margin: 4px 4px;
 	.square(120px);
 	border: 1px solid @grayLight;
+	.border-radius(4px);
 }
 
 .large-hash
@@ -169,9 +177,9 @@
 .social-content-main(@pad)
 {
 	overflow: hidden;
-	padding-top: @pad / 2;
+	padding-top: @pad ;
 	padding-right: @pad;
-	padding-bottom: @pad / 2;
+	padding-bottom: 0px;
 }
 
 .social-content-main-sml div
@@ -215,14 +223,19 @@
 {
 	float: left;
 	margin-right: @space;
+	margin-bottom: @spaceTny;
+	font-size: 11px;
+	color: @grayLight;
 }
 
-.vote-arrow
+.vote-arrow,
+.vote-count
 {
 	font-size: 22px;
 }
 
-.comment
+.comment,
+.comment-input
 {
 	background-color: @grayLighter;
 	margin-top: 1px;
@@ -231,7 +244,7 @@
 
 .comment-form
 {
-	margin-bottom: 0px !important;
+	margin-bottom: @spaceSml !important;
 }
 
 .comment-form input
@@ -243,12 +256,14 @@
 
 .profile
 {
-	.square(50px)
+	.square(50px);
+	border: 1px solid @grayDark;
 }
 
 .profile-sml
 {
-	.square(25px)
+	.square(25px);
+	border: 1px solid @grayDark;
 }
 
 // HERO
@@ -259,4 +274,11 @@
 }
 
 //  HISTORY
+
+// TABS
+
+.main-tabs
+{
+	font-size: 16px;
+}
 

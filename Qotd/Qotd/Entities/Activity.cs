@@ -55,6 +55,8 @@ namespace Qotd.Entities
 
         public virtual bool VisibleWithoutLink { get; set; }
 
+        public virtual bool InGblActivityStream { get; set; }
+
         public virtual Guid? CommentId { get; set; }
 
         public virtual Comment Comment { get; set; }

@@ -1,10 +1,10 @@
 ﻿@model Qotd.PresentationObjects.AnswerPO
-<div class="social-content-container-lrg">
+<div class="social-content-container-lrg social-content-container">
     <!-- Side bar of post -->
     <div class="social-content-left-lrg">
         <!-- Profile image -->
         <div>
-            <img src="@Model.User.User.ProfileImageUrl" alt="profile picture"/>
+            <img src="@Model.User.User.ProfileImageUrl" alt="profile picture" class="profile"/>
         </div>
         <!-- Up arrow -->
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
@@ -20,9 +20,7 @@
             </div>
         }
         <!-- Votes -->
-        <div>
-            <span style="font-size: 22px">@Model.Answer.VotesTotal</span>
-        </div>
+        <div class="vote-count">@Model.Answer.VotesTotal</div>
         <!-- Down arrow -->
         @if (ViewBag.IsAuthenticated && ViewBag.User != null && (!Model.HasUserVoted))
         {
@@ -42,9 +40,9 @@
     <div class="social-content-main-lrg">
         <!-- Header -->
         <div>
-                <span style="font-weight: bold">@Model.Answer.Title</span>
+                <span><b>@Model.Answer.Title</b></span>
                 <span>by</span>
-                <span style="font-weight: bold;">@Html.Partial("UserLink", Model.User)</span>
+                <span><b>@Html.Partial("UserLink", Model.User)</b></span>
             <div style="float: right;"><span class="label label-info" style="font-size: 11px"><i class="icon-comments"></i>&nbsp;Answer</span></div>
             @if (Model.Answer.IsFirst.HasValue && Model.Answer.IsFirst.Value)
             {
@@ -68,7 +66,7 @@
     <div class="social-content-main-lrg">
         @if (ViewBag.IsAuthenticated && ViewBag.User != null)
         {
-                <div class="social-content-ctrl"><a href="#"><i class="icon-pencil"></i>&nbsp;Comment</a></div>
+                <div class="social-content-ctrl"><a href="#" class="comment-link"><i class="icon-pencil"></i>&nbsp;Comment</a></div>
         }
         <div class="social-content-ctrl"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Answer.CreatedOn.ToString("s")"></time></div>
         @if (ViewBag.IsAuthenticated && ViewBag.User != null)
@@ -96,7 +94,7 @@
     }
     </div>
     <!-- Comment input footer -->
-        <div class="social-content-main-lrg comment">
+        <div class="social-content-main-lrg comment-input @(Model.Comments != null && Model.Comments.Length > 0 ? "" : "hidden")">
             <div class="social-content-left-sml">
                 <img src="@Model.User.User.ProfileImageUrl" class="profile-sml"/>
             </div>

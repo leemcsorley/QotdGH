@@ -9,7 +9,7 @@ else if (Model.Activity.ActivityType == Qotd.Entities.ActivityType.PostQuestion)
 }
 else
 {
-    <div class="social-content-container">
+    <div class="social-content-container-lrg">
     <!-- Side bar of post -->
     <div class="social-content-left-lrg">
         <!-- Profile image -->
@@ -17,6 +17,7 @@ else
             <img src="@Model.UserProfileImageUrl" alt="profile picture"/>
         </div>
     </div>
+    <div class="social-content-main-container">
     <!-- Header of post -->
     <div class="social-content-main-lrg">
         <div>
@@ -29,32 +30,51 @@ else
     switch (Model.Activity.ActivityType)
     {
         case Qotd.Entities.ActivityType.PostComment:
-            <text><div><span>posted a comment on answer "<a href="#">@Model.Activity.Text2</a>"</span></div>
+            <text><div><p>posted a comment on answer "@Html.Partial("AnswerLink", Model.Answer)"</p></div>
                 @Html.Partial("Comment", Model.Comment)
             </text>
-        break;
+           break;
         case Qotd.Entities.ActivityType.FollowTag:
-        break;
-        case Qotd.Entities.ActivityType.FollowUser:
-            <text>
+            <text><div><p>favourited tag "<a href="#">@Model.Activity.Text</a>"</p></div>
             </text>
-        break;
+                                                 break;
+        case Qotd.Entities.ActivityType.FollowUser:
+            <text><div><p>favourited user "<a href="#">@Model.Activity.Text</a>"</p></div>
+            </text>
+                                                  break;
         case Qotd.Entities.ActivityType.ReceiveFollow:
-        break;
+                                                  break;
         case Qotd.Entities.ActivityType.VoteAnswer:
-            <text><div><span>voted on answer "<a href="#">@Model.Activity.Text</a>"</span></div></text>
-        break;
+            <text><div><p>voted on answer "@Html.Partial("AnswerLink", Model.Answer)"</p></div></text>
+                                                  break;
         case Qotd.Entities.ActivityType.VoteQuestion:
-            <text><div><span>voted on question "<a href="#">@Model.Activity.Text</a>"</span></div></text>
-        break;
+            <text><div><p>voted on question "@Html.Partial("QuestionLink", Model.Question)"</p></div></text>
+                                                    break;
         case Qotd.Entities.ActivityType.ReceiveVoteUpAnswer:
-        break;
+            <text><div><p>received a positive vote on answer "@Html.Partial("AnswerLink", Model.Answer)" from </p><p><img src="@Model.TargetUserProfileImageUrl" class="profile-sml"/>&nbsp;<a href="#">@Model.TargetUserDisplayName</a></p></div>
+            </text>
+                                                                                                                                                                                              break;
+        case Qotd.Entities.ActivityType.ReceiveVoteDownAnswer:
+            <text><div><p>received a negative vote on answer "@Html.Partial("AnswerLink", Model.Answer)" from </p><p><img src="@Model.TargetUserProfileImageUrl" class="profile-sml"/>&nbsp;<a href="#">@Model.TargetUserDisplayName</a></p></div>
+            </text>
+                                                                                                                                                                                              break;
+        case Qotd.Entities.ActivityType.ReceiveVoteUpQuestion:
+            <text><div><p>received a positive vote on question "@Html.Partial("QuestionLink", Model.Question)" from </p><p><img src="@Model.TargetUserProfileImageUrl" class="profile-sml"/>&nbsp;<a href="#">@Model.TargetUserDisplayName</a></p></div>
+            </text>
+                                                                                                                                                                                              break;
+        case Qotd.Entities.ActivityType.ReceiveVoteDownQuestion:
+            <text><div><p>received a negative vote on question "@Html.Partial("QuestionLink", Model.Question)" from </p><p><img src="@Model.TargetUserProfileImageUrl" class="profile-sml"/>&nbsp;<a href="#">@Model.TargetUserDisplayName</a></p></div>
+            </text>
+                                                                                                                                                                                              break;
     }
             }
-    </div> 
+        </div> 
         <!-- Footer -->
-    <div class="social-content-main-lrg">
-            <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
+        <div class="social-content-main-lrg">
+            <div class="social-content-ctrl">
+                <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
+            </div>
+        </div>
     </div>
     </div>
 }

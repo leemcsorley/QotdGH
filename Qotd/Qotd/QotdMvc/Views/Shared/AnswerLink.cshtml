@@ -1,0 +1,2 @@
+﻿@model Qotd.PresentationObjects.AnswerPO
+<a href="@Url.Action("Answer", "Home", new { answerId = Model.Answer.Id, ajax = false })" class="ajax-popover single-link">@Model.Answer.Title</a>
