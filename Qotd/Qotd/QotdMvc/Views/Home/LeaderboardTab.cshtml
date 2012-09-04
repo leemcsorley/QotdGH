@@ -1,18 +1,28 @@
 ﻿<div class="tabbable">
     <ul class="nav nav-pills">
         <li class="active">
-            <a href="#this-period" data-toggle="tab" class="ajax-tab" rel="@Url.Action("LeaderboardThisPeriod", "Home")">Last 4 Weeks</a>
+            <a href="#overall" data-toggle="tab">Overall</a>
         </li>
         <li>
-            <a href="#overall" data-toggle="tab" class="ajax-tab" rel="@Url.Action("LeaderboardOverall", "Home")">Overall</a>
+            <a href="#answer-votes" data-toggle="tab" class="ajax-tab" rel="@Url.Action("Leaderboard", "Home", new { type = Qotd.PresentationObjects.ScoreEntryType.AnswerVotes })">Answer Votes</a>
+        </li>
+        <li>
+            <a href="#question-votes" data-toggle="tab" class="ajax-tab" rel="@Url.Action("Leaderboard", "Home", new { type = Qotd.PresentationObjects.ScoreEntryType.QuestionVotes })">Question Votes</a>
+        </li>
+        <li>
+            <a href="#activity-level" data-toggle="tab" class="ajax-tab" rel="@Url.Action("Leaderboard", "Home", new { type = Qotd.PresentationObjects.ScoreEntryType.ActivityLevel })">Activity Level</a>
+        </li>
+        <li>
+            <a href="#sociability" data-toggle="tab" class="ajax-tab" rel="@Url.Action("Leaderboard", "Home", new { type = Qotd.PresentationObjects.ScoreEntryType.Sociability })">Sociability</a>
         </li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active" id="this-period">
+        <div class="tab-pane active" id="overall">
             @Html.Partial("Leaderboard", (Qotd.PresentationObjects.LeaderboardPO)ViewBag.Leaderboard)
         </div>
-        <div class="tab-pane" id="overall">
-                                        
-        </div>
+        <div class="tab-pane" id="answer-votes"></div>
+        <div class="tab-pane" id="question-votes"></div>
+        <div class="tab-pane" id="activity-level"></div>
+        <div class="tab-pane" id="sociability"></div>
     </div>
 </div>

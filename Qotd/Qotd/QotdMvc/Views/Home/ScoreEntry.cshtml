@@ -1,0 +1,9 @@
+﻿@model Qotd.PresentationObjects.ScoreEntryPO
+@Html.Partial("Activity", Model.Activity)
+@foreach (var detail in Model.Details)
+{
+    <div class="score-entry-detail">@detail.Text<text>: </text>@detail.Points</div>
+}
+<div class="score-entry-total">
+    Total: @Model.PointsTotal
+</div>

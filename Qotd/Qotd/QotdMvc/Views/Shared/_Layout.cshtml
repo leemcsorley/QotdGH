@@ -53,6 +53,85 @@
     };
 
     function onPage() {
+
+        $("#search-form").submit(function()
+        {
+            var elem = $(".search-result > .active");
+            window.location = $(elem).find(".search-result-link").attr("href");
+            return false;
+        });
+
+        // search
+        $("#search-box").keyup(
+            function(event)
+            {
+                event.preventDefault();
+                var search = $(this).val();
+                if (search.length > 2)
+                {
+                    if (event.which == 40)
+                    {
+                        var elems = $(".search-result");
+                        for (var i = 0; i < elems.length; i++)
+                        {
+                            if ($(elems[i]).children(".active").length > 0)
+                            {
+                                if (i != elems.length - 1)
+                                {
+                                    $(elems[i]).children().removeClass("active");
+                                    $(elems[i + 1]).children().addClass("active");
+                                    i = elems.length;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                    if (event.which == 38)
+                    {
+                        var elems = $(".search-result");
+                        for (var i = 0; i < elems.length; i++)
+                        {
+                            if ($(elems[i]).children(".active").length > 0)
+                            {
+                                if (i != 0)
+                                {
+                                    $(elems[i]).children().removeClass("active");
+                                    $(elems[i - 1]).children().addClass("active");
+                                    i = elems.length;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                    $.get("@Url.Action("Search", "Home")" + "?search=" + search, function(data)
+                    {
+                        $("#search-results").html(data);
+                        $("#search-results").show();
+
+                        $(".search-result").mouseover(function()
+                        {
+                            $(".search-result").children().removeClass("active");
+                            $(this).children().addClass("active");
+                            return true;
+                        });
+
+                        $(".search-result").mousedown(function()
+                        {
+                            window.location = $(this).find(".search-result-link").attr("href");
+                        });
+                    });
+                 }
+                 return false;
+            });
+
+        $("#search-box").live("focusout",
+            function()
+            {
+                $(this).val("");
+                $("#search-results").html("");
+                $("#search-results").hide();
+            });
+
         // window size
         function windowSize()
         {
@@ -233,7 +312,26 @@
             });
             return false;
         });
+
+        $('.ajax-autoinsert').each(function()
+        {
+            var interval = $(this).attr("data-interval");
+            setInterval(function()
+            {
+                var aa = $(".ajax-autoinsert");
+                $(aa).removeClass("ajax-autoinsert");
+                var url = $(aa).attr("data-url");
+                $.get(url, function(data) {
+                    (aa).parent().prepend($(data).fadeIn("slow"));
+                 });
+               
+            }, interval);
+        });
         
+        $('.report-link').live("click", function() {
+            $('#report-submit').attr("href", $(this).attr("data-url"));
+            return true;
+        });
     };
 
     function alert(url)
@@ -255,6 +353,10 @@
 	    onPage();
 	});
 </script>
+<!-- Report Modal -->
+<div class="modal hide fade" id="report-modal">
+    @Html.Action("ReportForm", "Home")
+</div>
 <!-- Side Bar -->
 <div id="side-bar" style="position: fixed; width: 18%; right: 0px; top: 0px; background-color: white; border: 1px solid white; padding-top: 40px; height: 100%">
     @Html.Action("Activities", "Home")
@@ -264,7 +366,7 @@
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="@Url.Action("Index", "Home")">A Question A Day .co.uk</a>
+            <a class="brand" href="@Url.Action("Index", "Home")">NOTES</a>
             <!-- notification dropdown -->
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {
@@ -288,6 +390,13 @@
             </ul>
             <ul class="nav"><li class="divider-vertical"></li></ul>
             }
+            <!-- Search -->
+            <ul class="nav">
+            <form class="navbar-search pull-left" method="get" action="" id="search-form" autocomplete="off">
+                <input type="text" class="search-query" placeholder="Search" id="search-box" name="query" autocomplete="off">
+            </form>
+            <ul id="search-results" class="dropdown-menu" style="width: 300px"></ul>
+            </ul>
             <!-- --------------------- -->
             <div class="btn-group pull-right">
                 <!-- if signed in -->

@@ -78,16 +78,36 @@ namespace Qotd.Utils
         int NumCommentsThisPeriod { get; set; }
 
         int NumComments { get; set; }
+
+        double AnswerQualityScore { get; set; }
+
+        int AnswerQualityRank { get; set; }
+
+        double QuestionQualityScore { get; set; }
+
+        int QuestionQualityRank { get; set; }
+
+        int ActivityLevelScore { get; set; }
+
+        int ActivityLevelRank { get; set; }
+
+        int SociabilityScore { get; set; }
+
+        int SociabilityRank { get; set; }
     }
 
     public static class ActionEntryExtensions
     {
-        private static readonly TimeSpan PERIOD_LENGTH = new TimeSpan(28, 0, 0, 0);
+        public static readonly TimeSpan PERIOD_LENGTH = new TimeSpan(28, 0, 0, 0);
 
-        private const int ANSWER_WIN_MULT = 4;
-        private const int ANSWER_SECOND_MULT = 2;
-        private const int ANSWER_THIRD_MULT = 1;
-        private const int QUESTION_WIN_MULT = 10;
+        public const int ANSWER_WIN_MULT = 4;
+        public const int ANSWER_SECOND_MULT = 2;
+        public const int ANSWER_THIRD_MULT = 1;
+        public const int QUESTION_WIN_MULT = 10;
+        public const int ANSWER_ACT_MULT = 10;
+        public const int QUESTION_ACT_MULT = 10;
+        public const int FOLLOWING_MULT = 8;
+        public const int FOLLOWS_MULT = 4;
 
         public static void AddAction<T>(this T stats, ActivityType type, object obj = null)
             where T : IActionEntryStats
@@ -190,6 +210,36 @@ namespace Qotd.Utils
                     - actions.Where(a => a.Type == ActivityType.ReceiveVoteDownAnswer).Sum(a => (int?)a.Value).GetValueOrDefault();
             if (estats != null) estats.TotalQuestionVotesThisPeriod = actions.Where(a => a.Type == ActivityType.ReceiveVoteUpQuestion).Sum(a => (int?)a.Value).GetValueOrDefault()
                     - actions.Where(a => a.Type == ActivityType.ReceiveVoteDownQuestion).Sum(a => (int?)a.Value).GetValueOrDefault();
+
+            // relative ratings
+            if (estats != null)
+            {
+                // answer quality
+                if (estats.NumAnswersThisPeriod > 0)
+                {
+                    estats.AnswerQualityScore = (estats.TotalAnswerVotesThisPeriod +
+                        ANSWER_WIN_MULT * estats.NumAnswersWonThisPeriod +
+                        ANSWER_SECOND_MULT * estats.NumAnswersSecondThisPeriod +
+                        ANSWER_THIRD_MULT * estats.NumAnswersThisPeriod);
+                }
+                else estats.AnswerQualityScore = 0;
+                // question quality
+                if (estats.NumQuestionsThisPeriod > 0)
+                {
+                    estats.QuestionQualityScore = (estats.TotalQuestionVotesThisPeriod +
+                        QUESTION_WIN_MULT * estats.NumQuestionsWonThisPeriod);
+                }
+                // activity
+                estats.ActivityLevelScore = estats.NumAnswersThisPeriod * ANSWER_ACT_MULT +
+                    estats.NumQuestionsThisPeriod * QUESTION_ACT_MULT +
+                    estats.NumAnswersVotedThisPeriod +
+                    estats.NumQuestionsVotedThisPeriod +
+                    estats.NumComments;
+                // sociability
+                estats.SociabilityScore = estats.NumFollowingThisPeriod * FOLLOWING_MULT + estats.NumFollowsThisPeriod * FOLLOWS_MULT
+                    + estats.NumComments;
+
+            }
         }
     }
 }

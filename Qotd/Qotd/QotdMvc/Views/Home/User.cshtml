@@ -4,53 +4,50 @@
 }
 <div class="row">
     <div class="span12">
-        <div class="well" style="overflow: hidden">
-            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-                <img src="@ViewBag.TargetUser.User.ProfileImageUrl" alt="profile picture" style="border: 1px solid black"/>
+        <div class="well fill">
+            <div class="fl cl cr">
+                <img src="@ViewBag.TargetUser.User.ProfileImageUrl" alt="profile picture" class="profile"/>
             </div>
-            <div style="float: left; border-right: 1px solid #dddddd; height: 50px; margin-right: 10px;">&nbsp;</div>
-            <div style="float: left;">
-                <div><h3>@ViewBag.TargetUser.User.DisplayName</h3></div>
-                <div style="margin-top: 8px">Member Since <b>@ViewBag.TargetUser.User.JoinedOn.ToLongDateString()</b></div>
+            <div class="fl vline">&nbsp;</div>
+            <div class="fl">
+                <h3>@ViewBag.TargetUser.User.DisplayName</h3>
+                <p>Member Since <b>@ViewBag.TargetUser.User.JoinedOn.ToLongDateString()</b></p>
             </div>
-            <div style="float: right; padding-top: 0px;">
+            <div class="fr">
                 @if (ViewBag.IsAuthenticated && ViewBag.User != null && ViewBag.User.Id != ViewBag.TargetUser.User.Id)
                 {
-                    <div style="float: right; margin-left: 12px;">
+                    <div class="fr">
                     @if (ViewBag.TargetUser.IsFollowedByCurrent)
                     {
-                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center;"><i class="icon-ok" style="color: #22dd22"></i> <span style="color: #000000 !important">Is a favourite</span></div>
+                        <div class="favourite-ctrl"><i class="icon-ok color-ok"></i>&nbsp;Is a favourite</div>
                     }
                     else
                     {
-                        <a href="@Url.Action("AddFollow", "Home", new { userId = ViewBag.TargetUser.User.Id })" class="btn" style="width: 160px"><i class="icon-star" style="color: #dddd22"></i> <span style="color: #000000 !important">Add as favourite</span></a>
+                        <a href="@Url.Action("AddFollow", "Home", new { userId = ViewBag.TargetUser.User.Id })" class="btn favourite-ctrl"><i class="icon-star color-star"></i>&nbsp;Add as favourite</a>
                     }
                     </div>
-                    <div style="float: right;">
+                    <div class="fr">
                     @if (ViewBag.TargetUser.IsFollowingCurrent)
                     {
-                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center;"><i class="icon-ok" style="color: #22dd22"></i>&nbsp;Has favourited you</div>
+                        <div class="favourite-ctrl"><i class="icon-ok color-ok"></i>&nbsp;Has favourited you</div>
                     }
                     else
                     {
-                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center"><i class="icon-remove"></i>&nbsp;Has not favourited you</div>
+                        <div class="btn favourite-ctrl"><i class="icon-remove"></i>&nbsp;Has not favourited you</div>
                     }
                     </div>
                 }
             </div>
-            <div style="float: right; clear: right;">
-                <div style="overflow: hidden; text-align: center; font-weight: bold; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #dddddd;">
-                    Last 4 Weeks
+            @*<div class="fr cl stat-box-holder">
+                <div class="stat-box-row fill"><p><b>Last 4 Weeks</b></p>
+                    <div class="fill">@Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = false })</div>
                 </div>
-                    <div style="overflow: hidden;">
-                        @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = false })
-                    </div>
-                <div style="overflow: hidden; text-align: center; font-weight: bold; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #dddddd;">
-                    Overall
+                <div class="stat-box-row fill"><p><b>Overall</b></p>
+                    <div class="fill">@Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = true })</div>
                 </div>
-                    <div style="overflow: hidden;">
-                        @Html.Partial("UserBoxes", new QotdMvc.Models.UserBoxes() { User = ViewBag.TargetUser, Overall = true })
-                    </div>
+            </div>*@
+            <div style="margin-top: 22px" class="fl cl">
+                @Html.Partial("UserRatings", (Qotd.PresentationObjects.UserPO)ViewBag.TargetUser)
             </div>
         </div>
 
@@ -58,6 +55,9 @@
                     <ul class="nav nav-tabs">
                         <li class="active">
                             <a href="#tab1" data-toggle="tab" class="has-tooltip" title="" data-placement="right"><i class="icon-table" style="font-size: 15px; color: Red; padding-right: 10px"></i><b>Statistics</b></a>
+                        </li>
+                        <li>
+                           <a href="#tab6" data-toggle="tab" class="ajax-tab" title="" data-placement="right" rel="@Url.Action("UserScoresTab", "Home", new { userId = ViewBag.TargetUser.User.Id })"><i class="icon-table" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Scores</b></a> 
                         </li>
                         <li>
                             <a href="#tab4" data-toggle="tab" class="ajax-tab" title="" data-placement="right" rel="@Url.Action("TodaysActivitiesForUser", "Home", new { userId = ViewBag.TargetUser.User.Id })"><i class="icon-leaf" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>Today's Activities</b></a>
@@ -92,6 +92,7 @@
                     <div class="tab-pane" id="tab5">
                         
                     </div>
+                    <div class="tab-pane" id="tab6"></div>
                 </div>
             </div>
 

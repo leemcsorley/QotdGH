@@ -15,15 +15,7 @@ namespace QotdMvc.Data
     public static class TestData
     {
 #region lorem
-        private static readonly string LOREM = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas libero tellus, sodales eget hendrerit vel, pretium ultricies est. Vivamus magna diam, cursus non pulvinar non, euismod in turpis. Praesent facilisis ultrices dignissim. Donec condimentum porttitor iaculis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aliquam dui quam, volutpat sit amet adipiscing nec, rhoncus a purus. Aenean purus odio, fringilla non pellentesque sed, consequat sit amet orci.
-
-Praesent sit amet imperdiet turpis. Mauris aliquet lacinia libero rhoncus mattis. In hac habitasse platea dictumst. Fusce interdum, eros a egestas dignissim, tortor nisi convallis neque, sed lobortis elit ligula in sem. Morbi vitae quam nisl. Etiam bibendum, ante et volutpat imperdiet, dui augue rhoncus mi, lacinia euismod leo sapien eu nisl. Nulla ornare facilisis nisl, a blandit magna semper vitae. Etiam semper consectetur arcu ut hendrerit. Nunc mollis velit vitae sem molestie non volutpat ligula fringilla.
-
-Etiam lacus ipsum, posuere eu rutrum at, dignissim vitae nisl. Phasellus euismod fermentum metus, vel luctus nulla ultrices a. Aliquam vel dui in quam lacinia pulvinar ut et enim. Nunc velit massa, ultrices et sagittis quis, viverra dignissim risus. Quisque sed tellus non purus bibendum dapibus. Sed auctor odio non mi vehicula non molestie metus aliquet. Nulla facilisi. Sed vel justo vitae mauris dictum suscipit at sodales nunc. Etiam eget urna lectus. Nunc tempor elit ut sem pellentesque in condimentum sapien malesuada. Curabitur fringilla venenatis lacus commodo porta. Aenean ut rhoncus erat. Quisque rhoncus blandit metus volutpat dapibus. Donec id eros vitae dolor dignissim venenatis rhoncus ac dolor. Morbi varius ultrices augue in faucibus. Donec lacus felis, luctus vitae egestas at, auctor sit amet nunc.
-
-Nunc consequat turpis vulputate risus commodo pulvinar. Quisque ut eros dui, non pharetra libero. Etiam interdum gravida nibh sed ornare. Nunc sed interdum nunc. Pellentesque eleifend ligula ac lacus suscipit id pulvinar magna lacinia. Maecenas lorem neque, auctor non venenatis eget, facilisis ut dolor. Quisque vel dui nulla, mattis blandit purus. Nulla mattis, ligula eget scelerisque suscipit, tortor felis faucibus nunc, eu accumsan tortor ante et magna. Nam eu neque quam, non tincidunt augue. Nulla libero elit, blandit sit amet cursus vel, placerat in eros. Vivamus pulvinar leo a metus scelerisque eget molestie erat viverra. Nam ac eros nibh, quis malesuada elit. Nunc id leo non diam ornare mollis.
-
-Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapibus nunc, vel accumsan lacus porttitor sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras ultricies, mauris euismod viverra tristique, orci dui luctus urna, sed blandit quam nunc eu velit. Mauris eu enim id metus imperdiet ornare sed at dui. Praesent consequat vestibulum turpis vitae ultricies. Mauris lobortis lacus quis augue sodales vehicula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec quam sodales turpis mollis vulputate id venenatis eros. Suspendisse in dolor sem. Integer in aliquet velit.";
+        private static readonly string LOREM = @"Him had Living our. Grass under. Doesn't they're yielding behold earth, place the very greater. Multiply land so itself void female had our had seas. Sea. I heaven tree Given in over. Whales. Years creepeth a upon were After said whose had. Midst, itself meat first so divide him the male whose signs fifth them creature. There darkness day. Have. Fruitful had made that made. Make void man set sixth make female life. Every creature had. Place lights he whose winged subdue shall. Blessed Dry his creepeth, isn't likeness waters. Be first open second yielding given Signs dry good fruitful waters herb every. Creeping saw have sixth above midst them he third day isn't let, lights together living image creeping fish land. Unto fruit called blessed gathered Seas wherein them deep day may. Evening. You'll created called without their appear night green given brought bring yielding over in she'd forth kind fowl isn't. Seas, kind void their hath. Rule from meat to his very. Which spirit sea saying second was. Life fish you for likeness great is which is under night gathering. Their without open it winged said be our saw him. Waters midst darkness he third creeping divided. Night unto creepeth creepeth very every seas land from. Behold that saying, bring the abundantly give together fish above in gathering god. A cattle stars and may appear you beast days Fourth can't he land moveth Evening earth. Light hath winged open first without. Moving divide seas heaven. Form in. Called whales divide unto face fish subdue can't. From lesser. Divided morning fruit together gathering fifth sea made divide hath moveth, them. Creepeth gathering which open moved very gathered two one, meat own abundantly air. Hath face lights them greater lights. It firmament. Greater seasons very good tree winged after thing there of there set that own moved had, one. Created moveth you one.";
 #endregion
         private static readonly string[] LOREM_WORDS = LOREM.Split(' ');
         private static readonly string DEFAULT_USER_EMAIL = @"leemcsorley@gmail.com";
@@ -35,7 +27,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
         private const int NUM_ANSWERS = 30;
         private const int NUM_COMMENTS = 10;
 
-        private static string GenText(int words)
+        public static string GenText(int words)
         {
             int w = RND.Next(words / 2, words);
 
@@ -131,12 +123,12 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                     List<Question> questions = new List<Question>();
                     for (int i = 0; i < NUM_QUESTIONS; i++)
                     {
-                        int minutes = RND.Next(0, 60 * 24);
+                        int minutes = RND.Next(0, 60 * 4);
                         User user = users[RND.Next(0, users.Count)];
                         Question q = new Question()
                         {
                             User = user,
-                            CreatedOn = date.AddMinutes(-minutes),
+                            CreatedOn = date.AddDays(-1).AddMinutes(minutes),
                             DateFor = date,
                             MainText = GenText(8),
                             SubText = GenText(16),
@@ -173,7 +165,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                             User u = users[RND.Next(0, users.Count)];
                             Answer answer = new Answer()
                             {
-                                CreatedOn = date.AddMinutes(-RND.Next(0, 60 * 24)),
+                                CreatedOn = date.AddDays(-1).AddMinutes(RND.Next(0, 60 * 4)),
                                 User = u,
                                 NumComments = 0,
                                 Question = tq,
@@ -217,6 +209,7 @@ Nunc enim justo, scelerisque in adipiscing non, ornare et nisl. Nam sodales dapi
                 }
 
                 dp.SaveChanges();
+                dp.OptimiseLucene();
             }
         }
     }

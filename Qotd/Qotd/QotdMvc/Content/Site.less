@@ -5,6 +5,7 @@
 @spaceTny: 5px;
 @spaceSml: 9px;
 @space: 13px;
+@spaceLg: 16px;
 
 @hspace: @space;
 @vspace: @space;
@@ -18,10 +19,34 @@
 
 // SPACER
 
+.right-space
+{
+	margin-right: @space;
+}
+
+.right-space-lg
+{
+	margin-right: @spaceLg;
+}
+
+.vspaced
+{
+	margin-top: @vspace;
+	margin-bottom: @vspace;
+}
+
 .vspacer
 {
 	overflow: hidden;
 	height: @space;
+}
+
+.vline
+{
+	border-right: 1px solid @grayLight;
+	margin-left: @hspace;
+	margin-right: @hspace;
+	height: 50px;
 }
 
 // FLOAT
@@ -48,6 +73,57 @@
 .fill
 {
 	overflow: hidden;
+}
+
+// ALIGN
+
+.center
+{
+	text-align: center;
+}
+
+// SEARCH
+
+.social-content-container-sml.active
+{
+	background-color: @blue;
+	color: white !important;
+}
+
+.search-result
+{
+	background-color: white;
+	color: black !important;
+	padding: 3px 3px;
+}
+
+.search-result-link
+{
+	display: none;
+}
+
+.search-result-type
+{
+	background-color: @gray;
+	color: white !important;
+	padding: 3px 3px;
+}
+
+// SCORE ENTRY
+
+.score-entry-detail, .score-entry-total
+{
+	background-color: @grayLighter;
+	color: @grayDark;
+	font-weight: bold;
+	border-bottom: 1px solid @grayLight;
+	padding: @spaceTny @spaceTny;
+	font-size: 10px;
+}
+
+.score-entry-total
+{
+	margin-bottom: @spaceTny;
 }
 
 // NOTIFICATIONS
@@ -80,7 +156,88 @@
 	max-height: 700px;
 }
 
+// STARS
+
+.stars-holder
+{
+	.border-radius(8px);
+	#gradient > .vertical(@white, @grayLighter);
+	border: 1px solid @grayLight;
+	padding: @spaceSml @space;
+	color: @gray;
+}
+
+.stars-holder.invert
+{
+	#gradient > .vertical(@gray, @grayDark);
+	color: @grayLighter;
+	border: 1px solid @grayDarker;
+}
+
+.stars-holder.invert:hover { #gradient > .vertical(@gray, @gray); }
+
+.stars-holder:hover { #gradient > .vertical(@white, @white); }
+
+.star-holder
+{
+	display: inline-block;
+	font-size: 22px;
+	text-align: left;
+	color: @blue;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
+.star-half
+{
+	margin-right: 8px !important;
+}
+
+.stars-container
+{
+	overflow: hidden;
+	padding: 0px 0px;
+}
+
+.stars-header
+{
+	overflow: hidden;
+	padding: 0px 0px;
+	text-align: center;
+	margin-bottom: @space;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.stars-low
+{
+	color: @black;
+}
+
+.stars-high
+{
+	color: @yellow;
+}
+
 // BOXES
+
+.stat-box-holder
+{
+	text-align: center;
+}
+
+.stat-box-holder p
+{
+	margin-left: @space;
+	border-bottom: 1px dotted @grayLight;
+	padding: 4px 4px;
+}
+
+.stat-box-row
+{
+	margin-top: @space;
+	margin-bottom: @space;
+}
 
 .stat-box
 {
@@ -282,3 +439,55 @@
 	font-size: 16px;
 }
 
+// USER/TAG
+
+.favourite-ctrl
+{
+	margin-left: @space;
+	width: 170px;
+	padding: 3px 3px;
+	text-align: center;
+	.border-radius(4px);
+	border: 1px solid @grayLight;
+}
+
+// RATINGS
+
+.rating-summary td
+{
+	width: 180px;
+	font-size: 16px;
+	padding: @spaceSml @spaceSml;
+}
+
+// COLORS
+
+.color-ok
+{
+	color: @green;
+}
+
+.color-warning
+{
+	color: @yellow;
+}
+
+.color-star
+{
+	color: @yellow;
+}
+
+.color-low
+{
+	color: @red;
+}
+
+.color-med
+{
+	color: @yellow;
+}
+
+.color-high
+{
+	color: @green;
+}

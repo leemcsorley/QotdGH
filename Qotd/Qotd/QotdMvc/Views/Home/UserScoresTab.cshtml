@@ -1,0 +1,26 @@
+﻿<div class="tabbable">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href="#overall" data-toggle="tab">Overall</a>
+        </li>
+        <li>
+            <a href="#answer-votes" data-toggle="tab" class="ajax-tab" rel="@Url.Action("UserScores", "Home", new { userId = ViewBag.TargetUserId, type = Qotd.PresentationObjects.ScoreEntryType.AnswerVotes })">Answer Votes</a>
+        </li>
+        <li>
+            <a href="#question-votes" data-toggle="tab" class="ajax-tab" rel="@Url.Action("UserScores", "Home", new { userId = ViewBag.TargetUserId, type = Qotd.PresentationObjects.ScoreEntryType.QuestionVotes })">Question Votes</a>
+        </li>
+        <li>
+            <a href="#activity-level" data-toggle="tab" class="ajax-tab" rel="@Url.Action("UserScores", "Home", new { userId = ViewBag.TargetUserId, type = Qotd.PresentationObjects.ScoreEntryType.ActivityLevel })">Activity Level</a>
+        </li>
+        <li>
+            <a href="#sociability" data-toggle="tab" class="ajax-tab" rel="@Url.Action("UserScores", "Home", new { userId = ViewBag.TargetUserId, type = Qotd.PresentationObjects.ScoreEntryType.Sociability })">Sociability</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="overall">@Html.Partial("OverallRating", (Qotd.PresentationObjects.UserPO)ViewBag.TargetUser)</div>
+        <div class="tab-pane" id="answer-votes"></div>
+        <div class="tab-pane" id="question-votes"></div>
+        <div class="tab-pane" id="activity-level"></div>
+        <div class="tab-pane" id="sociability"></div>
+    </div>
+</div>

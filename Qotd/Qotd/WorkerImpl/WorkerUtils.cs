@@ -7,11 +7,44 @@ using Qotd.Entities;
 using Qotd.Utils;
 using System.Transactions;
 using System.Data.SqlClient;
+using System.Threading;
 
 namespace Qotd.WorkerImpl
 {
     public static class WorkerUtils
     {
+        public static void ProcessAll()
+        {
+            while (true)
+            {
+                Thread.Sleep(500);
+                using (QotdContext db = new QotdContext())
+                {
+                    db.CreateActivitiesAndNotifications();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.UpdateUserRankings();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.CreateUserFollowLinksForNewFollows();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.CreateUserFollowLinksForNewContent();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.ProcessTags();
+                }
+                using (QotdContext db = new QotdContext())
+                {
+                    db.AggregateNotifications();
+                }
+            }
+        }
+
         public static void ProcessTags(this QotdContext db)
         {
             using (TransactionScope scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TimeSpan(1, 0, 0)))

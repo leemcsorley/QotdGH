@@ -1,4 +1,5 @@
-﻿@foreach (var activity in ViewBag.Activities)
+﻿<div class="ajax-autoinsert" data-url="@Url.Action("Activities", "Home", new { number = ViewBag.Number, take = 3 })" data-interval="10000"></div>
+@foreach (var activity in ViewBag.Activities)
 {
     <div class="ajax-container">
     @Html.Partial("Activity", (Qotd.PresentationObjects.ActivityPO)activity)

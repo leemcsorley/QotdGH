@@ -87,6 +87,37 @@ namespace Qotd.Entities
 
         public int ScoreThisPeriod { get; set; }
 
+        // ratings - all relative
+        public double AnswerQualityScore { get; set; }
+
+        public int AnswerQualityRank { get; set; }
+
+        public double AnswerQualityStars { get; set; }
+
+        public double QuestionQualityScore { get; set; }
+
+        public int QuestionQualityRank { get; set; }
+
+        public double QuestionQualityStars { get; set; }
+
+        public int ActivityLevelScore { get; set; }
+
+        public int ActivityLevelRank { get; set; }
+
+        public double ActivityLevelStars { get; set; }
+
+        public int SociabilityScore { get; set; }
+
+        public int SociabilityRank { get; set; }
+
+        public double SociabilityStars { get; set; }
+
+        public int OverallRating { get; set; }
+
+        public int OverallRatingRank { get; set; }
+
+        public double OverallStars { get; set; }
+
         // complex serialized properties
         public virtual ActionEntry[] ActionEntriesThisPeriod
         {

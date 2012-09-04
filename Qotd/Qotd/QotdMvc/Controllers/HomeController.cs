@@ -15,7 +15,8 @@ namespace QotdMvc.Controllers
         private const int DEFAULT_TAKE = 20;
         private const int DEFAULT_TAKE_LEADERBOARD = 50;
         private const int DEFAULT_TAKE_NOTIFICATIONS = 20;
-        private const int DEFAULT_TAKE_ACTIVITIES = 50;
+        private const int DEFAULT_TAKE_ACTIVITIES = 40;
+        private const int DEFAULT_SEARCH_TAKE = 5;
 
         public ActionResult AddFollow(Guid userId)
         {
@@ -133,6 +134,35 @@ namespace QotdMvc.Controllers
             return View();
         }
 
+        public ActionResult SearchItem(Guid id, SearchItemType type)
+        {
+            switch (type)
+            {
+                case SearchItemType.User:
+                    return RedirectToAction("User", "Home", new { userId = id });
+                case SearchItemType.AnswerContent:
+                    return RedirectToAction("Answer", "Home", new { answerId = id, ajax = false, pageUrl = Url.Action("Index", "Home"), pageName = "Home" });
+                case SearchItemType.AnswerTags:
+                    return RedirectToAction("Answer", "Home", new { answerId = id, ajax = false, pageUrl = Url.Action("Index", "Home"), pageName = "Home" });
+                case SearchItemType.QuestionTags:
+                    return RedirectToAction("Question", "Home", new { questionId = id, ajax = false, pageUrl = Url.Action("Index", "Home"), pageName = "Home" });
+                case SearchItemType.QuestionContent:
+                    return RedirectToAction("Question", "Home", new { questionId = id, ajax = false, pageUrl = Url.Action("Index", "Home"), pageName = "Home" });
+            }
+            throw new System.NotImplementedException();
+        }
+
+        public ActionResult Search(string search, bool ajax = true)
+        {
+            if (ajax)
+            {
+                var results = DataProvider.Search(search, DEFAULT_SEARCH_TAKE);
+
+                return View(results);
+            }
+            else throw new System.NotImplementedException();
+        }
+
         //
         // GET: /Home/
         public ActionResult Index()
@@ -144,22 +174,107 @@ namespace QotdMvc.Controllers
             return View();
         }
 
-        public ActionResult Comments(Guid answerId)
+        public ActionResult UserScores(Guid userId, ScoreEntryType type, long? number = null, int take = DEFAULT_TAKE_ACTIVITIES)
         {
-            ViewBag.Comments = DataProvider.GetComments(answerId, UserEntity.Id);
+            var user = DataProvider.GetUserById(userId);
+            int count = 0;
+            var entries = DataProvider.GetScoreEntries(type, userId, number, take, out count);
+            ViewBag.ScoreEntries = entries;
+            ViewBag.Type = type;
+            ViewBag.TargetUserId = userId;
+            ViewBag.Take = take;
+            if (entries != null && entries.Length > 0)
+                ViewBag.Number = entries[entries.Length - 1].Activity.Activity.ActivityNumber;
+            switch (type)
+            {
+                case ScoreEntryType.AnswerVotes:
+                    ViewBag.Points = user.User.AnswerQualityScore;
+                    ViewBag.Rank = user.User.AnswerQualityRank;
+                    ViewBag.Stars = user.User.AnswerQualityStars;
+                    break;
+                case ScoreEntryType.QuestionVotes:
+                    ViewBag.Points = user.User.QuestionQualityScore;
+                    ViewBag.Rank = user.User.QuestionQualityRank;
+                    ViewBag.Stars = user.User.QuestionQualityStars;
+                    break;
+                case ScoreEntryType.ActivityLevel:
+                    ViewBag.Points = user.User.ActivityLevelScore;
+                    ViewBag.Rank = user.User.ActivityLevelRank;
+                    ViewBag.Stars = user.User.ActivityLevelStars;
+                    break;
+                case ScoreEntryType.Sociability:
+                    ViewBag.Points = user.User.SociabilityScore;
+                    ViewBag.Rank = user.User.SociabilityRank;
+                    ViewBag.Stars = user.User.SociabilityStars;
+                    break;
+                case ScoreEntryType.Overall:
+                    ViewBag.Points = user.User.OverallRating;
+                    ViewBag.Rank = user.User.OverallRatingRank;
+                    ViewBag.Star = user.User.OverallStars;
+                    break;
+            }
             return View();
         }
 
-        public ActionResult Activities()
+        public ActionResult UserScoresTab(Guid userId)
         {
-            var activities = DataProvider.GetActivities(null, DEFAULT_TAKE_ACTIVITIES);
+            ViewBag.TargetUserId = userId;
+            ViewBag.TargetUser = DataProvider.GetUserById(userId);
+            return View();
+        }
+
+        public ActionResult ReportForm()
+        {
+            return View();
+        }
+
+        public ActionResult ReportAnswer(Guid answerId)
+        {
+            DataProvider.MarkAdded(
+                new ContentReport()
+                {
+                    CreatedOn = Qotd.Utils.Config.Now,
+                    User = UserEntity,
+                    AnswerId = answerId
+                });
+            DataProvider.SaveChanges();
+            return View("ReportSuccess");
+        }
+
+        public ActionResult ReportQuestion(Guid questionId)
+        {
+            DataProvider.MarkAdded(
+                new ContentReport()
+                {
+                    CreatedOn = Qotd.Utils.Config.Now,
+                    User = UserEntity,
+                    QuestionId = questionId
+                });
+            DataProvider.SaveChanges();
+            return View("ReportSuccess");
+        }
+
+        public ActionResult Comments(Guid answerId)
+        {
+            ViewBag.Comments = DataProvider.GetComments(answerId, UserEntity == null ? (Guid?)null : UserEntity.Id);
+            return View();
+        }
+
+        public ActionResult Activities(long? number = null, int take = DEFAULT_TAKE_ACTIVITIES)
+        {
+            var activities = DataProvider.GetActivities(number, take);
             ViewBag.Activities = activities;
+            ViewBag.Date = null;
+            if (activities.Length > 0)
+                ViewBag.Number = activities[0].Activity.ActivityNumber;
+            else
+                ViewBag.Number = number;
             return View();
         }
 
         public ActionResult Answer(Guid answerId, bool ajax = true, string pageUrl = null, string pageName = null)
         {
-            var answer = DataProvider.GetAnswerById(answerId, UserEntity.Id);
+            AnswerPO answer = DataProvider.GetAnswerById(answerId, UserEntity == null ? (Guid?) null : UserEntity.Id);
             if (ajax)
                 return View("Answer", answer);
             else
@@ -174,7 +289,7 @@ namespace QotdMvc.Controllers
 
         public ActionResult Question(Guid questionId, bool ajax = true, string pageUrl = null, string pageName = null)
         {
-            var question = DataProvider.GetQuestionById(questionId, UserEntity.Id);
+            var question = DataProvider.GetQuestionById(questionId, UserEntity == null ? (Guid?)null : UserEntity.Id);
             if (ajax)
                 return View("Question", question);
             else
@@ -311,36 +426,37 @@ namespace QotdMvc.Controllers
 
         public ActionResult LeaderboardTab()
         {
-            int count;
-            LeaderboardPO leaderboard;
-            if (UserEntity == null)
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(0, DEFAULT_TAKE_LEADERBOARD, out count);
-            else
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, 0, DEFAULT_TAKE_LEADERBOARD, out count);
-            ViewBag.Leaderboard = leaderboard;
+            return View();
+        }
+
+        public ActionResult Leaderboard(ScoreEntryType type)
+        {
+
             return View();
         }
 
         public ActionResult LeaderboardOverall(int skip = 0, int take = DEFAULT_TAKE_LEADERBOARD)
         {
-            int count;
-            LeaderboardPO leaderboard;
-            if (UserEntity == null)
-                leaderboard = DataProvider.GetLeaderboard(skip, DEFAULT_TAKE_LEADERBOARD, out count);
-            else
-                leaderboard = DataProvider.GetLeaderboard(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD, out count);
-            return View("Leaderboard", leaderboard);
+            //int count;
+            //LeaderboardPO leaderboard;
+            //if (UserEntity == null)
+            //    leaderboard = DataProvider.GetLeaderboard(skip, DEFAULT_TAKE_LEADERBOARD, out count);
+            //else
+            //    leaderboard = DataProvider.GetLeaderboard(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD, out count);
+            //return View("Leaderboard", leaderboard);
+            throw new System.NotImplementedException();
         }
 
         public ActionResult LeaderboardThisPeriod(int skip = 0, int take = DEFAULT_TAKE_LEADERBOARD)
         {
-            int count;
-            LeaderboardPO leaderboard;
-            if (UserEntity == null)
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(skip, DEFAULT_TAKE_LEADERBOARD, out count);
-            else
-                leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD, out count);
-            return View("Leaderboard", leaderboard);
+            //int count;
+            //LeaderboardPO leaderboard;
+            //if (UserEntity == null)
+            //    leaderboard = DataProvider.GetLeaderboardThisPeriod(skip, DEFAULT_TAKE_LEADERBOARD, out count);
+            //else
+            //    leaderboard = DataProvider.GetLeaderboardThisPeriod(UserEntity.Id, skip, DEFAULT_TAKE_LEADERBOARD, out count);
+            //return View("Leaderboard", leaderboard);
+            throw new System.NotImplementedException();
         }
 
         public ActionResult FollowList(Guid userId)

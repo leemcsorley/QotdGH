@@ -101,6 +101,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Stars.cs" />
     <Compile Include="Models\TagBoxes.cs" />
     <Compile Include="Models\UserBoxes.cs" />
     <Compile Include="Service\IQotdService.cs" />
@@ -125,6 +126,17 @@
     <Content Include="Content\bootstrap\less\tests\css-tests.html" />
     <Content Include="Content\bootstrap\less\tests\forms.html" />
     <Content Include="Content\bootstrap\less\tests\navbar.html" />
+    <Content Include="Content\Images\GitHubSetup.exe" />
+    <Content Include="Content\Images\pic1.jpg" />
+    <Content Include="Content\Images\pic10.jpg" />
+    <Content Include="Content\Images\pic2.jpg" />
+    <Content Include="Content\Images\pic3.jpg" />
+    <Content Include="Content\Images\pic4.jpg" />
+    <Content Include="Content\Images\pic5.jpg" />
+    <Content Include="Content\Images\pic6.jpg" />
+    <Content Include="Content\Images\pic7.jpg" />
+    <Content Include="Content\Images\pic8.jpg" />
+    <Content Include="Content\Images\pic9.jpg" />
     <Content Include="Content\redactor\css\docstyle.css" />
     <Content Include="Content\redactor\css\redactor.css" />
     <Content Include="Content\redactor\css\style.css" />
@@ -349,6 +361,7 @@
     <None Include="Content\bootstrap\less\utilities.less" />
     <None Include="Content\bootstrap\less\variables.less" />
     <None Include="Content\bootstrap\less\wells.less" />
+    <None Include="Content\Images\Hong Rong.doc" />
     <None Include="Content\Site.less" />
     <Content Include="Views\Shared\UserStats.cshtml" />
     <Content Include="Views\Shared\UserTile.cshtml" />
@@ -358,6 +371,16 @@
     <Content Include="Views\Home\ActivitiesFull.cshtml" />
     <Content Include="Views\Home\ActivityFull.cshtml" />
     <Content Include="Views\Shared\AnswerLink.cshtml" />
+    <Content Include="Views\Home\Search.cshtml" />
+    <Content Include="Views\Home\Account.cshtml" />
+    <Content Include="Views\Home\ReportSuccess.cshtml" />
+    <Content Include="Views\Shared\ReportForm.cshtml" />
+    <Content Include="Views\Shared\UserRatings.cshtml" />
+    <Content Include="Views\Shared\Stars.cshtml" />
+    <Content Include="Views\Home\UserScoresTab.cshtml" />
+    <Content Include="Views\Home\UserScores.cshtml" />
+    <Content Include="Views\Home\ScoreEntry.cshtml" />
+    <Content Include="Views\Home\OverallRating.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

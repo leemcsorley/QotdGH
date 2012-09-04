@@ -34,7 +34,7 @@ namespace Qotd.Data
 
         bool HasUserPickedSide(Guid userId, Guid questionId);
 
-        AnswerPO GetAnswerById(Guid answerId, Guid userId);
+        AnswerPO GetAnswerById(Guid answerId, Guid? userId);
 
         AnswerPO[] GetAnswersFollowed(Guid userId, Guid questionId, FollowSource source, int skip, int take, out int count);
 
@@ -56,11 +56,11 @@ namespace Qotd.Data
 
         QuestionPO[] GetQuestionsFollowed(Guid userId, FollowSource source, int skip, int take, out int count);
 
-        QuestionPO GetQuestionById(Guid questionId, Guid userId);
+        QuestionPO GetQuestionById(Guid questionId, Guid? userId);
 
         Answer GetAnswerById(Guid answerId);
 
-        CommentPO[] GetComments(Guid answerId, Guid userId);
+        CommentPO[] GetComments(Guid answerId, Guid? userId);
 
         CommentPO GetCommentById(Guid commentId, Guid userId);
 
@@ -70,7 +70,7 @@ namespace Qotd.Data
 
         void VoteQuestion(Guid questionId, User user, int voteDelta);
 
-        ActivityPO[] GetActivities(DateTime? date, int take);
+        ActivityPO[] GetActivities(long? date, int take);
 
         LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take, out int count);
 
@@ -96,10 +96,12 @@ namespace Qotd.Data
 
         Notification[] GetNotifications(Guid userId, int skip, int take, out int count);
 
-        SearchResultPO[] Search(string search, int skip, int take);
+        SearchResultPO[] Search(string search, int take);
 
         Tag[] GetTags();
 
         Tag[] GetTags(string startsWith);
+
+        ScoreEntryPO[] GetScoreEntries(ScoreEntryType type, Guid userId, long? number, int take, out int count);
     }
 }

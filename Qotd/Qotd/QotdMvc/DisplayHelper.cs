@@ -7,6 +7,7 @@ using Qotd.Utils;
 using System.Text;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
+using Qotd.PresentationObjects;
 
 namespace QotdMvc
 {
@@ -16,8 +17,76 @@ namespace QotdMvc
         Question
     }
 
+    public enum SearchGroupType
+    {
+        User,
+        Answer,
+        Question
+    }
+
     public static class DisplayHelper
     {
+        public static string RatingHelper(double rating)
+        {
+            int r = (int)rating;
+            switch (r)
+            {
+                case 1:
+                    return "<span class=\"color-low\">Bottom 10%</span>";
+                case 2:
+                    return "<span class=\"color-low\">Bottom 20%</span>";
+                case 3:
+                    return "<span class=\"color-low\">Bottom 30%</span>";
+                case 4:
+                    return "<span class=\"color-med\">Bottom 40%</span>";
+                case 5:
+                    return "<span class=\"color-med\">Bottom 50%</span>";
+                case 6:
+                    return "<span class=\"color-med\">Top 50%</span>";
+                case 7:
+                    return "<span class=\"color-med\">Top 40%</span>";
+                case 8:
+                    return "<span class=\"color-high\">Top 30%</span>";
+                case 9:
+                    return "<span class=\"color-high\">Top 20%</span>";
+                case 10:
+                    return "<span class=\"color-high\">Top 10%</span>";
+            }
+            return "";
+        }
+
+        public static SearchGroupType GetGroupType(SearchItemType type)
+        {
+            switch (type)
+            {
+                case SearchItemType.User:
+                    return SearchGroupType.User;
+                case SearchItemType.AnswerTags:
+                    return SearchGroupType.Answer;
+                case SearchItemType.AnswerContent:
+                    return SearchGroupType.Answer;
+                case SearchItemType.QuestionTags:
+                    return SearchGroupType.Question;
+                case SearchItemType.QuestionContent:
+                    return SearchGroupType.Question;
+            }
+            throw new System.NotImplementedException();
+        }
+
+        public static string SearchItemTypeString(SearchGroupType type)
+        {
+            switch (type)
+            {
+                case SearchGroupType.User:
+                    return "Users";
+                case SearchGroupType.Answer:
+                    return "Answers";
+                case SearchGroupType.Question:
+                    return "Questions";
+            }
+            return "";
+        }
+
         public static string UserString(Notification notification)
         {
             StringBuilder sb = new StringBuilder();

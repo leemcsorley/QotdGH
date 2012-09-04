@@ -11,38 +11,50 @@
     <div class="social-content-main-sml">
         <!-- Content -->
         <div>
-            <span><b><a href="#">@Model.UserDisplayName</a></b></span>
+            <span><b><a href="@Url.Action("User", "Home", new { userId = Model.Activity.SourceUserId })">@Model.UserDisplayName</a></b></span>
             @{
                 switch (Model.Activity.ActivityType)
                 {
                     case Qotd.Entities.ActivityType.PostQuestion:
-                        <text><span>&nbsp;posted a question "@Html.Partial("QuestionLink", Model.Question)"</span>
+                        <text><span>&nbsp;posted a question "@Html.Partial("QuestionLink", new Qotd.PresentationObjects.QuestionPO() { Question = new Qotd.Entities.Question() { Id = Model.Activity.QuestionId.Value, MainText = Model.Activity.Text } })"</span>
                         </text>
                         break;
-                    case Qotd.Entities.ActivityType.VoteAnswer:
-                        <text><span>&nbsp;voted on answer "@Html.Partial("AnswerLink", Model.Answer)"</span>
+                        case Qotd.Entities.ActivityType.PostAnswer:
+                        <text>&nbsp;posted an answer "@Html.Partial("AnswerLink", new Qotd.PresentationObjects.AnswerPO() { Answer = new Qotd.Entities.Answer() { Id = Model.Activity.AnswerId.Value, Title = Model.Activity.Text } })"
                         </text>
-                                                                                                            break;
-                    case Qotd.Entities.ActivityType.VoteQuestion:
-                        <text><span>&nbsp;voted on question "@Html.Partial("QuestionLink", Model.Question)"</span>
+                                                 break;
+                        case Qotd.Entities.ActivityType.VoteAnswer:
+                        <text><span>&nbsp;voted on answer "@Html.Partial("AnswerLink", new Qotd.PresentationObjects.AnswerPO() { Answer = new Qotd.Entities.Answer() { Id = Model.Activity.AnswerId.Value, Title = Model.Activity.Text } })"</span>
                         </text>
-                                                    break;
-                    case Qotd.Entities.ActivityType.PostComment:
-                        <text><span>&nbsp;posted a comment "@Model.Activity.Text" on answer "@Html.Partial("AnswerLink", Model.Answer)"</span>
+                                                      break;
+                        case Qotd.Entities.ActivityType.VoteQuestion:
+                        <text><span>&nbsp;voted on question "@Html.Partial("QuestionLink", new Qotd.PresentationObjects.QuestionPO() { Question = new Qotd.Entities.Question() { Id = Model.Activity.QuestionId.Value, MainText = Model.Activity.Text } })"</span>
+                        </text>
+                                                        break;
+                        case Qotd.Entities.ActivityType.PostComment:
+                        <text><span>&nbsp;posted a comment "@Model.Activity.Text" on answer "@Html.Partial("AnswerLink", new Qotd.PresentationObjects.AnswerPO() { Answer = new Qotd.Entities.Answer() { Id = Model.Activity.AnswerId.Value, Title = Model.Activity.Text2 } })"</span>
                         </text>
                                                                                         break;
-                    case Qotd.Entities.ActivityType.PostAnswer:
-                        <text>&nbsp;posted an answer
+                        case Qotd.Entities.ActivityType.FollowUser:
+                        <text><span>&nbsp;favourited user <a href="@Url.Action("User", "Home", new { userId = Model.Activity.TargetUserId })">@Model.Activity.denorm_TargetUser_DisplayName</a></span>
                         </text>
-                                                                                                            break;
+                        break;
+                        case Qotd.Entities.ActivityType.ReceiveFollow:
+                        <text><span>&nbsp;is now a favourite of user <a href="@Url.Action("User", "Home", new { userId = Model.Activity.TargetUserId })">@Model.Activity.denorm_TargetUser_DisplayName</a></span>
+                        </text>
+                        break;
+
                 }
             }
         </div> 
         <!-- Footer -->
-        @*<div class="social-content-main-sml">
+        @if (Model.DisplayFooter)
+        {
+        <div class="social-content-main-sml">
             <div class="social-content-ctrl">
                 <i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Activity.Date.ToString("s")"></time>
             </div>
-        </div>*@
+        </div>
+        }
     </div>
 </div>

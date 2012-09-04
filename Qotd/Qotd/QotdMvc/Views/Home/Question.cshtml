@@ -64,7 +64,7 @@
             <div class="social-content-ctrl"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Question.CreatedOn.ToString("s")"></time></div>
             @if (ViewBag.IsAuthenticated && ViewBag.User != null)
             {
-                 <div class="social-content-ctrl"><a href="#"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
+                 <div class="social-content-ctrl"><a href="#report-modal" class="report-link" role="button" data-toggle="modal" data-url="@Url.Action("ReportQuestion", "Home", new { questionId = Model.Question.Id })"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
             }
         </div>
     </div>

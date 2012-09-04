@@ -1,0 +1,27 @@
+﻿<div class="well">
+    <table class="rating-summary">
+        <tr>
+            <td>Total Points:</td>
+            <td class="number"><b>@ViewBag.Points</b></td>
+            <td class="center"></td>
+        </tr>
+        <tr>
+            <td>Rank:</td>
+            <td class="number"><b>@ViewBag.Rank</b></td>
+            <td class="center"><b>@Html.Raw(QotdMvc.DisplayHelper.RatingHelper(ViewBag.Stars))</b></td>
+        </tr>
+    </table>
+</div>
+@foreach (Qotd.PresentationObjects.ScoreEntryPO entry in ViewBag.ScoreEntries)
+{
+    @Html.Partial("ScoreEntry", entry)
+}
+@if (ViewBag.ScoreEntries.Length > 0)
+{
+<div class="ajax-container">
+    <div style="overflow: hidden">
+        <a href="@Url.Action("UserScores", "Home", new { number = ViewBag.Number, take = ViewBag.Take, userId = ViewBag.TargetUserId, type = ViewBag.Type })" class="ajax-link"><button class="btn btn-small btn-primary" type="submit">
+            <i class="icon-chevron-down"></i>&nbsp;&nbsp;See More</button></a>
+    </div>
+</div>
+}

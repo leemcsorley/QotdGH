@@ -33,6 +33,8 @@ namespace Qotd.Entities
     {
         public virtual DateTime Date { get; set; }
 
+        public virtual long ActivityNumber { get; set; }
+
         public virtual Guid SourceUserId { get; set; }
 
         public virtual User SourceUser { get; set; }

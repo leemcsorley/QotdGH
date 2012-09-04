@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QotdConsole", "..\QotdConso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QotdDb", "QotdDb\QotdDb.csproj", "{BCD0BE90-5A9D-49B5-BB94-AD1A02D0D594}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QotdRealTimeTester", "..\QotdRealTimeTester\QotdRealTimeTester.csproj", "{961C0155-90D0-4927-88A0-2E50EB197F2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,16 @@ Global
 		{BCD0BE90-5A9D-49B5-BB94-AD1A02D0D594}.Release|Mixed Platforms.Build.0 = Release|x86
 		{BCD0BE90-5A9D-49B5-BB94-AD1A02D0D594}.Release|x86.ActiveCfg = Release|x86
 		{BCD0BE90-5A9D-49B5-BB94-AD1A02D0D594}.Release|x86.Build.0 = Release|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Debug|x86.ActiveCfg = Debug|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Debug|x86.Build.0 = Debug|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Release|Any CPU.ActiveCfg = Release|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Release|Mixed Platforms.Build.0 = Release|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Release|x86.ActiveCfg = Release|x86
+		{961C0155-90D0-4927-88A0-2E50EB197F2F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,13 @@
+﻿@model QotdMvc.Models.Stars
+<div class="fl cr cl stars-holder @(Model.Invert ? "invert" : "")">
+    <div class="stars-header">@Model.Heading</div>
+    <div class="stars-container">
+    @for (int i = 1; i <= Model.NumStars; i++)
+    {
+        <div class="star-holder">
+            <div><i class="@Model.GetIconClass(i)"></i></div>
+        </div>
+    }
+    </div>
+</div>
+

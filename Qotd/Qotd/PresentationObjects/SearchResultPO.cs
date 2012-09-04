@@ -16,5 +16,12 @@ namespace Qotd.PresentationObjects
 
     public class SearchResultPO
     {
+        public Guid Id { get; set; }
+
+        public SearchItemType Type { get; set; }
+
+        public string DisplayText { get; set; }
+
+        public string ImgUrl { get; set; }
     }
 }

@@ -4,42 +4,32 @@
 }
 <div class="row">
     <div class="span12">
-        <div class="well" style="overflow: hidden">
-            <div style="float: left; clear: both; width: 60px; margin-bottom: 8px">
-                <div style="font-size: 55px; position: relative; top: 12px; padding-left: 6px;"><b>#</b></div>
-            </div>
-            <div style="float: left; border-right: 1px solid #dddddd; height: 50px; margin-right: 10px;">&nbsp;</div>
-            <div style="float: left;">
-                <div><h3>@ViewBag.Tag.Tag.Value</h3></div>
-            </div>
-            <div style="float: right; padding-top: 0px;">
+        <div class="well fill">
+            <div class="fl cl cr"><p class="large-hash">#</p></div>
+            <div class="fl vline">&nbsp;</div>
+            <div class="fl"><h3>@ViewBag.Tag.Tag.Value</h3></div>
+            <div class="fr">
                 @if (ViewBag.IsAuthenticated && ViewBag.User != null)
                 {
-                    <div style="float: right;">
+                    <div>
                     @if (ViewBag.Tag.IsFollowedByCurrent)
                     {
-                        <div class="well" style="border: 1px solid #cccccc; padding: 3px 3px; width: 176px; text-align: center;"><i class="icon-ok" style="color: #22dd22"></i> <span style="color: #000000 !important">Is a favourite</span></div>
+                        <div class="favourite-ctrl"><i class="icon-ok color-ok"></i>&nbsp;Is a favourite</div>
                     }
                     else
                     {
-                        <a href="@Url.Action("AddFollowTag", "Home", new { tagId = ViewBag.Tag.Tag.Id })" class="btn" style="width: 160px; margin-bottom: 20px"><i class="icon-star" style="color: #dddd22"></i> <span style="color: #000000 !important">Add as favourite</span></a>
+                        <a href="@Url.Action("AddFollowTag", "Home", new { tagId = ViewBag.Tag.Tag.Id })" class="btn favourite-ctrl"><i class="icon-star color-star"></i>&nbsp;Add as favourite</a>
                     }
                     </div>
                 }
             </div>
-            <div style="float: right; clear: right;">
-                <div style="overflow: hidden; text-align: center; font-weight: bold; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #dddddd;">
-                    Last 4 Weeks
+            <div class="fr cl stat-box-holder">
+                <div class="stat-box-row fill"><p><b>Last 4 Weeks</b></p>
+                    <div class="fill">@Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = false })</div>
                 </div>
-                    <div style="overflow: hidden;">
-                        @Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = false })
-                    </div>
-                <div style="overflow: hidden; text-align: center; font-weight: bold; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #dddddd;">
-                    Overall
+                <div class="stat-box-row fill"><p><b>Overall</b></p>
+                    <div class="fill">@Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = true })</div>
                 </div>
-                    <div style="overflow: hidden;">
-                        @Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = true })
-                    </div>
             </div>
         </div>
 

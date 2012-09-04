@@ -97,12 +97,23 @@ namespace QotdMvc.Controllers
             string actionName = (string)this.RouteData.Values["Action"];
             ViewBag.PageController = controllerName;
             ViewBag.PageAction = actionName;
+            ViewBag.PageFriendlyName = GetPageFriendlyName();
+            ViewBag.PageUrl = GetPageUrl();
+        }
+
+        protected string GetPageUrl()
+        {
+            return HttpContext.Request.RawUrl;
+        }
+
+        protected string GetPageFriendlyName()
+        {
             string n = this.RouteData.Values["Controller"] + "-" + this.RouteData.Values["Action"];
             if (FriendlyPageNames.ContainsKey(n))
-                ViewBag.PageFriendlyName = FriendlyPageNames[n](ViewBag);
+                return FriendlyPageNames[n](ViewBag);
             if (ViewBag.PageFriendlyName == null)
-                ViewBag.PageFriendlyName = "";
-            ViewBag.PageUrl = HttpContext.Request.RawUrl;
+                return "";
+            return "";
         }
 
         protected virtual ActionResult JsonSuccess()

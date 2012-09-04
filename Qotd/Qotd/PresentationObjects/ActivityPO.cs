@@ -24,5 +24,7 @@ namespace Qotd.PresentationObjects
         public AnswerPO Answer { get; set; }
 
         public CommentPO Comment { get; set; }
+
+        public bool DisplayFooter { get; set; }
     }
 }

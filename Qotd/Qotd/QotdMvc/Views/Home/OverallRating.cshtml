@@ -1,0 +1,41 @@
+﻿@model Qotd.PresentationObjects.UserPO
+<div class="well oh">
+    <table class="rating-summary">
+        <tr>
+            <td>Answer Votes Rank:</td>
+            <td class="number"><b>@Model.User.AnswerQualityRank</b></td>
+            <td class="center"><b>@Html.Raw(QotdMvc.DisplayHelper.RatingHelper(Model.User.AnswerQualityStars))</b></td>
+        </tr>
+        <tr>
+            <td>Question Votes Rank:</td>
+            <td class="number"><b>@Model.User.QuestionQualityRank</b></td>
+            <td class="center"><b>@Html.Raw(QotdMvc.DisplayHelper.RatingHelper(Model.User.QuestionQualityStars))</b></td>
+        </tr>
+        <tr>
+            <td>Activity Level Rank:</td>
+            <td class="number"><b>@Model.User.ActivityLevelRank</b></td>
+            <td class="center"><b>@Html.Raw(QotdMvc.DisplayHelper.RatingHelper(Model.User.ActivityLevelStars))</b></td>
+        </tr>
+        <tr>
+            <td>Sociability Rank:</td>
+            <td class="number"><b>@Model.User.SociabilityRank</b></td>
+            <td class="center"><b>@Html.Raw(QotdMvc.DisplayHelper.RatingHelper(Model.User.SociabilityStars))</b></td>
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td>Total:</td>
+            <td class="number"><b>@(Model.User.AnswerQualityRank + Model.User.QuestionQualityRank + Model.User.ActivityLevelRank + Model.User.SociabilityRank)</b></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td><b>Overall Rank:</b></td>
+            <td class="number"><b>@Model.User.OverallRatingRank</b></td>
+            <td class="center"><b>@Html.Raw(QotdMvc.DisplayHelper.RatingHelper(Model.User.OverallStars))</b></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,17 @@
+﻿@model Qotd.PresentationObjects.UserPO
+<div class="fl right-space-lg">
+    @Html.Partial("Stars", new QotdMvc.Models.Stars() { Heading = "Answer Votes", NumStars = 5, IncludeHalf = true, Rating = (int)Model.User.AnswerQualityStars })
+</div>
+<div class="fl right-space-lg">
+    @Html.Partial("Stars", new QotdMvc.Models.Stars() { Heading = "Question Votes", NumStars = 5, IncludeHalf = true, Rating = (int)Model.User.QuestionQualityStars })
+</div>
+<div class="fl right-space-lg">
+    @Html.Partial("Stars", new QotdMvc.Models.Stars() { Heading = "Activity Level", NumStars = 5, IncludeHalf = true, Rating = (int)Model.User.ActivityLevelStars })
+</div>
+<div class="fl right-space-lg">
+    @Html.Partial("Stars", new QotdMvc.Models.Stars() { Heading = "Sociability", NumStars = 5, IncludeHalf = true, Rating = (int)Model.User.SociabilityStars })
+</div>
+<div class="fl right-space-lg">
+    @Html.Partial("Stars", new QotdMvc.Models.Stars() { Heading = "Overall", NumStars = 5, IncludeHalf = true, Rating = (int)Model.User.OverallStars, Invert = true })
+</div>
+

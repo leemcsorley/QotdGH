@@ -71,7 +71,7 @@
         <div class="social-content-ctrl"><i class="icon-time"></i>&nbsp;<time class="timeago" datetime="@Model.Answer.CreatedOn.ToString("s")"></time></div>
         @if (ViewBag.IsAuthenticated && ViewBag.User != null)
         {
-                <div class="social-content-ctrl"><a href="#"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
+                <div class="social-content-ctrl"><a href="#report-modal" class="report-link" role="button" data-toggle="modal" data-url="@Url.Action("ReportAnswer", "Home", new { answerId = Model.Answer.Id })"><i class="icon-warning-sign"></i>&nbsp;Report</a></div>
         }
     </div>
     <!-- Comments footer -->
@@ -93,6 +93,8 @@
         }
     }
     </div>
+    @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+    {
     <!-- Comment input footer -->
         <div class="social-content-main-lrg comment-input @(Model.Comments != null && Model.Comments.Length > 0 ? "" : "hidden")">
             <div class="social-content-left-sml">
@@ -105,6 +107,7 @@
                 </form>
             </div>
         </div>
+    }
     </div>
 </div>
 
