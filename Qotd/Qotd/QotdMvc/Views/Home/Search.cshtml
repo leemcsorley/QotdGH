@@ -1,23 +1,30 @@
 ﻿@model Qotd.PresentationObjects.SearchResultPO[]
 @{
 bool first = true;
-foreach (var srt in Model.GroupBy(s => QotdMvc.DisplayHelper.GetGroupType(s.Type)).OrderBy(s => (int)s.Key))
+if (@Model.Length > 0)
 {
-    <li class="search-result-type">@QotdMvc.DisplayHelper.SearchItemTypeString(srt.Key)</li>
-    foreach (var sr in srt.OrderBy(s => (int)s.Type))
+    foreach (var srt in Model.GroupBy(s => QotdMvc.DisplayHelper.GetGroupType(s.Type)).OrderBy(s => (int)s.Key))
     {
-    <li class="search-result">
-        <div class="social-content-container-sml @(first ? "active" : "")">
-            <div class="social-content-left-sml">
-                <img class="profile-sml" src="@sr.ImgUrl" />
+        <li class="search-result-type">@QotdMvc.DisplayHelper.SearchItemTypeString(srt.Key)</li>
+        foreach (var sr in srt.OrderBy(s => (int)s.Type))
+        {
+        <li class="search-result">
+            <div class="social-content-container-sml @(first ? "active" : "")">
+                <div class="social-content-left-sml">
+                    <img class="profile-sml" src="@sr.ImgUrl" />
+                </div>
+                <div class="social-content-main-sml">
+                    <div>@sr.DisplayText</div>
+                </div>
+                <a href="@Url.Action("SearchItem", "Home", new { id = sr.Id, type = sr.Type })" class="search-result-link" style="display: none"></a>
             </div>
-            <div class="social-content-main-sml">
-                <div>@sr.DisplayText</div>
-            </div>
-            <a href="@Url.Action("SearchItem", "Home", new { id = sr.Id, type = sr.Type })" class="search-result-link" style="display: none"></a>
-        </div>
-    </li>
-        if (first) { first = false; }
+        </li>
+            if (first) { first = false; }
+        }
     }
+    }
+    else
+    {
+    <div class="oh center">- No Search Results -</div>
 }
 }

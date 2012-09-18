@@ -128,6 +128,16 @@
 
 // NOTIFICATIONS
 
+.notification
+{
+	color: @grayDarker;
+}
+
+.notification-unread
+{
+	background-color: @grayLighter;
+}
+
 #notification-icon
 {
 	font-size: 22px;
@@ -458,6 +468,79 @@
 	width: 180px;
 	font-size: 16px;
 	padding: @spaceSml @spaceSml;
+}
+
+// LEADERBOARD
+
+.leaderboard td
+{
+	vertical-align: middle;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.leaderboard-current
+{
+	#gradient > .vertical(@gray, @grayLight);
+}
+
+.leaderboard-current td
+{
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	color: white !important;
+}
+
+.leaderboard-current a
+{
+	color: white !important;
+}
+
+// INFORMATION
+
+.info
+{
+	background-color: @infoBackground;
+}
+
+.info-content
+{
+	background-color: darken(saturate(@infoBackground, 30%), 60%);
+	color: white;
+}
+
+// TAB ICONS
+
+.active .tabicon-blue
+{
+	color: @blue;
+}
+
+.active .tabicon-orange
+{
+	color: @orange;
+}
+
+.active .tabicon-yellow
+{
+	color: @yellow;
+}
+
+.active .tabicon-green
+{
+	color: @green;
+}
+
+.active .tabicon-red
+{
+	color: @red;
+}
+
+.tabicon-blue, .tabicon-orange, .tabicon-yellow, .tabicon-green, .tabicon-red
+{
+	color: @grayLight;
+	font-size: 15px;
+	padding-right: 10px;
 }
 
 // COLORS

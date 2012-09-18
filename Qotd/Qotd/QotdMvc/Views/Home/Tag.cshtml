@@ -24,35 +24,30 @@
                 }
             </div>
             <div class="fr cl stat-box-holder">
+                <div class="fill">@Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = false })</div>
+            </div>
+            @*<div class="fr cl stat-box-holder">
                 <div class="stat-box-row fill"><p><b>Last 4 Weeks</b></p>
                     <div class="fill">@Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = false })</div>
                 </div>
                 <div class="stat-box-row fill"><p><b>Overall</b></p>
                     <div class="fill">@Html.Partial("TagBoxes", new QotdMvc.Models.TagBoxes() { Tag = ViewBag.Tag, Overall = true })</div>
                 </div>
-            </div>
+            </div>*@
         </div>
 
         <div class="tabbable tabs-left">
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a href="#tab1" data-toggle="tab" class="has-tooltip" title="" data-placement="right"><i class="icon-table" style="font-size: 15px; color: Red; padding-right: 10px"></i><b>Statistics</b></a>
-                        </li>
-                        <li>
-                            <a href="#tab2" data-toggle="tab" class="ajax-tab has-tooltip" title="" data-placement="right" rel="@Url.Action("HistoryForTag", "Home", new { tagId = ViewBag.Tag.Tag.Id })"><i class="icon-globe" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>History</b></a>
+                            <a href="#tab2" data-toggle="tab" ><i class="icon-globe" style="font-size: 15px; color: Gray; padding-right: 10px"></i><b>History</b></a>
                         </li>
                     </ul>
                 <div class="tab-content">
                     <div id="alert-box"></div>
-                    <div class="tab-pane active" id="tab1">
-                        
-                    </div>
-                    <div class="tab-pane" id="tab2">
-                        
+                    <div class="tab-pane active" id="tab2">
+                        @Html.Action("HistoryForTag", "Home", new { tagId = ViewBag.Tag.Tag.Id })
                     </div>
                 </div>
             </div>
-
-        
     </div>
 </div>

@@ -505,8 +505,13 @@ update cte
             }
 
             foreach (var n in unread)
+            {
                 n.IsRead = true;
+            }
             SaveChanges();
+
+            foreach (var n in unread)
+                n.IsRead = false;
 
             return nots;
         }
@@ -965,30 +970,294 @@ update cte
                 Av = u.TotalAnswerVotesThisPeriod
             };
 
-        public LeaderboardPO GetLeaderboard(Guid userId, int skip, int take, out int count)
+        public LeaderboardPO GetLeaderboard(Guid userId, ScoreEntryType type, int skip, int take, out int count)
         {
-            count = 0;
-            var us = Users.Where(u => u.OverallRank > 0).OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
-
-            LeaderboardRowPO[] top = us.Select(UserToLeaderboardFunc).ToArray();
+            LeaderboardRowPO[] top = null;
             LeaderboardRowPO[] aroundUser = null;
-            if (!us.Any(u => u.Id == userId))
+            switch (type)
             {
-                int ur = Users.Where(u => u.Id == userId).Select(u => u.OverallRank).Single();
+                case ScoreEntryType.ActivityLevel:
+                    var users1 = Users.Where(u => u.ActivityLevelRank > 0).OrderBy(u => u.ActivityLevelRank)
+                        .Skip(skip).Take(take)
+                        .Select(u => new
+                        {
+                            Score = u.ActivityLevelScore,
+                            Rank = u.ActivityLevelRank,
+                            Stars = u.ActivityLevelStars,
+                            u.DisplayName,
+                            u.ProfileImageUrl,
+                            u.Id
+                        })
+                        .ToArray();
 
-                aroundUser = Users.Where(u => u.OverallRank > (ur - 3) && u.OverallRank < (ur + 3))
-                    .ToArray()
-                    .Select(UserToLeaderboardFunc).ToArray();
+                    top = users1.Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                    if (userId != default(Guid))
+                    {
+                        var ur1 = Users.Where(u => u.Id == userId).Select(u => new { u.Username, u.ActivityLevelRank }).Single();
+                        if ((!top.Any(u => u.User.Id == userId)) && users1.Length > 0 && users1[0].Rank <= ur1.ActivityLevelRank)
+                        {
+                            var top_under1 = Users.Where(u => (u.AnswerQualityRank == ur1.ActivityLevelRank && string.Compare(u.Username, ur1.Username) <= 0) || u.ActivityLevelRank < ur1.ActivityLevelRank)
+                                .OrderByDescending(u => u.ActivityLevelRank).ThenByDescending(u => u.Username)
+                                .Take(4)
+                                .Select(u => new
+                                {
+                                    Score = u.ActivityLevelScore,
+                                    Rank = u.ActivityLevelRank,
+                                    Stars = u.ActivityLevelStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            var top_over1 = Users.Where(u => (u.AnswerQualityRank == ur1.ActivityLevelRank && string.Compare(u.Username, ur1.Username) > 0) || u.ActivityLevelRank > ur1.ActivityLevelRank)
+                                .OrderBy(u => u.ActivityLevelRank).ThenBy(u => u.Id)
+                                .Take(3)
+                                .Select(u => new
+                                {
+                                    Score = u.ActivityLevelScore,
+                                    Rank = u.ActivityLevelRank,
+                                    Stars = u.ActivityLevelStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            aroundUser = top_under1.Concat(top_over1).OrderBy(u => u.Rank)
+                                .Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                        }
+                    }
+                    break;
+                case ScoreEntryType.AnswerVotes:
+                    var users2 = Users.Where(u => u.AnswerQualityRank > 0).OrderBy(u => u.AnswerQualityRank)
+                        .Skip(skip).Take(take)
+                        .Select(u => new
+                        {
+                            Score = u.AnswerQualityScore,
+                            Rank = u.AnswerQualityRank,
+                            Stars = u.AnswerQualityStars,
+                            u.DisplayName,
+                            u.ProfileImageUrl,
+                            u.Id
+                        })
+                        .ToArray();
+                    top = users2.Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                    if (userId != default(Guid))
+                    {
+                        var ur2 = Users.Where(u => u.Id == userId).Select(u => new { u.Username, u.AnswerQualityRank }).Single();
+                        if (userId != default(Guid) && (!top.Any(u => u.User.Id == userId)) && users2.Length > 0 && users2[0].Rank <= ur2.AnswerQualityRank)
+                        {
+                            var top_under2 = Users.Where(u => (u.AnswerQualityRank == ur2.AnswerQualityRank && string.Compare(u.Username, ur2.Username) <= 0) || u.AnswerQualityRank < ur2.AnswerQualityRank)
+                                .OrderByDescending(u => u.AnswerQualityRank).ThenByDescending(u => u.Username)
+                                .Take(4)
+                                .Select(u => new
+                                {
+                                    Score = u.AnswerQualityScore,
+                                    Rank = u.AnswerQualityRank,
+                                    Stars = u.AnswerQualityStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            var top_over2 = Users.Where(u => (u.AnswerQualityRank == ur2.AnswerQualityRank && string.Compare(u.Username, ur2.Username) > 0) || u.AnswerQualityRank > ur2.AnswerQualityRank)
+                                .OrderBy(u => u.AnswerQualityRank).ThenBy(u => u.Username)
+                                .Take(3)
+                                .Select(u => new
+                                {
+                                    Score = u.AnswerQualityScore,
+                                    Rank = u.AnswerQualityRank,
+                                    Stars = u.AnswerQualityStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            aroundUser = top_under2.Concat(top_over2).OrderBy(u => u.Rank)
+                                .Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                        }
+                    }
+                    break;
+                case ScoreEntryType.Overall:
+                    var users3 = Users.Where(u => u.OverallRatingRank > 0).OrderBy(u => u.OverallRatingRank)
+                        .Skip(skip).Take(take)
+                        .Select(u => new
+                        {
+                            Score = u.OverallRating,
+                            Rank = u.OverallRatingRank,
+                            Stars = u.OverallStars,
+                            u.DisplayName,
+                            u.ProfileImageUrl,
+                            u.Id
+                        })
+                        .ToArray();
+                    top = users3.Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                    if (userId != default(Guid))
+                    {
+                        var ur3 = Users.Where(u => u.Id == userId).Select(u => new { u.Username, u.OverallRatingRank }).Single();
+                        if (userId != default(Guid) && (!top.Any(u => u.User.Id == userId)) && users3.Length > 0 && users3[0].Rank <= ur3.OverallRatingRank)
+                        {
+                            var top_under3 = Users.Where(u => (u.OverallRatingRank == ur3.OverallRatingRank && string.Compare(u.Username, ur3.Username) <= 0) || u.OverallRatingRank < ur3.OverallRatingRank)
+                                .OrderByDescending(u => u.OverallRatingRank).ThenByDescending(u => u.Username)
+                                .Take(4)
+                                .Select(u => new
+                                {
+                                    Score = u.OverallRating,
+                                    Rank = u.OverallRatingRank,
+                                    Stars = u.OverallStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            var top_over3 = Users.Where(u =>(u.OverallRatingRank == ur3.OverallRatingRank && string.Compare(u.Username, ur3.Username) > 0) || u.OverallRatingRank > ur3.OverallRatingRank)
+                                .OrderBy(u => u.OverallRatingRank).ThenBy(u => u.Username)
+                                .Take(3)
+                                .Select(u => new
+                                {
+                                    Score = u.OverallRating,
+                                    Rank = u.OverallRatingRank,
+                                    Stars = u.OverallStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            aroundUser = top_under3.Concat(top_over3).OrderBy(u => u.Rank)
+                                .Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                        }
+                    }
+                    break;
+                case ScoreEntryType.QuestionVotes:
+                    var users4 = Users.Where(u => u.QuestionQualityRank > 0).OrderBy(u => u.QuestionQualityRank)
+                        .Skip(skip).Take(take)
+                        .Select(u => new
+                        {
+                            Score = u.QuestionQualityScore,
+                            Rank = u.QuestionQualityRank,
+                            Stars = u.QuestionQualityStars,
+                            u.DisplayName,
+                            u.ProfileImageUrl,
+                            u.Id
+                        })
+                        .ToArray();
+                    top = users4.Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                    if (userId != default(Guid))
+                    {
+                        var ur4 = Users.Where(u => u.Id == userId).Select(u => new { u.Username, u.QuestionQualityRank }).Single();
+                        if (userId != default(Guid) && (!top.Any(u => u.User.Id == userId)) && users4.Length > 0 && users4[0].Rank <= ur4.QuestionQualityRank)
+                        {
+                            var top_under4 = Users.Where(u => (u.QuestionQualityRank == ur4.QuestionQualityRank && string.Compare(u.Username, ur4.Username) <= 0) || u.QuestionQualityRank < ur4.QuestionQualityRank)
+                                .OrderByDescending(u => u.QuestionQualityRank).ThenByDescending(u => u.Username)
+                                .Take(4)
+                                .Select(u => new
+                                {
+                                    Score = u.QuestionQualityScore,
+                                    Rank = u.QuestionQualityRank,
+                                    Stars = u.QuestionQualityStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            var top_over4 = Users.Where(u => (u.QuestionQualityRank == ur4.QuestionQualityRank && string.Compare(u.Username, ur4.Username) > 0) || u.QuestionQualityRank > ur4.QuestionQualityRank)
+                                .OrderBy(u => u.QuestionQualityRank).ThenBy(u => u.Username)
+                                .Take(3)
+                                .Select(u => new
+                                {
+                                    Score = u.QuestionQualityScore,
+                                    Rank = u.QuestionQualityRank,
+                                    Stars = u.QuestionQualityStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            aroundUser = top_under4.Concat(top_over4).OrderBy(u => u.Rank)
+                                .Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                        }
+                    }
+                    break;
+                case ScoreEntryType.Sociability:
+                    var users5 = Users.Where(u => u.SociabilityRank > 0).OrderBy(u => u.SociabilityRank)
+                        .Skip(skip).Take(take)
+                        .Select(u => new
+                        {
+                            Score = u.SociabilityScore,
+                            Rank = u.SociabilityRank,
+                            Stars = u.SociabilityStars,
+                            u.DisplayName,
+                            u.ProfileImageUrl,
+                            u.Id
+                        })
+                        .ToArray();
+                    top = users5.Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                    if (userId != default(Guid))
+                    {
+                        var ur5 = Users.Where(u => u.Id == userId).Select(u => new { u.Username, u.SociabilityRank }).Single();
+                        if (userId != default(Guid) && (!top.Any(u => u.User.Id == userId)) && users5.Length > 0 && users5[0].Rank <= ur5.SociabilityRank)
+                        {
+                            var top_under5 = Users.Where(u => (u.SociabilityRank == ur5.SociabilityRank && string.Compare(u.Username, ur5.Username) <= 0) || u.SociabilityRank < ur5.SociabilityRank)
+                                .OrderByDescending(u => u.SociabilityRank).ThenByDescending(u => u.Username)
+                                .Take(4)
+                                .Select(u => new
+                                {
+                                    Score = u.SociabilityScore,
+                                    Rank = u.SociabilityRank,
+                                    Stars = u.SociabilityStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            var top_over5 = Users.Where(u => (u.SociabilityRank == ur5.SociabilityRank && string.Compare(u.Username, ur5.Username) > 0) || u.SociabilityRank > ur5.SociabilityRank)
+                                .OrderBy(u => u.SociabilityRank).ThenBy(u => u.Username)
+                                .Take(3)
+                                .Select(u => new
+                                {
+                                    Score = u.SociabilityScore,
+                                    Rank = u.SociabilityRank,
+                                    Stars = u.SociabilityStars,
+                                    u.DisplayName,
+                                    u.ProfileImageUrl,
+                                    u.Id
+                                })
+                            .ToArray();
+                            aroundUser = top_under5.Concat(top_over5).OrderBy(u => u.Rank)
+                                .Select(u => new LeaderboardRowPO() { User = new User() { Id = u.Id, DisplayName = u.DisplayName, ProfileImageUrl = u.ProfileImageUrl }, Score = (int)u.Score, Rank = u.Rank, Stars = (int)u.Stars }).ToArray();
+                        }
+                    }
+                    break;
+            }
+            count = 0;
+            if (aroundUser != null)
+            {
+                foreach (var u in aroundUser)
+                    if (u.User.Id == userId)
+                        u.IsCurrentUser = true;
+            }
+            if (top != null)
+            {
+                foreach (var u in top)
+                    if (u.User.Id == userId)
+                        u.IsCurrentUser = true;
             }
             return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
+            //LeaderboardRowPO[] top = us.Select(UserToLeaderboardFunc).ToArray();
+            //LeaderboardRowPO[] aroundUser = null;
+            //if (!us.Any(u => u.Id == userId))
+            //{
+            //    int ur = Users.Where(u => u.Id == userId).Select(u => u.OverallRank).Single();
+
+            //    aroundUser = Users.Where(u => u.OverallRank > (ur - 3) && u.OverallRank < (ur + 3))
+            //        .ToArray()
+            //        .Select(UserToLeaderboardFunc).ToArray();
+            //}
+            //return new LeaderboardPO() { Top = top, AroundUser = aroundUser };
         }
 
-        public LeaderboardPO GetLeaderboard(int skip, int take, out int count)
+        public LeaderboardPO GetLeaderboard(ScoreEntryType type, int skip, int take, out int count)
         {
-            count = 0;
-            var us = Users.Where(u => u.OverallRank > 0).OrderBy(u => u.OverallRank).Skip(skip).Take(take).ToArray();
-
-            return new LeaderboardPO() { Top = us.Select(UserToLeaderboardFunc).ToArray() };
+            return GetLeaderboard(default(Guid), type, skip, take, out count);
         }
 
         public LeaderboardPO GetLeaderboardThisPeriod(int skip, int take, out int count)
@@ -1215,9 +1484,9 @@ update cte
             return Tags.ToArray();
         }
 
-        public Tag[] GetTags(string startsWith)
+        public Tag[] GetTags(string startsWith, Guid userId)
         {
-            return Tags.Where(t => t.Value.StartsWith(startsWith)).ToArray();
+            return Tags.Where(t => t.Value.StartsWith(startsWith) && (t.Approved || t.UserId == userId)).ToArray();
         }
 
         #endregion

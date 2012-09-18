@@ -18,7 +18,7 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="overall">
-            @Html.Partial("Leaderboard", (Qotd.PresentationObjects.LeaderboardPO)ViewBag.Leaderboard)
+            @Html.Action("Leaderboard", "Home", new { type = Qotd.PresentationObjects.ScoreEntryType.Overall })
         </div>
         <div class="tab-pane" id="answer-votes"></div>
         <div class="tab-pane" id="question-votes"></div>

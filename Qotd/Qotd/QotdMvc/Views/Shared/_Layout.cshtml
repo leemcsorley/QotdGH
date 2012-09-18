@@ -44,6 +44,8 @@
 //                el.removeClass('.ajax-popover');
 //            });
 //        });
+        $('.has-popover').popover();
+        $('.has-delayed-popover').popover({delay: { show: 700, hide: 0 } });
 
         var elems = $('.social-content-background');
         elems.css("position", "absolute");
@@ -243,7 +245,7 @@
         $('#notification-dropdown').bind("click",
             function()
             {
-                $("#notification-menu").load("@Url.Action("Notifications", "Home")", function() 
+                $("#notification-menu").load("@Url.Action("Notifications", "Home")" + "?pageUrl=" + gblPageUrl + "&pageName=" + gblPageFriendlyName, function() 
                 {
                     jQuery("time.timeago").timeago();
                     $("#notification-number").hide();
@@ -357,6 +359,10 @@
 <div class="modal hide fade" id="report-modal">
     @Html.Action("ReportForm", "Home")
 </div>
+<!-- New Tag Modal -->
+<div class="modal hide fade" id="new-tag-modal">
+    @Html.Action("NewTagForm", "Home")
+</div>
 <!-- Side Bar -->
 <div id="side-bar" style="position: fixed; width: 18%; right: 0px; top: 0px; background-color: white; border: 1px solid white; padding-top: 40px; height: 100%">
     @Html.Action("Activities", "Home")
@@ -391,12 +397,26 @@
             <ul class="nav"><li class="divider-vertical"></li></ul>
             }
             <!-- Search -->
+            @if (ViewBag.IsAuthenticated && ViewBag.User != null)
+            {
             <ul class="nav">
             <form class="navbar-search pull-left" method="get" action="" id="search-form" autocomplete="off">
                 <input type="text" class="search-query" placeholder="Search" id="search-box" name="query" autocomplete="off">
             </form>
             <ul id="search-results" class="dropdown-menu" style="width: 300px"></ul>
             </ul>
+            }
+            
+            <!-- NAV -->
+            <div class="pull-right">
+                <ul class="nav">
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">About</a></li>
+                    <li class="divider-vertical"></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li class="divider-vertical"></li>
+                </ul>
+            </div>
             <!-- --------------------- -->
             <div class="btn-group pull-right">
                 <!-- if signed in -->
@@ -407,7 +427,7 @@
                       <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                      <li><a href="#">Account</a></li>
+                      <li><a href="@Url.Action("User", "Home", new { userId = ViewBag.User.Id })">Profile</a></li>
                       <li class="divider"></li>
                       <li><a href="@Url.Action("Signout", "Account")">Sign out</a></li>
                     </ul>
@@ -429,7 +449,9 @@
                       <li><a href="#">Register</a></li>
                     </ul>
                 }
+                
             </div>
+            
 </div>
         </div>
     </div>
@@ -440,7 +462,7 @@
         <h1>@QotdMvc.DisplayHelper.QuestionMainText(ViewBag.Question.MainText)</h1>
         <p></p>
         <p>@ViewBag.Question.SubText</p>
-        <a href=""><span class="label label-info">More Info</span></a>
+        <a href="" class="has-popover" data-content="@ViewBag.Question.Details" data-title="More Info..."><span class="label label-info">More Info</span></a>
          @if (ViewBag.IsAuthenticated && ViewBag.User != null)
          {
              if (ViewBag.Question.QuestionType == Qotd.Entities.QuestionType.Debate)
@@ -448,8 +470,12 @@
                 <a href="" class="btn btn-danger" style="width: 75px"><i class="icon-thumbs-down icon-white" style="font-size: 18px; padding-right: 10px; position: relative; top:0px"></i>Disagree</a>
                 <a href="" class="btn btn-success" style="width: 75px"><i class="icon-thumbs-up icon-white" style="font-size: 18px; padding-right: 10px; position: relative; top:3px"></i>&nbsp;Agree</a>
              }
-             <a id="new-question-btn" href="#" class="btn btn-warning pull-right" style="width:170px"><i class="icon-question-sign icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Pose a Question&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i></a> 
-             <a id="new-answer-btn" href="#" class="@QotdMvc.DisplayHelper.AnswerButtonClass(ViewBag.Question.QuestionType, ViewBag.HasPickedSide)" style="margin-right: 8px; width: 170px"><i class="icon-edit icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Submit an Answer&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i></a>
+             <a id="new-question-btn" href="#" class="btn btn-warning pull-right has-delayed-popover" style="width:170px" data-content="Click here to pose a question. Users will vote on your question, and the winning one will be selected to be asked on the site tomorrow" data-title="Pose a Question...">
+                <i class="icon-question-sign icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Pose a Question&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i>
+             </a> 
+             <a id="new-answer-btn" href="#" class="has-delayed-popover @QotdMvc.DisplayHelper.AnswerButtonClass(ViewBag.Question.QuestionType, ViewBag.HasPickedSide)" style="margin-right: 8px; width: 170px" data-content="Click here to submit an answer to today's question. Users will vote on your answer and first, second and third places will receive extra points and special recognition." data-title="Submit an Answer...">
+                <i class="icon-edit icon-white"  style="font-size: 18px; padding-right: 10px; position: relative; top: 2px"></i>&nbsp;Submit an Answer&nbsp;<i class="icon-chevron-right icon-white" style="font-size: 18px; padding-left: 10px; position: relative; top: 2px"></i>
+             </a>
          }
     </div>
 }
@@ -474,6 +500,7 @@
                     <label class="control-label">Sub Text:</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" placeholder="Sub Text..." name="sub" style="width: 440px"/>
+                        <a href="#new-tag-modal" role="button" data-toggle="modal" style="font-size: 11px"><i class="icon-plus"></i>&nbsp;Create New Tag</a>
                     </div>
                     <br />
                     <label class="control-label">More Information:</label>
@@ -501,6 +528,18 @@
           </li>
           <li class="active">Submit an Answer</li>
         </ul>
+        <div class="accordion info" id="answer-accordion">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#answer-accordion" href="#collapseAns1"><i class="icon-info-sign"></i>&nbsp;Information</a>
+                </div>
+                <div id="collapseAns1" class="accordion-body collapse info-content">
+                    <div class="accordion-inner">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
         <form class="well form-horizontal" action="/" id="answerForm">
             <fieldset>
                 <div class="control-group">
@@ -512,6 +551,7 @@
                     <label class="control-label">Tags:</label>
                     <div class="controls">
                         <input type="text" class="tag-input" placeholder="Answer tags..." name="tags" id="answer-tags"/>
+                        <a href="#new-tag-modal" role="button" data-toggle="modal" style="font-size: 11px"><i class="icon-plus"></i>&nbsp;Create New Tag</a>
                     </div>
                 </div>
                 <textarea id="answerContent" rows="12" cols="100" style="height: 210px" name="content"></textarea>

@@ -1,0 +1,8 @@
+﻿@model Qotd.PresentationObjects.LeaderboardRowPO
+<tr class="@(Model.IsCurrentUser ? "leaderboard-current" : "")">
+    <td class="number" style="width: 45px">@Model.Rank</td>
+    <td style="width: 80px; text-align: right"><img src="@Model.User.ProfileImageUrl" class="profile" /></td>
+    <td><a href="@Url.Action("User", "Home", new { userId = Model.User.Id })">@Model.User.DisplayName</a></td>
+    <td class="number" style="width: 45px">@Model.Score</td>
+    <td style="width: 170px">@Html.Partial("Stars", new QotdMvc.Models.Stars() { IncludeHalf = true, NumStars = 5, Rating = Model.Stars, Invert = Model.IsCurrentUser })</td>
+</tr>

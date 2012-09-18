@@ -74,9 +74,9 @@ namespace Qotd.Data
 
         LeaderboardPO GetLeaderboardThisPeriod(Guid userId, int skip, int take, out int count);
 
-        LeaderboardPO GetLeaderboard(Guid userId, int skip, int take, out int count);
+        LeaderboardPO GetLeaderboard(Guid userId, ScoreEntryType type, int skip, int take, out int count);
 
-        LeaderboardPO GetLeaderboard(int skip, int take, out int count);
+        LeaderboardPO GetLeaderboard(ScoreEntryType type, int skip, int take, out int count);
 
         LeaderboardPO GetLeaderboardThisPeriod(int skip, int take, out int count);
 
@@ -100,7 +100,7 @@ namespace Qotd.Data
 
         Tag[] GetTags();
 
-        Tag[] GetTags(string startsWith);
+        Tag[] GetTags(string startsWith, Guid userId);
 
         ScoreEntryPO[] GetScoreEntries(ScoreEntryType type, Guid userId, long? number, int take, out int count);
     }

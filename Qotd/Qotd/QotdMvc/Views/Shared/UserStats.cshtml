@@ -1,84 +1,52 @@
 ﻿@model Qotd.PresentationObjects.UserPO
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th></th>
-            <th style="width: 10%">Last 4 Weeks</th>
-            <th style="width: 10%">Overall</th>
-            <th style="width: 10%">Site Highest</th>
-            <th style="width: 10%">Favourites Highest</th>
+            <th style="width: 30%">Last 4 Weeks</th>
+            <th style="width: 30%">Since Joining</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Ranking:</td>
-            <td class="number">@ViewBag.TargetUser.User.OverallRankThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.OverallRank</td>
-            <td class="number">-</td>
-            <td class="number">-</td>
-        </tr>
-        <tr>
-            <td>Total Number of Answer Votes:</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-        </tr>
-        <tr>
-            <td>Total Number of Question Votes:</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalQuestionVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalQuestionVotes</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
-        </tr>
-        <tr>
             <td>Number of Answers Won:</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersWonThisPeriod</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersWon</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
         </tr>
         <tr>
-            <td>Number of Answers Second Place:</td>
+            <td>Number of Answers Second:</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersSecondThisPeriod</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersSecond</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
         </tr>
         <tr>
-            <td>Number of Answers Third Place:</td>
+            <td>Number of Answers Third:</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersThirdThisPeriod</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersThird</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
         </tr>
         <tr>
             <td>Number of Questions Won:</td>
             <td class="number">@ViewBag.TargetUser.User.NumQuestionsWonThisPeriod</td>
             <td class="number">@ViewBag.TargetUser.User.NumQuestionsWon</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
         </tr>
         <tr>
             <td>Number of Answers Submitted:</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswersThisPeriod</td>
             <td class="number">@ViewBag.TargetUser.User.NumAnswers</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
         </tr>
         <tr>
             <td>Number of Questions Submitted:</td>
             <td class="number">@ViewBag.TargetUser.User.NumQuestionsThisPeriod</td>
             <td class="number">@ViewBag.TargetUser.User.NumQuestions</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
         </tr>
         <tr>
-            <td>Score:</td>
-            <td class="number">@ViewBag.TargetUser.User.ScoreThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.Score</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotesThisPeriod</td>
-            <td class="number">@ViewBag.TargetUser.User.TotalAnswerVotes</td>
+            <td>Number of Users Favourited:</td>
+            <td class="number">@ViewBag.TargetUser.User.NumFollowsThisPeriod</td>
+            <td class="number">@ViewBag.TargetUser.User.NumFollows</td>
+        </tr>
+        <tr>
+            <td>Number of Users that have Favourited:</td>
+            <td class="number">@ViewBag.TargetUser.User.NumFollowingThisPeriod</td>
+            <td class="number">@ViewBag.TargetUser.User.NumFollowing</td>
         </tr>
     </tbody>
 </table>

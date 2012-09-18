@@ -7,6 +7,7 @@ using Qotd.Data;
 using Qotd.Entities;
 using QotdMvc.Service;
 using Qotd.PresentationObjects;
+using System.Transactions;
 
 namespace QotdMvc.Controllers
 {
@@ -21,9 +22,21 @@ namespace QotdMvc.Controllers
         {
             { "Home-Index", d => "Home" },
             { "Home-User", d => d.TargetUser.User.DisplayName },
-            { "Home-Question", d => "View Question"  },
-            { "Home-Answer", d => "View Answer" }
+            { "Home-Tag", d => d.Tag.Tag.Value },
+            { "Home-Question", d => "View Question" },
+            { "Home-Answer", d => "View Answer" },
+            { "Home-AllNotifications", d => "Notifications" }
         };
+
+        protected TransactionScope CreateTransactionScope()
+        {
+            return new TransactionScope(TransactionScopeOption.RequiresNew,
+                new TransactionOptions()
+                {
+                    IsolationLevel = IsolationLevel.ReadUncommitted,
+                    Timeout = new TimeSpan(0, 15, 0)
+                });
+        }
 
         protected IDataProvider DataProvider
         {
@@ -89,16 +102,21 @@ namespace QotdMvc.Controllers
         {
             base.OnActionExecuted(filterContext);
 
-            ViewBag.IsAuthenticated = User != null && User.Identity.IsAuthenticated;
-            ViewBag.User = UserEntity;
-            ViewBag.Question = TodaysQuestion;
-            ViewBag.UserPO = UserPO;
-            string controllerName = (string)this.RouteData.Values["Controller"];
-            string actionName = (string)this.RouteData.Values["Action"];
-            ViewBag.PageController = controllerName;
-            ViewBag.PageAction = actionName;
-            ViewBag.PageFriendlyName = GetPageFriendlyName();
-            ViewBag.PageUrl = GetPageUrl();
+            using (TransactionScope scope = CreateTransactionScope())
+            {
+                ViewBag.IsAuthenticated = User != null && User.Identity.IsAuthenticated;
+                ViewBag.User = UserEntity;
+                ViewBag.Question = TodaysQuestion;
+                ViewBag.UserPO = UserPO;
+                string controllerName = (string)this.RouteData.Values["Controller"];
+                string actionName = (string)this.RouteData.Values["Action"];
+                ViewBag.PageController = controllerName;
+                ViewBag.PageAction = actionName;
+                string fn = GetPageFriendlyName();
+                ViewBag.PageFriendlyName = GetPageFriendlyName();
+                ViewBag.PageUrl = GetPageUrl();
+                scope.Complete();
+            }
         }
 
         protected string GetPageUrl()

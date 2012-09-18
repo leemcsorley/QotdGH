@@ -1,6 +1,9 @@
 ﻿@model QotdMvc.Models.Stars
 <div class="fl cr cl stars-holder @(Model.Invert ? "invert" : "")">
-    <div class="stars-header">@Model.Heading</div>
+    @if (!String.IsNullOrEmpty(Model.Heading))
+    {
+        <div class="stars-header">@Model.Heading</div>
+    }
     <div class="stars-container">
     @for (int i = 1; i <= Model.NumStars; i++)
     {

@@ -98,7 +98,7 @@
     <!-- Comment input footer -->
         <div class="social-content-main-lrg comment-input @(Model.Comments != null && Model.Comments.Length > 0 ? "" : "hidden")">
             <div class="social-content-left-sml">
-                <img src="@Model.User.User.ProfileImageUrl" class="profile-sml"/>
+                <img src="@ViewBag.User.ProfileImageUrl" class="profile-sml"/>
             </div>
             <div class="social-content-main-sml">
                 <form class="ajax-form comment-form" action="@Url.Action("CommentSubmit", "Home", new { answerId = Model.Answer.Id })" method="get">

@@ -1,4 +1,6 @@
-﻿<div class="well">
+﻿@if (ViewBag.ShowSummary)
+{
+<div class="well">
     <table class="rating-summary">
         <tr>
             <td>Total Points:</td>
@@ -12,6 +14,7 @@
         </tr>
     </table>
 </div>
+}
 @foreach (Qotd.PresentationObjects.ScoreEntryPO entry in ViewBag.ScoreEntries)
 {
     @Html.Partial("ScoreEntry", entry)

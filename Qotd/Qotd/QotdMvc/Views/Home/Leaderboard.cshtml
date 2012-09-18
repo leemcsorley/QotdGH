@@ -1,3 +1,35 @@
 ﻿@model Qotd.PresentationObjects.LeaderboardPO
-
+<table class="table leaderboard" style="margin-bottom: 0px">
+    @if (Model.DisplayHeaders)
+    {
+    <thead>
+        <tr>
+            <th style="width: 45px">Rank</th>
+            <th colspan="2">User</th>
+            <th style="width: 45px">Score</th>
+            <th style="width: 170px"></th>
+        </tr>
+    </thead>
+    }
+@foreach (var row in Model.Top)
+{
+    @Html.Partial("LeaderboardRow", row)
+}
+</table>
+<div class="ajax-container">
+    @if (Model.AroundUser != null)
+    {
+    <div style="overflow:hidden; margin-top: 13px; margin-bottom: 13px; border-top: 1px dashed black">&nbsp;</div>
+    <table class="table leaderboard">
+        @foreach (var row in Model.AroundUser)
+    {
+        @Html.Partial("LeaderboardRow", row)
+    }
+    </table>
+    }
+    <div class="fill">
+        <a href="@Url.Action("Leaderboard", "Home", new { skip = Model.Skip, take = Model.Take, type = Model.Type, displayHeaders = false })" class="ajax-link"><button class="btn btn-small btn-primary" type="submit">
+            <i class="icon-chevron-down"></i>&nbsp;&nbsp;See More</button></a>
+    </div>
+</div>
 

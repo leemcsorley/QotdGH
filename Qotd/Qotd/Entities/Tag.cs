@@ -32,6 +32,10 @@ namespace Qotd.Entities
 
         public virtual string Value { get; set; }
 
+        public virtual Guid? UserId { get; set; }
+
+        public virtual User User { get; set; }
+
         public virtual int NumFollowing { get; set; }
 
         public virtual int NumFollowingThisPeriod { get; set; }

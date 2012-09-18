@@ -14,6 +14,10 @@ namespace Qotd.PresentationObjects
 
         public int Score { get; set; }
 
+        public int Stars { get; set; }
+
+        public bool IsCurrentUser { get; set; }
+
         public int Ac { get; set; }
 
         public int Qv { get; set; }

@@ -1,7 +1,7 @@
 ﻿@foreach (var notification in ViewBag.Notifications)
 {
-    <text><li>@Html.Partial("Notification", (Qotd.Entities.Notification)notification)</li></text>
+    <text><li class="notification @(((Qotd.Entities.Notification)notification).IsRead ? "" : "notification-unread")">@Html.Partial("Notification", (Qotd.Entities.Notification)notification)</li></text>
 }
 <li>
-    <a href="@Url.Action("AllNotifications", "Home")">See All</a>
+    <a href="@Url.Action("AllNotifications", "Home", new { pageUrl = ViewBag.PastPageUrl, pageName = ViewBag.PastPageFriendlyName })">See All</a>
 </li>

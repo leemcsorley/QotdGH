@@ -14,7 +14,7 @@ namespace QotdRealTimeTester
             QotdContext.UseLucene = false;
             Thread worker = new Thread(new ThreadStart(() => Qotd.WorkerImpl.WorkerUtils.ProcessAll()));
             worker.Start();
-            int numTesters = 10;
+            int numTesters = 20;
             Tester[] testers = new Tester[numTesters];
             for (int i = 0; i < numTesters; i++)
             {

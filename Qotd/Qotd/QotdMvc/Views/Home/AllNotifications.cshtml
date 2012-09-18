@@ -2,6 +2,12 @@
     ViewBag.Title = "All Notifications";
     Layout = ViewBag.Layout;
 }
+<ul class="breadcrumb">
+    <li>
+    <a href="@ViewBag.PastPageUrl">@ViewBag.PastPageName</a> <span class="divider">/</span>
+    </li>
+    <li class="active">@ViewBag.PageFriendlyName</li>
+</ul>
 @foreach (var notification in ViewBag.Notifications)
 {
     <text><div>@Html.Partial("Notification", (Qotd.Entities.Notification)notification)</div></text>

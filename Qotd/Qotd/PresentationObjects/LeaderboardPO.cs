@@ -10,5 +10,13 @@ namespace Qotd.PresentationObjects
         public LeaderboardRowPO[] Top { get; set; }
 
         public LeaderboardRowPO[] AroundUser { get; set; }
+
+        public int Skip { get; set; }
+
+        public int Take { get; set; }
+
+        public ScoreEntryType Type { get; set; }
+
+        public bool DisplayHeaders { get; set; }
     }
 }
